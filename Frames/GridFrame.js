@@ -4,6 +4,7 @@ export class GridFrame extends Frame{
     constructor(x, y, width, height, {
       backgroundColor = color(255),
       borderColor = color(0),
+      highlightedBorderColor = color(0),
       borderWidth = 1,
       cornerRadius = 0,
       padx=0,
@@ -11,16 +12,22 @@ export class GridFrame extends Frame{
       rows=1,
       cols=1,
       nearestBorderThreshold=5,
-      bannerHeight=0.07, // 7% of total height
+      bannerHeight=50,
       parent=null,
       enableReposition=false,
-      enableResizing=false
+      enableResizing=false,
+      enableShadow=false,
+      shadowColor= 'rgb(0,0,0)',
+      shadowIntensity= 0.4,
+      shadowSpread= 3,
+      shadowDetail=5,
     }
     ){
-      super(x, y, width, height, backgroundColor, borderColor, borderWidth,
+      bannerHeight = bannerHeight%height;
+      super(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableResizing);
-  
+        enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
+
       //for storing child elements
       this.rows=rows;
       this.cols=cols;
@@ -29,7 +36,6 @@ export class GridFrame extends Frame{
       this.grid=null;
       this.totalRowWeight = 0;
       this.totalColWeight = 0;
-  
     }
   
     add(element, row, col, {
@@ -117,7 +123,7 @@ export class GridFrame extends Frame{
   
             curr[0].width -= curr[3] + curr[4];
   
-            if(curr[0].parentType=="Frame"){
+            if(curr[0].type=="Frame"){
               curr[0].adjustWidth(curr[0].x + curr[0].padx, curr[0].width - 2*curr[0].padx);
             } else {
               curr[0].updateWidth();
@@ -146,7 +152,9 @@ export class GridFrame extends Frame{
   
             curr[0].height -= curr[5] + curr[6];
   
-            if(curr[0].parentType=="Frame"){
+            console.log("curr[0].type:"+curr[0].type);
+
+            if(curr[0].type=="Frame"){
               curr[0].adjustHeight(curr[0].y + curr[0].pady, curr[0].height - 2*curr[0].pady);
             } else {
               curr[0].updateHeight();
@@ -265,7 +273,7 @@ export class GridFrame extends Frame{
     }
     
     showBanner(){
-      this.adjustHeight(this.y + (this.bannerHeight*this.height) + this.pady, this.height - (this.bannerHeight*this.height) - 2*(this.pady));
+      this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
       this.bannerFlag=true;
     }
     
@@ -280,7 +288,7 @@ export class GridFrame extends Frame{
           if(this.grid[i][j]!=null && this.grid[i][j]!="taken"){
             this.grid[i][j][0].x -= xDiff;
             this.grid[i][j][0].y -= yDiff;
-            if(this.grid[i][j][0].parentType=="Frame"){
+            if(this.grid[i][j][0].type=="Frame"){
               this.grid[i][j][0].updatePosUtil(xDiff, yDiff);
             }
           }
@@ -292,7 +300,7 @@ export class GridFrame extends Frame{
       let cursorOverFrame = this.isCursorHoveringOver();
   
       if(cursorOverFrame){
-        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight*this.height)){
+        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){
           if(this.enableReposition && this.bannerFlag==false){
             this.showBanner();
           }
@@ -333,6 +341,12 @@ export class GridFrame extends Frame{
     }
   
     show(){
+
+      //shadow
+      if(this.enableShadow){
+        this.drawShadow();
+      }
+
       //applying background color
       if(this.backgroundColor!=null){
         push();
@@ -361,25 +375,20 @@ export class GridFrame extends Frame{
       if(this.enableReposition && this.bannerFlag==true){
         noStroke();
         fill(0);
-        rect(this.x, this.y, this.width, this.bannerHeight*this.height);
+        rect(this.x, this.y, this.width, this.bannerHeight);
   
         fill(255);        
         ellipse(this.x+this.width/2,
-           this.y+(this.bannerHeight*this.height)/2,
-           (this.bannerHeight*this.height)/4,
-           (this.bannerHeight*this.height)/4);
-        ellipse(this.x+this.width/2 - (this.bannerHeight*this.height)/2,
-         this.y+(this.bannerHeight*this.height)/2, (this.bannerHeight*this.height)/4,
-        (this.bannerHeight*this.height)/4);
-        ellipse(this.x+this.width/2 + (this.bannerHeight*this.height)/2,
-        this.y+(this.bannerHeight*this.height)/2,
-        (this.bannerHeight*this.height)/4,
-        (this.bannerHeight*this.height)/4);
-      }
-  
-      //highlighting the relevant border if cursor is sufficiently near to it
-      if(this.enableResizing && this.nearestBorder!=null){
-        this.showHighlightedBorder();
+           this.y+(this.bannerHeight)/2,
+           (this.bannerHeight)/4,
+           (this.bannerHeight)/4);
+        ellipse(this.x+this.width/2 - (this.bannerHeight)/2,
+         this.y+(this.bannerHeight)/2, (this.bannerHeight)/4,
+        (this.bannerHeight)/4);
+        ellipse(this.x+this.width/2 + (this.bannerHeight)/2,
+        this.y+(this.bannerHeight)/2,
+        (this.bannerHeight)/4,
+        (this.bannerHeight)/4);
       }
   
       pop();
@@ -393,6 +402,10 @@ export class GridFrame extends Frame{
         rect(this.x, this.y, this.width, this.height, this.cornerRadius);
         pop();
       }
+
+      //highlighting the relevant border if cursor is sufficiently near to it
+      if(this.enableResizing && this.nearestBorder!=null){
+        this.showHighlightedBorder();
+      }
     }
-  
   }

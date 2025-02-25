@@ -16,8 +16,26 @@ export class Root{
     //needs safeguards against illegal access
     add(element, {onClickSendToFront=true}={}){
       this.layers.push(element);
-      element.parent=this;
       this.preferences.push({onClickSendToFront: onClickSendToFront});
+
+      //parent and type are unrelated.
+      //parent stores the refernece of the parent that contains the child
+      //type specifies the 
+      if(element.constructor.name==="GridFrame"){
+        for (let i = 0; i < element.rows; i++) {
+          for (let j = 0; j < element.cols; j++) {
+            if(element.grid[i][j]!=null && element.grid[i][j][0].type==="Frame"){
+              this.add(element.grid[i][j][0], {onClickSendToFront: true});
+            }
+          }
+        }
+      } else if(element.constructor.name==="ScrollFrame"){
+        for(let elem of element.elements){
+          if(elem!=null && elem[0].type==="Frame"){
+            this.add(elem[0], {onClickSendToFront: true});
+          }
+        }
+      }
     }
   
     //needs safeguards against illegal access
@@ -120,7 +138,7 @@ export class Root{
   
           this.activeElement=i;
           this.makeChange=true;
-          //console.log("active element: ",this.activeElement, "last active element: ",this.lastActiveElement);
+          console.log("active element: ",this.activeElement, "last active element: ",this.lastActiveElement);
           break;
         }
       }
@@ -131,18 +149,19 @@ export class Root{
         return;
       }
   
-      if(this.layers[this.lastActiveElement].parentType=="Frame"){
+      if(this.layers[this.lastActiveElement].type=="Frame"){
         this.layers[this.lastActiveElement].clearHoverCache();
+        console.log("handled last active element: "+this.lastActiveElement);
       }
       this.lastActiveElement=-2;
     }
   
-    mouseReleaseEventListener(){
+    mouseReleasedEventListener(){
       if(this.activeElement<0){
         return;
       }
   
-      this.layers[this.activeElement].mouseReleaseEventListener();
+      this.layers[this.activeElement].mouseReleasedEventListener();
       this.activeElement=-1;
     }
   }

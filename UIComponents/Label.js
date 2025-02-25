@@ -2,7 +2,7 @@ import {UIComponent} from './UIComponent.js';
 
 export class Label extends UIComponent{
     constructor(x, y, width, height, label, {parent = null, borderFlag = false, borderColor = color(0), borderWidth = 1, cornerRadius = 0} = {}) {
-      super(x, y, width, height, {parent: parent, parentType: "UIComponent"});
+      super(x, y, width, height, {parent: parent, type: "UIComponent"});
 
       this.x = x;
       this.y = y;

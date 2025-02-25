@@ -1,21 +1,23 @@
 import { FrameComponent } from './FrameComponent.js';
 
-//frame should allow, closing off -> remove it and all of its childern frm the root array
+//frame should allow, closing off -> remove it and all of its childern from the root array
 //frames should also allow docking -> adding frames in frames
 
 export class Frame extends FrameComponent{
-    constructor(x, y, width, height, backgroundColor, borderColor, borderWidth,
-      cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, parentType, 
-      enableReposition, enableResizing){
-      super(x, y, width, height, {parent: parent, parentType: parentType});
+    constructor(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
+      cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, type, 
+      enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
+      super(x, y, width, height, {parent: parent, type: type});
   
       this.backgroundColor = backgroundColor;
       this.borderColor = borderColor;
+      this.highlightedBorderColor = highlightedBorderColor;
       this.borderWidth = borderWidth;
       this.cornerRadius = cornerRadius;
       this.padx = padx;
       this.pady = pady;
   
+      this.enableShadow = enableShadow;
       this.enableReposition = enableReposition;
       this.enableResizing = enableResizing;
   
@@ -32,6 +34,13 @@ export class Frame extends FrameComponent{
         this.nearestBorder = null;
         this.nearestBorderThreshold = nearestBorderThreshold;
       }
+
+      if(this.enableShadow){
+        this.shadowColor = shadowColor;//rgb value
+        this.shadowIntensity = shadowIntensity;//opacity value between 0 and 1
+        this.shadowSpread = shadowSpread;//stroke width of each of those rectangles
+        this.shadowDetail = shadowDetail;//number of rectangles that will be drawn around the component
+      }
     }
 
     drawEventListener(){};
@@ -41,7 +50,7 @@ export class Frame extends FrameComponent{
       return mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
     }
   
-    mouseReleaseEventListener(){
+    mouseReleasedEventListener(){
       if(this.enableReposition && this.xDist!=null && this.yDist!=null){
         this.xDist=null;
         this.yDist=null;
@@ -72,8 +81,8 @@ export class Frame extends FrameComponent{
   
     showHighlightedBorder(){
       push();
-      stroke(this.borderColor);
-      strokeWeight(6);
+      stroke(this.highlightedBorderColor);
+      strokeWeight(this.borderWidth+5);
       if(this.nearestBorder=="left"){
         line(this.x, this.y+this.cornerRadius, this.x, this.y+this.height-this.cornerRadius);
       } else if(this.nearestBorder=="right"){
@@ -201,7 +210,9 @@ export class Frame extends FrameComponent{
   
     clearHoverCache(){
       if(this.enableReposition){
-        this.hideBanner();
+        if(this.constructor.name=="GridFrame"){
+          this.hideBanner();
+        }
         this.xDist=null;
         this.yDist=null;
         this.prevX=null;
@@ -212,4 +223,35 @@ export class Frame extends FrameComponent{
         this.nearestBorder=null;
       }
     }
+
+    rgbToArray(shadowColor) {
+      let match = shadowColor.match(/\d+/g);
+      return match ? match.map(Number) : null;
+    }
+
+    drawShadow({}={}){
+      let color = this.rgbToArray(this.shadowColor);
+      if(color==null){
+        console.log("shadow color value is not in the correct format: rgb(0,0,0)");
+        return;
+      }
+
+      if(this.shadowIntensity>1){
+        this.shadowIntensity=1;
+        console.log("shadow intensity should be between 0 and 1 inclusive.\nAny value given outside of the range will be clipped to the ends.");
+      } else if(this.shadowIntensity<0){
+        console.log("shadow intensity should be between 0 and 1 inclusive.\nAny value given outside of the range will be clipped to the ends.");
+        this.shadowIntensity=0;
+      }
+
+      for(let i=1; i<=this.shadowDetail; i++){
+        push();
+        noFill();
+        let alpha = this.shadowIntensity * pow(1 - i / this.shadowDetail, 2);
+        stroke(`rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`);
+        strokeWeight(this.shadowSpread);
+        rect(this.x-((i*this.shadowSpread)/2), this.y-((i*this.shadowSpread)/2), this.width+(i*this.shadowSpread), this.height+(i*this.shadowSpread), this.cornerRadius);
+        pop();
+      }
+    }    
   }

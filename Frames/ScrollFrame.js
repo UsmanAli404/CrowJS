@@ -4,6 +4,7 @@ export class ScrollFrame extends Frame{
     constructor(x, y, width, height, {
       backgroundColor = color(255),
       borderColor = color(0),
+      highlightedBorderColor = color(0),
       borderWidth = 1,
       cornerRadius = 0,
       padx=0,
@@ -11,16 +12,22 @@ export class ScrollFrame extends Frame{
       yScroll=false,
       xScroll=false,
       scrollSensitivity=20,
-      bannerHeight=0.07,// 7% of total height
+      bannerHeight=50,
       alignment="v", //v for vertical, h for horizontal
       nearestBorderThreshold=5,
       parent=null,
       enableReposition=false,
       enableResizing=false,
+      enableShadow=false,
+      shadowColor= 'rgb(0,0,0)',
+      shadowIntensity= 0.4,
+      shadowSpread= 3,
+      shadowDetail=5,
     } = {}) {
-      super(x, y, width, height, backgroundColor, borderColor, borderWidth,
+      bannerHeight = bannerHeight%height;
+      super(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableResizing);
+        enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
       
       this.elements = [];
       //used for calculating weighted dimensions of child elements
@@ -60,6 +67,12 @@ export class ScrollFrame extends Frame{
     }
   
     show() {
+
+      //shadow
+      if(this.enableShadow){
+        this.drawShadow();
+      }
+
       //coloring the background
       if(this.backgroundColor!=null){
         push();
@@ -84,17 +97,12 @@ export class ScrollFrame extends Frame{
       if(this.enableReposition && this.bannerFlag){
         noStroke();
         fill(0);
-        rect(this.x, this.y, this.width, this.bannerHeight*this.height);
+        rect(this.x, this.y, this.width, this.bannerHeight);
   
         fill(255);        
-        ellipse(this.x+this.width/2, this.y+(this.bannerHeight*this.height)/2, (this.bannerHeight*this.height)/4, (this.bannerHeight*this.height)/4);
-        ellipse(this.x+this.width/2 - (this.bannerHeight*this.height)/2, this.y+(this.bannerHeight*this.height)/2, (this.bannerHeight*this.height)/4, (this.bannerHeight*this.height)/4);
-        ellipse(this.x+this.width/2 + (this.bannerHeight*this.height)/2, this.y+(this.bannerHeight*this.height)/2, (this.bannerHeight*this.height)/4, (this.bannerHeight*this.height)/4);
-      }
-  
-      //highlight the relevant border if cursor is sufficiently near to it
-      if(this.enableResizing && this.nearestBorder!=null){
-        this.showHighlightedBorder();
+        ellipse(this.x+this.width/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
+        ellipse(this.x+this.width/2 - (this.bannerHeight)/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
+        ellipse(this.x+this.width/2 + (this.bannerHeight)/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
       }
       
       pop();
@@ -107,6 +115,11 @@ export class ScrollFrame extends Frame{
         noFill();
         rect(this.x, this.y, this.width, this.height, this.cornerRadius);
         pop();
+      }
+
+      //highlight the relevant border if cursor is sufficiently near to it
+      if(this.enableResizing && this.nearestBorder!=null){
+        this.showHighlightedBorder();
       }
     }
   
@@ -158,7 +171,7 @@ export class ScrollFrame extends Frame{
       let cursorOverFrame = this.isCursorHoveringOver();
   
       if(cursorOverFrame){
-        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight*this.height)){
+        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){
           if(this.enableReposition && this.bannerFlag==false){
             this.showBanner();
           }
@@ -376,16 +389,16 @@ export class ScrollFrame extends Frame{
     
     showBanner(){
       if(this.yScroll==true){
-        this.BannerUtil(1, this.bannerHeight*this.height);
+        this.BannerUtil(1, this.bannerHeight);
       } else {
-        this.adjustHeight(this.y + (this.bannerHeight*this.height) + this.pady, this.height - (this.bannerHeight*this.height) - 2*(this.pady));
+        this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
       }
       this.bannerFlag=true;
     }
     
     hideBanner(){
       if(this.yScroll==true){
-        this.BannerUtil(-1, this.bannerHeight*this.height);
+        this.BannerUtil(-1, this.bannerHeight);
       } else {
         this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
       }
@@ -398,7 +411,7 @@ export class ScrollFrame extends Frame{
         curr[0].y += dir*heightAdjustment;
   
         if(curr[0].constructor.name=="ScrollFrame"){
-           curr[0].BannerUtil(dir, heightAdjustment);
+          curr[0].BannerUtil(dir, heightAdjustment);
         }
       }
     }
@@ -428,7 +441,7 @@ export class ScrollFrame extends Frame{
           }
         }
   
-        if(curr[0].parentType=="Frame"){
+        if(curr[0].type=="Frame"){
          curr[0].adjustHeight(curr[0].y + curr[0].pady, curr[0].height - 2*(curr[0].pady));
         } else {
           if(this.yScroll==false){
@@ -462,7 +475,7 @@ export class ScrollFrame extends Frame{
           }
         }
   
-        if(curr[0].parentType=="Frame"){
+        if(curr[0].type=="Frame"){
           curr[0].adjustWidth(curr[0].x + curr[0].padx, curr[0].width - 2*(curr[0].padx));
         } else {
           if(this.xScroll==false){
@@ -477,7 +490,7 @@ export class ScrollFrame extends Frame{
       for(let i=0; i<this.elements.length; i++){
         this.elements[i][0].x -= xDiff;
         this.elements[i][0].y -= yDiff;
-        if(this.elements[i][0].parentType=="Frame"){
+        if(this.elements[i][0].type=="Frame"){
           this.elements[i][0].updatePosUtil(xDiff, yDiff);
         }
       }
