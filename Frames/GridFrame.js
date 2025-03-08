@@ -57,6 +57,7 @@ export class GridFrame extends Frame{
       }
   
       element.parent=this;
+      this.children.push(element);
       this.grid[row][col] = [element, rowSpan, colSpan, padL, padR, padT, padB];
       this.adjustToGrid(row, col, rowSpan, colSpan);
     }
@@ -297,7 +298,7 @@ export class GridFrame extends Frame{
     }
   
     drawEventListener(){
-      let cursorOverFrame = this.isCursorHoveringOver();
+      let cursorOverFrame = this.isInside();
   
       if(cursorOverFrame){
         if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){

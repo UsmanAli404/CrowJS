@@ -89,8 +89,8 @@ export class ScrollFrame extends Frame{
       endClip();
   
       //displaying child elements
-      for (let elem of this.elements) {
-        elem[0].show();
+      for (let child of this.children) {
+        child.show();
       }
       
       //show the top banner
@@ -144,7 +144,12 @@ export class ScrollFrame extends Frame{
       }
       
       element.parent=this;
-      this.elements.push([element, weight, padL, padR, padT, padB]);
+      this.children.push(element);
+      //     0      , 1     , 2   , 3   , 4   , 5
+      //old: element, weight, padL, padR, padT, padB
+      //     0      , 1     , 2   , 3   , 4
+      //new: weight, padL, padR, padT, padB
+      this.elements.push([weight, padL, padR, padT, padB]);
       this.totalWeight+=weight;
       this.correctPosAndDim();
   
@@ -168,7 +173,7 @@ export class ScrollFrame extends Frame{
     
     //needs cleanup
     drawEventListener(){
-      let cursorOverFrame = this.isCursorHoveringOver();
+      let cursorOverFrame = this.isInside();
   
       if(cursorOverFrame){
         if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){
@@ -221,6 +226,11 @@ export class ScrollFrame extends Frame{
   
       return cursorOverFrame;
     }
+
+    //the following find methods find the relevant subjects by maintaing a
+    //reference variable. This variable is conditionally updated by comparing
+    //it to the most recently added element in the list. Therefore, there is
+    //no need to loop over all the elements every single time any element is added.
   
     //finds the element nearest to the top
     findTopper(){
@@ -230,10 +240,10 @@ export class ScrollFrame extends Frame{
       }
   
       let i = this.elements.length-1;
-      if(this.elements[i][0].y +
-        this.elements[i][4] <
-        this.elements[this.topper][0].y +
-        this.elements[this.topper][4]){
+      if(this.children[i].y +
+        this.elements[i][3] <
+        this.children[this.topper].y +
+        this.elements[this.topper][3]){
         this.topper = i;
       }
     }
@@ -246,12 +256,12 @@ export class ScrollFrame extends Frame{
       }
   
       let i = this.elements.length-1;
-      if(this.elements[i][0].y +
-        this.elements[i][0].height -
-        this.elements[i][5] >
-        this.elements[this.deepest][0].y +
-        this.elements[this.deepest][0].height -
-        this.elements[this.deepest][5]){
+      if(this.children[i].y +
+        this.children[i].height -
+        this.elements[i][4] >
+        this.children[this.deepest].y +
+        this.children[this.deepest].height -
+        this.elements[this.deepest][4]){
         this.deepest = i;
       }
     }
@@ -264,11 +274,11 @@ export class ScrollFrame extends Frame{
       }
   
       let i = this.elements.length-1;
-      if(this.elements[i][0].x +
-        this.elements[i][2] <
-        this.elements[this.leftist][0].x +
-        this.elements[this.leftist][2]){
-        this.leftist = i;
+      if(this.children[i].x +
+        this.elements[i][1] <
+        this.children[this.leftist].x +
+        this.elements[this.leftist][1]){
+        this.leftist = i
       }
     }
   
@@ -280,55 +290,55 @@ export class ScrollFrame extends Frame{
       }
   
       let i = this.elements.length-1;
-      if(this.elements[i][0].x +
-        this.elements[i][0].width -
-        this.elements[i][3] >
-        this.elements[this.rightist][0].x +
-        this.elements[this.rightist][0].width -
-        this.elements[this.rightist][3]){
+      if(this.children[i].x +
+        this.children[i].width -
+        this.elements[i][2] >
+        this.children[this.rightist].x +
+        this.children[this.rightist].width -
+        this.elements[this.rightist][2]){
         this.rightist = i;
       }
     }
     
     scrollDown(){
-      if(!this.yScroll || this.elements.length==0){
+      if(!this.yScroll || this.children.length==0){
         return;
       }
       
       if(this.alignment=="v"){
-        let last_elem = this.elements[this.elements.length-1][0];
-        if(last_elem.y + last_elem.height > this.y + this.height - this.pady - this.elements[this.elements.length-1][5]){
+        let last_elem = this.children[this.children.length-1];
+        if(last_elem.y + last_elem.height > this.y + this.height - this.pady - this.elements[this.elements.length-1][4]){
           this.vScrollUtil(-1);
         }
       } else {
         //need to find the one that extends the longest
-        if(this.elements[this.deepest][0].y + this.elements[this.deepest][0].height > this.y + this.height - this.pady- this.elements[this.deepest][5]){
+        if(this.children[this.deepest].y + this.children[this.deepest].height > this.y + this.height - this.pady- this.elements[this.deepest][4]){
           this.vScrollUtil(-1);
         }
       }
     }
     
     scrollUp(){
-      if(!this.yScroll || this.elements.length==0){
+      if(!this.yScroll || this.children.length==0){
         return;
       }
       
       if(this.alignment=="v"){
-        let first_elem = this.elements[0];
-        if(first_elem[0].y + first_elem[4] <this.y + this.pady){
+        let first_elem = this.children[0];
+        if(first_elem.y + this.elements[0][3] <this.y + this.pady){
           this.vScrollUtil(1);
         }
       } else {
         //need to find the element that is nearest to the top
-        if(this.elements[this.topper][0].y + this.elements[this.topper][4] <this.y + this.pady){
+        if(this.children[this.topper].y + this.elements[this.topper][3] <this.y + this.pady){
           this.vScrollUtil(1);
         }
       }
     }
     
     vScrollUtil(multiple){
-      for(let i=0; i<this.elements.length; i++){
-        let elem = this.elements[i][0];
+      for(let i=0; i<this.children.length; i++){
+        let elem = this.children[i];
         
         if(elem.constructor.name=="ScrollFrame"){
           elem.vScrollUtil(multiple);
@@ -339,45 +349,45 @@ export class ScrollFrame extends Frame{
     }
     
     scrollLeft(){
-      if(!this.xScroll || this.elements.length==0){
+      if(!this.xScroll || this.children.length==0){
         return;
       }
   
       if(this.alignment=="v"){
         //do something about the loop
-        if(this.elements[this.leftist][0].x-this.elements[this.leftist][2]<this.x+this.padx){
+        if(this.children[this.leftist].x-this.elements[this.leftist][1]<this.x+this.padx){
           this.hScrollUtil(1);
         }
         
       } else {
         //first element
-        if(this.elements[0][0].x-this.elements[0][2]<this.x+this.padx){
+        if(this.children[0].x-this.elements[0][1]<this.x+this.padx){
           this.hScrollUtil(1);
         }
       }
     }
     
     scrollRight(){
-      if(!this.xScroll || this.elements.length==0){
+      if(!this.xScroll || this.children.length==0){
         return;
       }
   
       if(this.alignment=="v"){
-        if(this.elements[this.rightist][0].x+this.elements[this.rightist][0].width+this.elements[this.rightist][3]>this.x+this.width-this.padx){
+        if(this.children[this.rightist].x+this.children[this.rightist].width+this.elements[this.rightist][2]>this.x+this.width-this.padx){
           this.hScrollUtil(-1);
         }
   
       } else {
-        let last_elem = this.elements[this.elements.length-1];
-        if(last_elem[0].x+last_elem[0].width+last_elem[3]>this.x+this.width-this.padx){
+        let last_elem = this.children[this.children.length-1];
+        if(last_elem.x+last_elem.width+this.elements[this.elements.length-1][2]>this.x+this.width-this.padx){
           this.hScrollUtil(-1);
         }
       }
     }
     
     hScrollUtil(multiple){
-      for(let i=0; i<this.elements.length; i++){
-        let elem = this.elements[i][0];
+      for(let i=0; i<this.children.length; i++){
+        let elem = this.children[i];
         
         if(elem.constructor.name=="ScrollFrame"){
           elem.hScrollUtil(multiple);
@@ -406,46 +416,46 @@ export class ScrollFrame extends Frame{
     }
   
     BannerUtil(dir, heightAdjustment){
-      for(let i=0; i<this.elements.length; i++){
-        let curr = this.elements[i];
-        curr[0].y += dir*heightAdjustment;
+      for(let i=0; i<this.children.length; i++){
+        let curr = this.children[i];
+        curr.y += dir*heightAdjustment;
   
-        if(curr[0].constructor.name=="ScrollFrame"){
-          curr[0].BannerUtil(dir, heightAdjustment);
+        if(curr.constructor.name=="ScrollFrame"){
+          curr.BannerUtil(dir, heightAdjustment);
         }
       }
     }
     
     adjustHeight(y, h){
       //[element, weight, padL, padR, padT, padB]
-      for(let i=0; i<this.elements.length; i++){
+      for(let i=0; i<this.children.length; i++){
   
-        let curr = this.elements[i];
+        let curr = this.children[i];
   
         if(i-1>=0){
-          let prev = this.elements[i-1];
+          let prev = this.children[i-1];
           if(this.alignment=="v"){
-            curr[0].y = prev[0].y + prev[0].height + prev[5] + curr[4];
+            curr.y = prev.y + prev.height + this.elements[i-1][4] + this.elements[i][3];
           } else {
-            curr[0].y = y + curr[4];
+            curr.y = y + this.elements[i][3];
           }
         } else {
-          curr[0].y = y + curr[4];
+          curr.y = y + this.elements[i][3];
         }
         
         if(this.yScroll==false){
           if(this.alignment=="v"){
-            curr[0].height = (curr[1]/(this.totalWeight))*(h) - curr[4] - curr[5];
+            curr.height = (this.elements[i][0]/(this.totalWeight))*(h) - this.elements[i][3] - this.elements[i][4];
           } else {
-            curr[0].height = h - curr[4] - curr[5];
+            curr.height = h - this.elements[i][3] - this.elements[i][4];
           }
         }
   
-        if(curr[0].type=="Frame"){
-         curr[0].adjustHeight(curr[0].y + curr[0].pady, curr[0].height - 2*(curr[0].pady));
+        if(curr.type=="Frame"){
+         curr.adjustHeight(curr.y + curr.pady, curr.height - 2*(curr.pady));
         } else {
           if(this.yScroll==false){
-            curr[0].updateHeight();
+            curr.updateHeight();
           }
         }
   
@@ -454,32 +464,32 @@ export class ScrollFrame extends Frame{
   
     adjustWidth(x, w){
       //[element, weight, padL, padR, padT, padB]
-      for(let i=0; i<this.elements.length; i++){
-        let curr = this.elements[i];
+      for(let i=0; i<this.children.length; i++){
+        let curr = this.children[i];
         if(i-1>=0){
-          let prev = this.elements[i-1];
+          let prev = this.children[i-1];
           if(this.alignment!="v"){
-            curr[0].x = prev[0].x + prev[0].width + prev[3] + curr[2];
+            curr.x = prev.x + prev.width + this.elements[i-1][2] + this.elements[i][1];
           } else {
-            curr[0].x = x + curr[2];
+            curr.x = x + this.elements[i][1];
           }
         } else {
-          curr[0].x = x + curr[2];
+          curr.x = x + this.elements[i][1];
         }
   
         if(this.xScroll==false){
           if(this.alignment=="v"){
-            curr[0].width = w - curr[2] - curr[3];
+            curr.width = w - this.elements[i][1] - this.elements[i][2];
           } else {
-            curr[0].width = (curr[1]/(this.totalWeight))*(w) - curr[2] - curr[3];
+            curr.width = (this.elements[i][0]/(this.totalWeight))*(w) - this.elements[i][1] - this.elements[i][2];
           }
         }
   
-        if(curr[0].type=="Frame"){
-          curr[0].adjustWidth(curr[0].x + curr[0].padx, curr[0].width - 2*(curr[0].padx));
+        if(curr.type=="Frame"){
+          curr.adjustWidth(curr.x + curr.padx, curr.width - 2*(curr.padx));
         } else {
           if(this.xScroll==false){
-            curr[0].updateWidth();
+            curr.updateWidth();
           }
         }
   
@@ -487,11 +497,11 @@ export class ScrollFrame extends Frame{
     }
   
     updatePosUtil(xDiff, yDiff){
-      for(let i=0; i<this.elements.length; i++){
-        this.elements[i][0].x -= xDiff;
-        this.elements[i][0].y -= yDiff;
-        if(this.elements[i][0].type=="Frame"){
-          this.elements[i][0].updatePosUtil(xDiff, yDiff);
+      for(let i=0; i<this.children.length; i++){
+        this.children[i].x -= xDiff;
+        this.children[i].y -= yDiff;
+        if(this.children[i].type=="Frame"){
+          this.children[i].updatePosUtil(xDiff, yDiff);
         }
       }
     }

@@ -45,10 +45,6 @@ export class Frame extends FrameComponent{
 
     drawEventListener(){};
     updatePosUtil(){};
-
-    isCursorHoveringOver(){
-      return mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
-    }
   
     mouseReleasedEventListener(){
       if(this.enableReposition && this.xDist!=null && this.yDist!=null){
@@ -210,7 +206,8 @@ export class Frame extends FrameComponent{
   
     clearHoverCache(){
       if(this.enableReposition){
-        if(this.constructor.name=="GridFrame"){
+        //gives error in ScrollFrame
+        if(this.type=="Frame"){
           this.hideBanner();
         }
         this.xDist=null;

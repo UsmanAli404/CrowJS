@@ -17,10 +17,7 @@ export class Root{
     add(element, {onClickSendToFront=true}={}){
       this.layers.push(element);
       this.preferences.push({onClickSendToFront: onClickSendToFront});
-
-      //parent and type are unrelated.
-      //parent stores the refernece of the parent that contains the child
-      //type specifies the 
+      
       if(element.constructor.name==="GridFrame"){
         for (let i = 0; i < element.rows; i++) {
           for (let j = 0; j < element.cols; j++) {
