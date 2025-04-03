@@ -2,6 +2,7 @@ import {Frame} from './Frame.js';
 
 export class ScrollFrame extends Frame{
     constructor(x, y, width, height, {
+      id=null,
       backgroundColor = color(255),
       borderColor = color(0),
       highlightedBorderColor = color(0),
@@ -25,7 +26,7 @@ export class ScrollFrame extends Frame{
       shadowDetail=5,
     } = {}) {
       bannerHeight = bannerHeight%height;
-      super(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
+      super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
       
@@ -155,6 +156,18 @@ export class ScrollFrame extends Frame{
   
       if(weight<=0){
         console.log("weight can't be non-positive");
+        return;
+      }
+
+      if(this.getElementById(element.id)){
+        console.log(`component with duplicate id (${element.id}) found in ${this.constructor.name}; component (${element.constructor.name}) can't be added!`);
+        console.log(this);
+        console.log("");
+        return;
+      }
+
+      if(this.getElementById(element.id)){
+        console.log(`duplicate id (${element.id}) found; element (${element.constructor.name}) can't be added!`);
         return;
       }
       

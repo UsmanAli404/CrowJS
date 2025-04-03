@@ -1,7 +1,8 @@
 export class Component{
-  constructor(x, y, width, height, {parent=null, type=""} = {}){
+  constructor(x, y, width, height, {parent=null, type="", id=null} = {}){
     this.x = x;
     this.y = y;
+    this.id = id;
     this.height = height;
     this.width = width;
     this.parent = parent;
@@ -60,6 +61,7 @@ export class Component{
     return mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
   }
 
+  //finds element in children
   findElement(element){
     if(element==this){
       return true;
@@ -73,6 +75,60 @@ export class Component{
     }
 
     return false;
+  }
+
+  safeToFillElementsMap(map){
+    if(map.has(this.id)){
+      return this.id;//false
+    }
+
+    for(let i=0; i<this.children.length; i++){
+      let res = this.children[i].safeToFillElementsMap(map);
+      if(res!=="<<no_match_found>>"){
+        return res;//return the duplicate id
+      }
+    }
+
+    return "<<no_match_found>>";//true
+  }
+
+  fillElementsMap(map){
+    let res = this.safeToFillElementsMap(map);
+    if(res!=="<<no_match_found>>"){
+      return res;//return duplicate id
+    }
+
+    this.fillElementsMapUtil(map);
+    return "<<map_filled_successfully>>";
+  }
+
+  fillElementsMapUtil(map){
+    if(this.id!==null){
+      map.set(this.id, this);
+    }
+
+    for(let i=0; i<this.children.length; i++){
+      this.children[i].fillElementsMapUtil(map);
+    }
+  }
+
+  getElementById(id){
+    if(id===null){
+      return null;
+    }
+
+    if(this.id===id){
+      return this;
+    }
+
+    for(let i=0; i<this.children.length; i++){
+      let result = this.children[i].getElementById(id);
+      if(result){
+        return result;
+      }
+    }
+
+    return null;
   }
 
   findTarget(){

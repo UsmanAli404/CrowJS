@@ -2,6 +2,7 @@ import {Frame} from './Frame.js';
 
 export class GridFrame extends Frame{
     constructor(x, y, width, height, {
+      id=null,
       backgroundColor = color(255),
       borderColor = color(0),
       highlightedBorderColor = color(0),
@@ -24,7 +25,7 @@ export class GridFrame extends Frame{
     }
     ){
       bannerHeight = bannerHeight%height;
-      super(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
+      super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
 
@@ -51,8 +52,16 @@ export class GridFrame extends Frame{
         console.log("index out of range; can't add the element at (",row,",",col,")");
         return;
       }
+
       if(this.grid[row][col]!=null){
         console.log("Grid cell (",row,",",col,") already taken");
+        return;
+      }
+
+      if(this.getElementById(element.id)){
+        console.log(`component with duplicate id (${element.id}) found in ${this.constructor.name}; component (${element.constructor.name}) can't be added!`);
+        console.log(this);
+        console.log("");
         return;
       }
   

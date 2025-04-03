@@ -1,5 +1,5 @@
-import { KeyboardEvent } from "./KeyboardEvent.js";
-import { MouseEvent } from "./MouseEvent.js";
+import { KeyboardEvent } from "./GUIEvent/KeyboardEvent.js";
+import { MouseEvent } from "./GUIEvent/MouseEvent.js";
 
 export class Root{
     constructor(){
@@ -7,6 +7,11 @@ export class Root{
       this.lastActiveElement = -2;
       this.activeElement = -1;
       this.enterStack = [];
+      this.elementsMap = new Map();
+    }
+
+    getElementById(id){
+      return this.elementsMap.get(id);
     }
   
     show(){
@@ -16,9 +21,17 @@ export class Root{
     }
   
     add(element){
+      let res = element.fillElementsMap(this.elementsMap);
+      if(res!=="<<map_filled_successfully>>"){
+        console.log(`duplicate id (${res}) found across this element and previously added elements; this element (${element.constructor.name}) can't be added!`);
+        console.log(element);
+        console.log("");
+        return;
+      }
+
       this.layers.push(element);
       element.setRoot(this);
-      console.log(this.layers[this.layers.length-1]);
+      // console.log(this.layers[this.layers.length-1]);
     }
   
     findElement(element){

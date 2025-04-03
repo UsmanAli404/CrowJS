@@ -4,10 +4,10 @@ import { FrameComponent } from './FrameComponent.js';
 //frames should also allow docking -> adding frames in frames
 
 export class Frame extends FrameComponent{
-    constructor(x, y, width, height, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
+    constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, type, 
       enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
-      super(x, y, width, height, {parent: parent, type: type});
+      super(x, y, width, height, {parent: parent, type: type, id: id});
   
       this.backgroundColor = backgroundColor;
       this.borderColor = borderColor;
@@ -46,6 +46,66 @@ export class Frame extends FrameComponent{
       this.addEventListener("mouseLeave", (event)=> this.onMouseLeave(event));
       this.addEventListener("drag", (event)=> this.onMouseDrag(event));
       this.addEventListener("press", (event) => this.onMouseBtnPress(event));
+    }
+
+    onMouseLeave(event){
+      // console.log("mouse left...");
+      this.clearHoverCache();
+    }
+
+    onMouseHover(event){
+      // console.log("mouse hovering...");
+      if(this.enableResizing) {
+        this.checkNearestBorder();
+        if(this.nearestBorder!=null){
+          if(this.bannerFlag){
+            this.clearHoverCache({clearResizingCache:false});
+          }
+          return;
+        }
+      }
+
+      if(this.isOverBannerArea() && this.enableReposition && !this.bannerFlag) {
+        this.showBanner();
+      } else {
+        if(!this.isOverBannerArea()) {
+          if(this.enableReposition && this.bannerFlag){
+            this.clearHoverCache({clearResizingCache:false});
+          }
+          this.hideBanner();
+        }
+      }
+    }
+
+    onMouseBtnPress(event) {
+      // console.log("mouse btn pressed...");
+      if(this.nearestBorder!=null){
+        return;
+      }
+
+      if(this.isOverBannerArea()){
+        if(this.enableReposition) {
+          this.xDist = mouseX - this.x;
+          this.yDist = mouseY - this.y;
+        }
+      }
+    }
+
+    onMouseDrag(event){
+      // console.log("mouse dragged...");
+
+      if(this.enableResizing){
+        if(this.nearestBorder!=null && this.xDist==null && this.yDist==null){
+          this.updateDimensions();
+          return;
+        }
+      }
+
+      if(this.enableReposition){
+        if(this.xDist!=null && this.yDist!=null){
+          this.updatePosition();
+        }
+      }
     }
 
     isOverBannerArea(){
@@ -258,66 +318,6 @@ export class Frame extends FrameComponent{
         strokeWeight(this.shadowSpread);
         rect(this.x-((i*this.shadowSpread)/2), this.y-((i*this.shadowSpread)/2), this.width+(i*this.shadowSpread), this.height+(i*this.shadowSpread), this.cornerRadius);
         pop();
-      }
-    }
-    
-    onMouseLeave(event){
-      console.log("mouse left...");
-      this.clearHoverCache();
-    }
-
-    onMouseHover(event){
-      // console.log("mouse hovering...");
-      if(this.enableResizing) {
-        this.checkNearestBorder();
-        if(this.nearestBorder!=null){
-          if(this.bannerFlag){
-            this.clearHoverCache({clearResizingCache:false});
-          }
-          return;
-        }
-      }
-
-      if(this.isOverBannerArea() && this.enableReposition && !this.bannerFlag) {
-        this.showBanner();
-      } else {
-        if(!this.isOverBannerArea()) {
-          if(this.enableReposition && this.bannerFlag){
-            this.clearHoverCache({clearResizingCache:false});
-          }
-          this.hideBanner();
-        }
-      }
-    }
-
-    onMouseBtnPress(event) {
-      // console.log("mouse btn pressed...");
-      if(this.nearestBorder!=null){
-        return;
-      }
-
-      if(this.isOverBannerArea()){
-        if(this.enableReposition) {
-          this.xDist = mouseX - this.x;
-          this.yDist = mouseY - this.y;
-        }
-      }
-    }
-
-    onMouseDrag(event){
-      // console.log("mouse dragged...");
-
-      if(this.enableResizing){
-        if(this.nearestBorder!=null && this.xDist==null && this.yDist==null){
-          this.updateDimensions();
-          return;
-        }
-      }
-
-      if(this.enableReposition){
-        if(this.xDist!=null && this.yDist!=null){
-          this.updatePosition();
-        }
       }
     }
   }

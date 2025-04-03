@@ -2,7 +2,8 @@ import {UIComponent} from './UIComponent.js';
 
 export class Label extends UIComponent{
     constructor(x, y, width, height, label,
-       {parent = null,
+       {id=null,
+        parent = null,
         backgroundColor = color(200),
         textColor = color(0),
         borderFlag = true,
@@ -11,11 +12,11 @@ export class Label extends UIComponent{
         cornerRadius = 0
       } = {}) {
       super(x, y, width, height, backgroundColor, borderFlag, borderColor,
-        borderWidth, cornerRadius, {parent: parent, type: "UIComponent"});
+        borderWidth, cornerRadius, {parent: parent, type: "UIComponent", id: id});
 
       this.text = label;
       this.labelSize = 20;
-      this.textColor =textColor;
+      this.textColor = textColor;
     }
   
     show() {
