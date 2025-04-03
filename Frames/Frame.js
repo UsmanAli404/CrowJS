@@ -41,9 +41,17 @@ export class Frame extends FrameComponent{
         this.shadowSpread = shadowSpread;//stroke width of each of those rectangles
         this.shadowDetail = shadowDetail;//number of rectangles that will be drawn around the component
       }
+
+      this.addEventListener("hover", (event) => this.onMouseHover(event));
+      this.addEventListener("mouseLeave", (event)=> this.onMouseLeave(event));
+      this.addEventListener("drag", (event)=> this.onMouseDrag(event));
+      this.addEventListener("press", (event) => this.onMouseBtnPress(event));
     }
 
-    drawEventListener(){};
+    isOverBannerArea(){
+      return (mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight));
+    }
+
     updatePosUtil(){};
   
     mouseReleasedEventListener(){
@@ -54,13 +62,13 @@ export class Frame extends FrameComponent{
     }
   
     checkNearestBorder(){
-      if(mouseX>=this.x-this.nearestBorderThreshold && mouseX<=this.x && mouseY>=this.y + this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
+      if(mouseX>=this.x && mouseX<=this.x+this.nearestBorderThreshold && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
         this.nearestBorder = "left";
-      } else if(mouseX>=this.x + this.width && mouseX<=this.x + this.width + this.nearestBorderThreshold && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
+      } else if(mouseX>=this.x + this.width - this.nearestBorderThreshold && mouseX<=this.x + this.width && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
         this.nearestBorder = "right";
-      } else if(mouseY>=this.y-this.nearestBorderThreshold && mouseY<=this.y && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
+      } else if(mouseY>=this.y && mouseY<=this.y+this.nearestBorderThreshold && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
         this.nearestBorder = "top";
-      } else if(mouseY>=this.y + this.height && mouseY<=this.y + this.height+this.nearestBorderThreshold && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
+      } else if(mouseY>=this.y +this.height - this.nearestBorderThreshold && mouseY<=this.y + this.height && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
         this.nearestBorder = "bottom";
       } else if(abs(mouseX-this.x)<=this.nearestBorderThreshold && abs(mouseY-this.y)<=this.nearestBorderThreshold){
         this.nearestBorder = "top-left";
@@ -78,7 +86,7 @@ export class Frame extends FrameComponent{
     showHighlightedBorder(){
       push();
       stroke(this.highlightedBorderColor);
-      strokeWeight(this.borderWidth+5);
+      strokeWeight(this.borderWidth+2);
       if(this.nearestBorder=="left"){
         line(this.x, this.y+this.cornerRadius, this.x, this.y+this.height-this.cornerRadius);
       } else if(this.nearestBorder=="right"){
@@ -204,20 +212,21 @@ export class Frame extends FrameComponent{
       this.updatePosUtil(this.prevX-this.x, this.prevY-this.y);
     }
   
-    clearHoverCache(){
-      if(this.enableReposition){
-        //gives error in ScrollFrame
-        if(this.type=="Frame"){
-          this.hideBanner();
-        }
+    clearHoverCache({clearRepositionCache=true, clearResizingCache=true}={}){
+      // console.log("Hover cache cleared...");
+      if(clearRepositionCache && this.enableReposition){
+        this.hideBanner();
+
         this.xDist=null;
         this.yDist=null;
         this.prevX=null;
         this.prevY=null;
+        // console.log("reposition cache removed...");
       }
       
-      if(this.enableResizing){
+      if(clearResizingCache && this.enableResizing){
         this.nearestBorder=null;
+        // console.log("resizing cache removed...");
       }
     }
 
@@ -250,5 +259,65 @@ export class Frame extends FrameComponent{
         rect(this.x-((i*this.shadowSpread)/2), this.y-((i*this.shadowSpread)/2), this.width+(i*this.shadowSpread), this.height+(i*this.shadowSpread), this.cornerRadius);
         pop();
       }
-    }    
+    }
+    
+    onMouseLeave(event){
+      console.log("mouse left...");
+      this.clearHoverCache();
+    }
+
+    onMouseHover(event){
+      // console.log("mouse hovering...");
+      if(this.enableResizing) {
+        this.checkNearestBorder();
+        if(this.nearestBorder!=null){
+          if(this.bannerFlag){
+            this.clearHoverCache({clearResizingCache:false});
+          }
+          return;
+        }
+      }
+
+      if(this.isOverBannerArea() && this.enableReposition && !this.bannerFlag) {
+        this.showBanner();
+      } else {
+        if(!this.isOverBannerArea()) {
+          if(this.enableReposition && this.bannerFlag){
+            this.clearHoverCache({clearResizingCache:false});
+          }
+          this.hideBanner();
+        }
+      }
+    }
+
+    onMouseBtnPress(event) {
+      // console.log("mouse btn pressed...");
+      if(this.nearestBorder!=null){
+        return;
+      }
+
+      if(this.isOverBannerArea()){
+        if(this.enableReposition) {
+          this.xDist = mouseX - this.x;
+          this.yDist = mouseY - this.y;
+        }
+      }
+    }
+
+    onMouseDrag(event){
+      // console.log("mouse dragged...");
+
+      if(this.enableResizing){
+        if(this.nearestBorder!=null && this.xDist==null && this.yDist==null){
+          this.updateDimensions();
+          return;
+        }
+      }
+
+      if(this.enableReposition){
+        if(this.xDist!=null && this.yDist!=null){
+          this.updatePosition();
+        }
+      }
+    }
   }

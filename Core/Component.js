@@ -6,6 +6,7 @@ export class Component{
     this.width = width;
     this.parent = parent;
     this.type = type;
+    this.root = null;
     this.eventListeners = {};
     this.children = [];
   }
@@ -20,6 +21,22 @@ export class Component{
       this.eventListeners[eventType] = [];
     }
     this.eventListeners[eventType].push(callback);
+  }
+
+  dispatchMouseEnterEvent(event){
+    this.dispatchMouseEnterLeaveEventUtil(event);
+  }
+
+  dispatchMouseLeaveEvent(event){
+    this.dispatchMouseEnterLeaveEventUtil(event);
+  }
+
+  dispatchMouseEnterLeaveEventUtil(event){
+    if(this.eventListeners[event.type]){
+      for(let callback of this.eventListeners[event.type]){
+        callback(event);
+      }
+    }
   }
 
   //to take action upon event occurence
@@ -43,15 +60,43 @@ export class Component{
     return mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
   }
 
-  //children?
-  findTarget(x, y){
+  findElement(element){
+    if(element==this){
+      return true;
+    }
+
     for(let i = this.children.length - 1; i >= 0; i--){
       let child = this.children[i];
-      if(child.isInside(x, y)){
-        return child.findTarget(x, y);
+      if(child.findElement(element)){
+        return true;
       }
     }
-    return this; // Return the topmost element under the cursor
+
+    return false;
+  }
+
+  findTarget(){
+    for(let i = this.children.length - 1; i >= 0; i--){
+      let child = this.children[i];
+      if(child.isInside()){
+        return child.findTarget();
+      }
+    }
+
+    if(this.isInside()){
+      return this;
+    }
+
+    return null;
+  }
+
+  setRoot(root){
+    this.root = root;
+    
+    for(let i=0; i<this.children.length; i++){
+      let child = this.children[i];
+      child.setRoot(root);
+    }
   }
 
 }

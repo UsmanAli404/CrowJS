@@ -1,5 +1,7 @@
 export class GUIEvent {
-    constructor(type, target) {
+    constructor(x, y, type, target) {
+        this.x = x;
+        this.y = y;
         this.type = type;
         this.target = target;
         this.propagationStopped = false;

@@ -64,10 +64,25 @@ export class ScrollFrame extends Frame{
         this.leftist=-1;
         this.rightist=-1;
       }
+
+      //default event listeners
+      this.addEventListener("keyDown", (event) => this.onKeyDown(event));
+    }
+
+    onKeyDown(event) {
+      // console.log("key is pressed...");
+      if(keyIsDown(LEFT_ARROW)){
+        this.scrollLeft();
+      } else if(keyIsDown(RIGHT_ARROW)){
+          this.scrollRight();
+      } else if(keyIsDown(UP_ARROW)){
+        this.scrollUp();
+      } else if(keyIsDown(DOWN_ARROW)){
+        this.scrollDown();
+      }
     }
   
     show() {
-
       //shadow
       if(this.enableShadow){
         this.drawShadow();
@@ -171,62 +186,6 @@ export class ScrollFrame extends Frame{
       this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
     
-    //needs cleanup
-    drawEventListener(){
-      let cursorOverFrame = this.isInside();
-  
-      if(cursorOverFrame){
-        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){
-          if(this.enableReposition && this.bannerFlag==false){
-            this.showBanner();
-          }
-  
-          if(this.enableReposition && mouseIsPressed && this.xDist==null && this.yDist==null){
-            this.xDist = mouseX-this.x;
-            this.yDist = mouseY-this.y;
-          }
-  
-        } else {
-          if(this.enableReposition && this.bannerFlag==true && this.xDist==null && this.yDist==null){
-            this.hideBanner();
-          }
-        }
-  
-        if(keyIsDown(LEFT_ARROW)){
-           this.scrollLeft();
-        } else if(keyIsDown(RIGHT_ARROW)){
-           this.scrollRight();
-        } else if(keyIsDown(UP_ARROW)){
-          this.scrollUp();
-        } else if(keyIsDown(DOWN_ARROW)){
-          this.scrollDown();
-        }
-  
-      } else {
-        if(this.enableReposition && this.bannerFlag==true && mouseIsPressed==false && this.xDist==null && this.yDist==null){
-          this.hideBanner();
-        }
-      }
-  
-      if(this.enableResizing && mouseIsPressed==false && this.xDist==null && this.yDist==null){
-        this.checkNearestBorder();
-        if(this.nearestBorder!=null){
-          cursorOverFrame=true;
-        }
-      }
-  
-      if(this.enableResizing && this.nearestBorder!=null && this.xDist==null && this.yDist==null){
-        //this.showHighlightedBorder();
-        this.updateDimensions();
-      }
-  
-      if(this.enableReposition && mouseIsPressed && this.xDist!=null && this.yDist!=null){
-        this.updatePosition();
-      }
-  
-      return cursorOverFrame;
-    }
-
     //the following find methods find the relevant subjects by maintaing a
     //reference variable. This variable is conditionally updated by comparing
     //it to the most recently added element in the list. Therefore, there is
@@ -407,12 +366,14 @@ export class ScrollFrame extends Frame{
     }
     
     hideBanner(){
-      if(this.yScroll==true){
-        this.BannerUtil(-1, this.bannerHeight);
-      } else {
-        this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
+      if(this.enableReposition && this.bannerFlag){
+        if(this.yScroll==true){
+          this.BannerUtil(-1, this.bannerHeight);
+        } else {
+          this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
+        }
+        this.bannerFlag=false;
       }
-      this.bannerFlag=false;
     }
   
     BannerUtil(dir, heightAdjustment){

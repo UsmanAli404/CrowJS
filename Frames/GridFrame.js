@@ -153,7 +153,7 @@ export class GridFrame extends Frame{
   
             curr[0].height -= curr[5] + curr[6];
   
-            console.log("curr[0].type:"+curr[0].type);
+            //console.log("curr[0].type:"+curr[0].type);
 
             if(curr[0].type=="Frame"){
               curr[0].adjustHeight(curr[0].y + curr[0].pady, curr[0].height - 2*curr[0].pady);
@@ -266,11 +266,8 @@ export class GridFrame extends Frame{
   
       this.grid[row][col][0].width = w - this.grid[row][col][3] - this.grid[row][col][4];
       this.grid[row][col][0].height = h - this.grid[row][col][5] - this.grid[row][col][6];
-      //this.grid[row][col] = [element, rowSpan, colSpan, padL, padR, padT, padB];
-      //console.log(this.grid[row][col][1], this.grid[row][col][2]);
       this.grid[row][col][1] = yLimit+1;
       this.grid[row][col][2] = xLimit+1;
-      //console.log(this.grid[row][col][1], this.grid[row][col][2]);
     }
     
     showBanner(){
@@ -295,50 +292,6 @@ export class GridFrame extends Frame{
           }
         }
       }
-    }
-  
-    drawEventListener(){
-      let cursorOverFrame = this.isInside();
-  
-      if(cursorOverFrame){
-        if(!(mouseIsPressed && this.nearestBorder!=null) && mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight)){
-          if(this.enableReposition && this.bannerFlag==false){
-            this.showBanner();
-          }
-  
-          if(this.enableReposition && mouseIsPressed && this.xDist==null && this.yDist==null){
-            this.xDist = mouseX-this.x;
-            this.yDist = mouseY-this.y;
-          }
-  
-        } else {
-          if(this.enableReposition && this.bannerFlag==true && this.xDist==null && this.yDist==null){
-            this.hideBanner();
-          }
-        }
-  
-      } else {
-        if(this.enableReposition && this.bannerFlag==true && mouseIsPressed==false && this.xDist==null && this.yDist==null){
-          this.hideBanner();
-        }
-      }
-  
-      if(this.enableResizing && mouseIsPressed==false && this.xDist==null && this.yDist==null){
-        this.checkNearestBorder();
-        if(this.nearestBorder!=null){
-          cursorOverFrame=true;
-        }
-      }
-  
-      if(this.enableResizing && this.nearestBorder!=null && this.xDist==null && this.yDist==null){
-        this.updateDimensions();
-      }
-  
-      if(this.enableReposition && mouseIsPressed && this.xDist!=null && this.yDist!=null){
-        this.updatePosition();
-      }
-  
-      return cursorOverFrame;
     }
   
     show(){
