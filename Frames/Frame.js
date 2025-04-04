@@ -288,6 +288,8 @@ export class Frame extends FrameComponent{
         this.nearestBorder=null;
         // console.log("resizing cache removed...");
       }
+
+      // console.log("");
     }
 
     rgbToArray(shadowColor) {

@@ -65,6 +65,7 @@ export class GridFrame extends Frame{
         return;
       }
   
+      element.turnResizingAndRepositionOff();
       element.parent=this;
       this.children.push(element);
       this.grid[row][col] = [element, rowSpan, colSpan, padL, padR, padT, padB];
@@ -203,7 +204,7 @@ export class GridFrame extends Frame{
         this.grid[row][col][0].adjustWidth(this.grid[row][col][0].x + this.grid[row][col][0].padx, this.grid[row][col][0].width - 2*this.grid[row][col][0].padx);
         this.grid[row][col][0].adjustHeight(this.grid[row][col][0].y + this.grid[row][col][0].pady, this.grid[row][col][0].height - 2*this.grid[row][col][0].pady);
       } else if(this.grid[row][col][0].constructor.name=="ScrollFrame"){
-        this.grid[row][col][0].correctPosAndDim();
+        this.grid[row][col][0].redraw();
       } else {
         this.grid[row][col][0].updateWidth();
         if(this.grid[row][col][0].constructor.name!="Label"){

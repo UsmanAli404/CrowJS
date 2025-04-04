@@ -1,11 +1,11 @@
 export class Component{
-  constructor(x, y, width, height, {parent=null, type="", id=null} = {}){
+  constructor(x, y, width, height, {type="", id=null} = {}){
     this.x = x;
     this.y = y;
     this.id = id;
     this.height = height;
     this.width = width;
-    this.parent = parent;
+    this.parent = null;
     this.type = type;
     this.root = null;
     this.eventListeners = {};
@@ -56,12 +56,32 @@ export class Component{
     }
   }
 
-  //is cursor inside
-  isInside(){
-    return mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
+  turnResizingAndRepositionOff(){
+    if(this.type==="Frame"){
+      this.enableResizing=false;
+      this.enableReposition=false;
+
+      for(let i=0; i<this.children.length; i++){
+        this.children[i].turnResizingAndRepositionOff();
+      }
+    }
   }
 
-  //finds element in children
+  //is cursor inside
+  isInside(){
+    let res = mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
+
+    let parentRes;
+    if(this.parent && this.parent.constructor.name==="ScrollFrame"
+       && (this.parent.yScroll || this.parent.xScroll)){
+      parentRes = this.parent.isInside();
+      return res && parentRes;
+    }
+
+    return res;
+  }
+
+  //finds element recursively among children
   findElement(element){
     if(element==this){
       return true;
@@ -77,6 +97,9 @@ export class Component{
     return false;
   }
 
+  // cheking if it or any of its children have ids
+  // already present in the map
+  // if there is, then the duplicate id is returned
   safeToFillElementsMap(map){
     if(map.has(this.id)){
       return this.id;//false

@@ -10,8 +10,8 @@ export class ScrollFrame extends Frame{
       cornerRadius = 0,
       padx=0,
       pady=0,
-      yScroll=false,
-      xScroll=false,
+      enableVScroll=false,
+      enableHScroll=false,
       scrollSensitivity=20,
       bannerHeight=50,
       alignment="v", //v for vertical, h for horizontal
@@ -30,12 +30,12 @@ export class ScrollFrame extends Frame{
         cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
       
-      this.elements = [];
+      this.preferences = [];
       //used for calculating weighted dimensions of child elements
       this.totalWeight = 0;
       //flags for scroll on/off
-      this.yScroll=yScroll;
-      this.xScroll=xScroll;
+      this.enableVScroll=enableVScroll;
+      this.enableHScroll=enableHScroll;
       //for internal alignment of elements
       this.alignment = alignment;
   
@@ -52,16 +52,16 @@ export class ScrollFrame extends Frame{
       }
   
       //sets the amount in % to scroll in any direction
-      if(this.xScroll || this.yScroll){
+      if(this.enableHScroll || this.enableVScroll){
         this.scrollSensitivity=scrollSensitivity;
       }
   
-      if(this.yScroll){
+      if(this.enableVScroll){
         this.topper=-1;
         this.deepest=-1;
       }
   
-      if(this.xScroll){
+      if(this.enableHScroll){
         this.leftist=-1;
         this.rightist=-1;
       }
@@ -170,31 +170,147 @@ export class ScrollFrame extends Frame{
         console.log(`duplicate id (${element.id}) found; element (${element.constructor.name}) can't be added!`);
         return;
       }
-      
+
+      element.turnResizingAndRepositionOff();
       element.parent=this;
       this.children.push(element);
       //     0      , 1     , 2   , 3   , 4   , 5
       //old: element, weight, padL, padR, padT, padB
       //     0      , 1     , 2   , 3   , 4
       //new: weight, padL, padR, padT, padB
-      this.elements.push([weight, padL, padR, padT, padB]);
+      this.preferences.push([weight, padL, padR, padT, padB]);
       this.totalWeight+=weight;
-      this.correctPosAndDim();
+      this.redraw();
   
-      if(this.xScroll==true){
+      if(this.enableHScroll==true){
         this.findLeftist();
         this.findRightist();
       }
   
-      if(this.yScroll==true){
+      if(this.enableVScroll==true){
         this.findTopper();
         this.findDeepest();
       }
     }
+
+    setWeight(index, weight){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new weight");
+        return;
+      }
+
+      if(weight<1){
+        console.log("weight to set must be >= 1");
+        return;
+      }
+
+      this.preferences[index][0] = weight;
+    }
+
+    getWeight(index){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new weight");
+        return;
+      }
+
+      return this.preferences[index][0];
+    }
+
+    setPadL(index, padL){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padL");
+        return;
+      }
+
+      if(padL<0){
+        console.log("padL to set must be >= 0");
+        return;
+      }
+
+      this.preferences[index][1] = padL;
+    }
+
+    getPadL(index){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padL");
+        return;
+      }
+
+      return this.preferences[index][1];
+    }
+
+    setPadR(index, padR){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padR");
+        return;
+      }
+
+      if(padR<0){
+        console.log("padR to set must be >= 0");
+        return;
+      }
+
+      this.preferences[index][2] = padR;
+    }
+
+    getPadR(index){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padR");
+        return;
+      }
+
+      return this.preferences[index][2];
+    }
+
+    setPadT(index, padT){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padT");
+        return;
+      }
+
+      if(padT<0){
+        console.log("padT to set must be >= 0");
+        return;
+      }
+
+      this.preferences[index][3] = padT;
+    }
+
+    getPadT(index){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padT");
+        return;
+      }
+
+      return this.preferences[index][3];
+    }
+
+    setPadB(index, padB){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padB");
+        return;
+      }
+
+      if(padB<0){
+        console.log("padB to set must be >= 0");
+        return;
+      }
+
+      this.preferences[index][4] = padB;
+    }
+
+    getPadB(index){
+      if(index<0 || index>this.children.length-1){
+        console.log("index out of range! can't set new padB");
+        return;
+      }
+
+      return this.preferences[index][4];
+    }
   
     //corrects position and dimensions of all the child elements so that
     //they fit right in the parent frame
-    correctPosAndDim(){
+    redraw(){
       this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
       this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
@@ -211,11 +327,11 @@ export class ScrollFrame extends Frame{
         return;
       }
   
-      let i = this.elements.length-1;
+      let i = this.preferences.length-1;
       if(this.children[i].y +
-        this.elements[i][3] <
+        this.preferences[i][3] <
         this.children[this.topper].y +
-        this.elements[this.topper][3]){
+        this.preferences[this.topper][3]){
         this.topper = i;
       }
     }
@@ -227,13 +343,13 @@ export class ScrollFrame extends Frame{
         return;
       }
   
-      let i = this.elements.length-1;
+      let i = this.preferences.length-1;
       if(this.children[i].y +
         this.children[i].height -
-        this.elements[i][4] >
+        this.preferences[i][4] >
         this.children[this.deepest].y +
         this.children[this.deepest].height -
-        this.elements[this.deepest][4]){
+        this.preferences[this.deepest][4]){
         this.deepest = i;
       }
     }
@@ -245,11 +361,11 @@ export class ScrollFrame extends Frame{
         return;
       }
   
-      let i = this.elements.length-1;
+      let i = this.preferences.length-1;
       if(this.children[i].x +
-        this.elements[i][1] <
+        this.preferences[i][1] <
         this.children[this.leftist].x +
-        this.elements[this.leftist][1]){
+        this.preferences[this.leftist][1]){
         this.leftist = i
       }
     }
@@ -261,48 +377,48 @@ export class ScrollFrame extends Frame{
         return;
       }
   
-      let i = this.elements.length-1;
+      let i = this.preferences.length-1;
       if(this.children[i].x +
         this.children[i].width -
-        this.elements[i][2] >
+        this.preferences[i][2] >
         this.children[this.rightist].x +
         this.children[this.rightist].width -
-        this.elements[this.rightist][2]){
+        this.preferences[this.rightist][2]){
         this.rightist = i;
       }
     }
     
     scrollDown(){
-      if(!this.yScroll || this.children.length==0){
+      if(!this.enableVScroll || this.children.length==0){
         return;
       }
       
       if(this.alignment=="v"){
         let last_elem = this.children[this.children.length-1];
-        if(last_elem.y + last_elem.height > this.y + this.height - this.pady - this.elements[this.elements.length-1][4]){
+        if(last_elem.y + last_elem.height > this.y + this.height - this.pady - this.preferences[this.preferences.length-1][4]){
           this.vScrollUtil(-1);
         }
       } else {
         //need to find the one that extends the longest
-        if(this.children[this.deepest].y + this.children[this.deepest].height > this.y + this.height - this.pady- this.elements[this.deepest][4]){
+        if(this.children[this.deepest].y + this.children[this.deepest].height > this.y + this.height - this.pady- this.preferences[this.deepest][4]){
           this.vScrollUtil(-1);
         }
       }
     }
     
     scrollUp(){
-      if(!this.yScroll || this.children.length==0){
+      if(!this.enableVScroll || this.children.length==0){
         return;
       }
       
       if(this.alignment=="v"){
         let first_elem = this.children[0];
-        if(first_elem.y + this.elements[0][3] <this.y + this.pady){
+        if(first_elem.y + this.preferences[0][3] <this.y + this.pady){
           this.vScrollUtil(1);
         }
       } else {
         //need to find the element that is nearest to the top
-        if(this.children[this.topper].y + this.elements[this.topper][3] <this.y + this.pady){
+        if(this.children[this.topper].y + this.preferences[this.topper][3] <this.y + this.pady){
           this.vScrollUtil(1);
         }
       }
@@ -321,37 +437,37 @@ export class ScrollFrame extends Frame{
     }
     
     scrollLeft(){
-      if(!this.xScroll || this.children.length==0){
+      if(!this.enableHScroll || this.children.length==0){
         return;
       }
   
       if(this.alignment=="v"){
         //do something about the loop
-        if(this.children[this.leftist].x-this.elements[this.leftist][1]<this.x+this.padx){
+        if(this.children[this.leftist].x-this.preferences[this.leftist][1]<this.x+this.padx){
           this.hScrollUtil(1);
         }
         
       } else {
         //first element
-        if(this.children[0].x-this.elements[0][1]<this.x+this.padx){
+        if(this.children[0].x-this.preferences[0][1]<this.x+this.padx){
           this.hScrollUtil(1);
         }
       }
     }
     
     scrollRight(){
-      if(!this.xScroll || this.children.length==0){
+      if(!this.enableHScroll || this.children.length==0){
         return;
       }
   
       if(this.alignment=="v"){
-        if(this.children[this.rightist].x+this.children[this.rightist].width+this.elements[this.rightist][2]>this.x+this.width-this.padx){
+        if(this.children[this.rightist].x+this.children[this.rightist].width+this.preferences[this.rightist][2]>this.x+this.width-this.padx){
           this.hScrollUtil(-1);
         }
   
       } else {
         let last_elem = this.children[this.children.length-1];
-        if(last_elem.x+last_elem.width+this.elements[this.elements.length-1][2]>this.x+this.width-this.padx){
+        if(last_elem.x+last_elem.width+this.preferences[this.preferences.length-1][2]>this.x+this.width-this.padx){
           this.hScrollUtil(-1);
         }
       }
@@ -370,7 +486,7 @@ export class ScrollFrame extends Frame{
     }
     
     showBanner(){
-      if(this.yScroll==true){
+      if(this.enableVScroll==true){
         this.BannerUtil(1, this.bannerHeight);
       } else {
         this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
@@ -380,7 +496,7 @@ export class ScrollFrame extends Frame{
     
     hideBanner(){
       if(this.enableReposition && this.bannerFlag){
-        if(this.yScroll==true){
+        if(this.enableVScroll==true){
           this.BannerUtil(-1, this.bannerHeight);
         } else {
           this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
@@ -409,26 +525,26 @@ export class ScrollFrame extends Frame{
         if(i-1>=0){
           let prev = this.children[i-1];
           if(this.alignment=="v"){
-            curr.y = prev.y + prev.height + this.elements[i-1][4] + this.elements[i][3];
+            curr.y = prev.y + prev.height + this.preferences[i-1][4] + this.preferences[i][3];
           } else {
-            curr.y = y + this.elements[i][3];
+            curr.y = y + this.preferences[i][3];
           }
         } else {
-          curr.y = y + this.elements[i][3];
+          curr.y = y + this.preferences[i][3];
         }
         
-        if(this.yScroll==false){
+        if(this.enableVScroll==false){
           if(this.alignment=="v"){
-            curr.height = (this.elements[i][0]/(this.totalWeight))*(h) - this.elements[i][3] - this.elements[i][4];
+            curr.height = (this.preferences[i][0]/(this.totalWeight))*(h) - this.preferences[i][3] - this.preferences[i][4];
           } else {
-            curr.height = h - this.elements[i][3] - this.elements[i][4];
+            curr.height = h - this.preferences[i][3] - this.preferences[i][4];
           }
         }
   
         if(curr.type=="Frame"){
          curr.adjustHeight(curr.y + curr.pady, curr.height - 2*(curr.pady));
         } else {
-          if(this.yScroll==false){
+          if(this.enableVScroll==false){
             curr.updateHeight();
           }
         }
@@ -443,26 +559,26 @@ export class ScrollFrame extends Frame{
         if(i-1>=0){
           let prev = this.children[i-1];
           if(this.alignment!="v"){
-            curr.x = prev.x + prev.width + this.elements[i-1][2] + this.elements[i][1];
+            curr.x = prev.x + prev.width + this.preferences[i-1][2] + this.preferences[i][1];
           } else {
-            curr.x = x + this.elements[i][1];
+            curr.x = x + this.preferences[i][1];
           }
         } else {
-          curr.x = x + this.elements[i][1];
+          curr.x = x + this.preferences[i][1];
         }
   
-        if(this.xScroll==false){
+        if(this.enableHScroll==false){
           if(this.alignment=="v"){
-            curr.width = w - this.elements[i][1] - this.elements[i][2];
+            curr.width = w - this.preferences[i][1] - this.preferences[i][2];
           } else {
-            curr.width = (this.elements[i][0]/(this.totalWeight))*(w) - this.elements[i][1] - this.elements[i][2];
+            curr.width = (this.preferences[i][0]/(this.totalWeight))*(w) - this.preferences[i][1] - this.preferences[i][2];
           }
         }
   
         if(curr.type=="Frame"){
           curr.adjustWidth(curr.x + curr.padx, curr.width - 2*(curr.padx));
         } else {
-          if(this.xScroll==false){
+          if(this.enableHScroll==false){
             curr.updateWidth();
           }
         }

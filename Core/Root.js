@@ -8,6 +8,13 @@ export class Root{
       this.activeElement = -1;
       this.enterStack = [];
       this.elementsMap = new Map();
+      // this.preferences = {};
+    }
+
+    printEnterStack(){
+      for(let i=this.enterStack.length-1; i>=0; i--){
+        console.log(this.enterStack[i]);
+      }
     }
 
     getElementById(id){
@@ -23,7 +30,8 @@ export class Root{
     add(element){
       let res = element.fillElementsMap(this.elementsMap);
       if(res!=="<<map_filled_successfully>>"){
-        console.log(`duplicate id (${res}) found across this element and previously added elements; this element (${element.constructor.name}) can't be added!`);
+        console.log(`duplicate id (${res}) found across this element and previously added elements;
+           this element (${element.constructor.name}) can't be added!`);
         console.log(element);
         console.log("");
         return;
@@ -107,7 +115,7 @@ export class Root{
     handleMouseEvent(type, x, y){
       //currently engaged element
       if(mouseIsPressed && !Number.isInteger(this.activeElement)){
-        // this.sendToFront(this.activeElement);
+        this.sendToFront(this.activeElement);
 
         let target = this.activeElement;
         let event = new MouseEvent(x, y, type, target);
@@ -121,6 +129,9 @@ export class Root{
         target = this.layers[i].findTarget();
         if(target!=null){
           if(this.activeElement!=this.lastActiveElement){
+            // console.log("component to component...");
+            // console.log(this.lastActiveElement);
+            // console.log(this.activeElement);
             this.mouseLeaveEventHandler(x, y);
           }
           this.lastActiveElement = this.activeElement;
@@ -250,6 +261,8 @@ export class Root{
         return;
       }
 
+      // console.log("mouseLeaveEventListeners...");
+
       while(true && this.enterStack.length>0){
         let top = this.enterStack.pop();
         if(!top.isInside()){
@@ -265,18 +278,35 @@ export class Root{
     //used for component to component cursor transition
     //triggered on the component the cursor left from
     mouseLeaveEventHandler(x, y){
+      // console.log("mouseLeaveEventHandler ...");
+      // this.printEnterStack();
       if(this.activeElement==-1 || Number.isInteger(this.lastActiveElement)){
         return;
       }
 
-      //make sure that the current active component is not a child component
-      if(this.lastActiveElement.findElement(this.activeElement)){
+      let index = -1;
+      for(let i=this.enterStack.length-1; i>=0; i--){
+        if(this.layers.includes(this.enterStack[i])){
+          index = i;
+          // console.log("index:", index);
+          break;
+        }
+      }
+
+      if(index==-1){
         return;
       }
 
-      let target = this.lastActiveElement;
-      let event = new MouseEvent(x, y, "mouseLeave", target);
-      target.dispatchMouseLeaveEvent(event);      
+      let temp = this.enterStack.slice(0, index);
+      // console.log(temp);
+      while(temp.length>0){
+        let top = temp.pop();
+        let event = new MouseEvent(x, y, "mouseLeave", top);
+        top.dispatchMouseLeaveEvent(event);
+      }
+
+      this.enterStack.splice(0, index);
+      // this.printEnterStack();
     }
 
     //separate function
