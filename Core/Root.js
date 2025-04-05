@@ -6,8 +6,10 @@ export class Root{
       this.layers = [];//determines order of display
       this.lastActiveElement = -2;
       this.activeElement = -1;
+      //for keeping track of entry order,
+      //useful for mouseEnter and mouseLeave events
       this.enterStack = [];
-      this.elementsMap = new Map();
+      this.elementsMap = new Map();//for storing ids
       // this.preferences = {};
     }
 

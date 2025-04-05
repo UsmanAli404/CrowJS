@@ -5,7 +5,7 @@ import { FrameComponent } from './FrameComponent.js';
 
 export class Frame extends FrameComponent{
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-      cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, type, 
+      cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, type, 
       enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
       super(x, y, width, height, {parent: parent, type: type, id: id});
   
@@ -20,16 +20,24 @@ export class Frame extends FrameComponent{
       this.enableShadow = enableShadow;
       this.enableReposition = enableReposition;
       this.enableResizing = enableResizing;
-  
-      if(this.enableReposition){
-        this.bannerFlag = false;
+      this.alwaysShowBanner = alwaysShowBanner;
+
+      if(this.enableReposition || this.alwaysShowBanner){
         this.bannerHeight = bannerHeight;
-        this.xDist = null;
-        this.yDist = null;
-        this.prevX = null;
-        this.prevY = null;
+        
+        if(this.enableReposition){
+          this.bannerFlag = false;
+          this.xDist = null;
+          this.yDist = null;
+          this.prevX = null;
+          this.prevY = null;
+        }
+
+        if(this.alwaysShowBanner){
+          this.bannerFlag = true;
+        }
       }
-  
+
       if(this.enableResizing){
         this.nearestBorder = null;
         this.nearestBorderThreshold = nearestBorderThreshold;
@@ -46,18 +54,30 @@ export class Frame extends FrameComponent{
       this.addEventListener("mouseLeave", (event)=> this.onMouseLeave(event));
       this.addEventListener("drag", (event)=> this.onMouseDrag(event));
       this.addEventListener("press", (event) => this.onMouseBtnPress(event));
+      this.addEventListener("release", (event) => this.onMouseRelease(event));
+    }
+
+    onMouseRelease(event){
+      if(!this.isOverBannerArea()){
+        cursor("");
+      }
     }
 
     onMouseLeave(event){
       // console.log("mouse left...");
       this.clearHoverCache();
+      cursor("");
+    }
+
+    isNearBorder(){
+      return this.nearestBorder!==null;
     }
 
     onMouseHover(event){
       // console.log("mouse hovering...");
       if(this.enableResizing) {
-        this.checkNearestBorder();
-        if(this.nearestBorder!=null){
+        this.checkAndFindNearestBorder();
+        if(this.isNearBorder()){
           if(this.bannerFlag){
             this.clearHoverCache({clearResizingCache:false});
           }
@@ -65,46 +85,60 @@ export class Frame extends FrameComponent{
         }
       }
 
-      if(this.isOverBannerArea() && this.enableReposition && !this.bannerFlag) {
+      if(this.enableReposition && this.isOverBannerArea() && !mouseIsPressed){
+        cursor("grab");
+      }
+
+      if(!this.isOverBannerArea()){
+        cursor("");
+      }
+
+      if(this.isOverBannerArea() && (this.enableReposition && !this.bannerFlag)) {
         this.showBanner();
       } else {
         if(!this.isOverBannerArea()) {
           if(this.enableReposition && this.bannerFlag){
             this.clearHoverCache({clearResizingCache:false});
           }
-          this.hideBanner();
+
+          if(!this.alwaysShowBanner){
+            this.hideBanner();
+          }
         }
       }
     }
 
     onMouseBtnPress(event) {
       // console.log("mouse btn pressed...");
-      if(this.nearestBorder!=null){
+      if(this.isNearBorder()){
         return;
       }
 
       if(this.isOverBannerArea()){
         if(this.enableReposition) {
+          cursor("grabbing");
           this.xDist = mouseX - this.x;
           this.yDist = mouseY - this.y;
         }
       }
     }
 
+    isDragging(){
+      return (this.xDist!=null && this.yDist!=null);
+    }
+
     onMouseDrag(event){
       // console.log("mouse dragged...");
 
       if(this.enableResizing){
-        if(this.nearestBorder!=null && this.xDist==null && this.yDist==null){
+        if(this.isNearBorder() && !this.isDragging()){
           this.updateDimensions();
           return;
         }
       }
 
-      if(this.enableReposition){
-        if(this.xDist!=null && this.yDist!=null){
-          this.updatePosition();
-        }
+      if(this.enableReposition && this.isDragging()){
+        this.updatePosition();
       }
     }
 
@@ -115,29 +149,37 @@ export class Frame extends FrameComponent{
     updatePosUtil(){};
   
     mouseReleasedEventListener(){
-      if(this.enableReposition && this.xDist!=null && this.yDist!=null){
+      if(this.enableReposition && this.isDragging()){
         this.xDist=null;
         this.yDist=null;
       }
     }
   
-    checkNearestBorder(){
+    checkAndFindNearestBorder(){
       if(mouseX>=this.x && mouseX<=this.x+this.nearestBorderThreshold && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
         this.nearestBorder = "left";
+        cursor("ew-resize");
       } else if(mouseX>=this.x + this.width - this.nearestBorderThreshold && mouseX<=this.x + this.width && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
         this.nearestBorder = "right";
+        cursor("ew-resize");
       } else if(mouseY>=this.y && mouseY<=this.y+this.nearestBorderThreshold && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
         this.nearestBorder = "top";
+        cursor("ns-resize");
       } else if(mouseY>=this.y +this.height - this.nearestBorderThreshold && mouseY<=this.y + this.height && mouseX>=this.x+this.cornerRadius && mouseX<=this.x+this.width-this.cornerRadius){
         this.nearestBorder = "bottom";
+        cursor("ns-resize");
       } else if(abs(mouseX-this.x)<=this.nearestBorderThreshold && abs(mouseY-this.y)<=this.nearestBorderThreshold){
         this.nearestBorder = "top-left";
+        cursor("nwse-resize");
       } else if(abs(mouseX-(this.x+this.width))<=this.nearestBorderThreshold && abs(mouseY-this.y)<=this.nearestBorderThreshold){
         this.nearestBorder = "top-right";
+        cursor("nesw-resize");
       } else if(abs(mouseX-this.x)<=this.nearestBorderThreshold && abs(mouseY - (this.y+this.height))<=this.nearestBorderThreshold){
         this.nearestBorder = "bottom-left";
+        cursor("nesw-resize");
       } else if(abs(mouseX-(this.x+this.width))<=this.nearestBorderThreshold && abs(mouseY - (this.y+this.height))<=this.nearestBorderThreshold){
         this.nearestBorder = "bottom-right";
+        cursor("nwse-resize");
       } else {
         this.nearestBorder = null;
       }
@@ -176,12 +218,12 @@ export class Frame extends FrameComponent{
         //call check function here
         if(this.nearestBorder=="left" || this.nearestBorder=="right"){
           if( this.nearestBorder=="left"){
-            if(this.x+this.width-mouseX>=50){
+            if(this.x+this.width-mouseX>=this.bannerHeight){
               this.width = this.x + this.width - mouseX;
               this.x = mouseX;
             }
           } else {
-            if(mouseX-this.x>=50){
+            if(mouseX-this.x>=this.bannerHeight){
               this.width = mouseX - this.x;
             }
           }
@@ -194,12 +236,12 @@ export class Frame extends FrameComponent{
   
         } else if(this.nearestBorder=="top"||this.nearestBorder=="bottom"){
           if(this.nearestBorder=="top"){
-            if(this.y+this.height-mouseY>=50){
+            if(this.y+this.height-mouseY>=this.bannerHeight){
               this.height =this.y + this.height - mouseY;
               this.y = mouseY;
             }
           } else {
-            if(mouseY-this.y>=50){
+            if(mouseY-this.y>=this.bannerHeight){
               this.height = mouseY - this.y;
             }
           }
@@ -208,7 +250,12 @@ export class Frame extends FrameComponent{
             return;
           }
   
-          this.adjustHeight(this.y + this.pady, this.height - 2*(this.pady));
+          if(this.alwaysShowBanner){
+            this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+          } else {
+            this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+          }
+
         } else {
           if(this.nearestBorder=="top-left"){
             if(this.x+this.width-mouseX>=50){
@@ -249,7 +296,11 @@ export class Frame extends FrameComponent{
           }
   
           this.adjustWidth(this.x + this.padx, this.width - 2*(this.padx));
-          this.adjustHeight(this.y + this.pady, this.height - 2*(this.pady));
+          if(this.alwaysShowBanner){
+            this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+          } else {
+            this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+          }
         }
   
         //console.log("(",this.width,"x",this.height,")");
@@ -275,7 +326,9 @@ export class Frame extends FrameComponent{
     clearHoverCache({clearRepositionCache=true, clearResizingCache=true}={}){
       // console.log("Hover cache cleared...");
       if(clearRepositionCache && this.enableReposition){
-        this.hideBanner();
+        if(!this.alwaysShowBanner){
+          this.hideBanner();
+        }
 
         this.xDist=null;
         this.yDist=null;

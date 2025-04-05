@@ -10,10 +10,11 @@ export class GridFrame extends Frame{
       cornerRadius = 0,
       padx=0,
       pady=0,
+      alwaysShowBanner = false,
       rows=1,
       cols=1,
-      nearestBorderThreshold=5,
-      bannerHeight=50,
+      nearestBorderThreshold=8,
+      bannerHeight=35,
       parent=null,
       enableReposition=false,
       enableResizing=false,
@@ -26,7 +27,7 @@ export class GridFrame extends Frame{
     ){
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-        cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
+        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
 
       //for storing child elements
@@ -181,9 +182,15 @@ export class GridFrame extends Frame{
     adjustToGrid(row, col, rowSpan, colSpan){
       let x = this.x + this.padx;
       let y = this.y + this.pady;
+      if(this.alwaysShowBanner){
+        y += this.bannerHeight;
+      }
   
       let w = this.width - 2*this.padx;
       let h = this.height - 2*this.pady;
+      if(this.alwaysShowBanner){
+        h -= this.bannerHeight;
+      }
   
       for(let i=0; i<col; i++){
         x += (this.colWeights[i]/this.totalColWeight) * w;
@@ -259,7 +266,11 @@ export class GridFrame extends Frame{
       let w=0;
       let h=0;
       for(let i=row; i<=row+yLimit; i++){
-        h += (this.rowWeights[i]/this.totalRowWeight) * (this.height - 2*this.pady);
+        if(this.alwaysShowBanner){
+          h += (this.rowWeights[i]/this.totalRowWeight) * (this.height - this.bannerHeight - 2*this.pady);
+        } else {
+          h += (this.rowWeights[i]/this.totalRowWeight) * (this.height - 2*this.pady);
+        }
       }
   
       for(let j=col; j<=col+xLimit; j++){
@@ -336,7 +347,7 @@ export class GridFrame extends Frame{
       }
   
       //showing the top banner
-      if(this.enableReposition && this.bannerFlag==true){
+      if(this.alwaysShowBanner || (this.enableReposition && this.bannerFlag==true)){
         noStroke();
         fill(0);
         rect(this.x, this.y, this.width, this.bannerHeight);
@@ -368,8 +379,8 @@ export class GridFrame extends Frame{
       }
 
       //highlighting the relevant border if cursor is sufficiently near to it
-      if(this.enableResizing && this.nearestBorder!=null){
-        this.showHighlightedBorder();
-      }
+      // if(this.enableResizing && this.nearestBorder!=null){
+      //   this.showHighlightedBorder();
+      // }
     }
   }

@@ -67,19 +67,47 @@ export class Component{
     }
   }
 
-  //is cursor inside
-  isInside(){
-    let res = mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height;
-
-    let parentRes;
-    if(this.parent && this.parent.constructor.name==="ScrollFrame"
-       && (this.parent.yScroll || this.parent.xScroll)){
-      parentRes = this.parent.isInside();
-      return res && parentRes;
-    }
-
-    return res;
+  isInside() {
+    let insideRect = mouseX > this.x && mouseX < this.x + this.width &&
+                     mouseY > this.y && mouseY < this.y + this.height;
+  
+    if (!insideRect) return false;
+  
+    let r = this.cornerRadius || 0;
+  
+    // If corner radius is 0, we don't need further checks
+    if (r <= 0) return this.checkParent();
+  
+    // Define the 4 corner centers
+    let corners = [
+      { x: this.x + r, y: this.y + r },                                 // top-left
+      { x: this.x + this.width - r, y: this.y + r },                    // top-right
+      { x: this.x + r, y: this.y + this.height - r },                   // bottom-left
+      { x: this.x + this.width - r, y: this.y + this.height - r },      // bottom-right
+    ];
+  
+    // Check if mouse is within the quarter circle of any corner
+    if (mouseX < this.x + r && mouseY < this.y + r && dist(mouseX, mouseY, corners[0].x, corners[0].y) > r)
+      return false;
+    if (mouseX > this.x + this.width - r && mouseY < this.y + r && dist(mouseX, mouseY, corners[1].x, corners[1].y) > r)
+      return false;
+    if (mouseX < this.x + r && mouseY > this.y + this.height - r && dist(mouseX, mouseY, corners[2].x, corners[2].y) > r)
+      return false;
+    if (mouseX > this.x + this.width - r && mouseY > this.y + this.height - r && dist(mouseX, mouseY, corners[3].x, corners[3].y) > r)
+      return false;
+  
+    return this.checkParent();
   }
+  
+  // helper to deal with scrollable parent
+  checkParent() {
+    if (this.parent && this.parent.constructor.name === "ScrollFrame" &&
+        (this.parent.enableVScroll || this.parent.enableHScroll)) {
+      return this.parent.isInside();
+    }
+    return true;
+  }
+  
 
   //finds element recursively among children
   findElement(element){

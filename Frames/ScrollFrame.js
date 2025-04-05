@@ -10,12 +10,13 @@ export class ScrollFrame extends Frame{
       cornerRadius = 0,
       padx=0,
       pady=0,
+      alwaysShowBanner = false,
       enableVScroll=false,
       enableHScroll=false,
       scrollSensitivity=20,
-      bannerHeight=50,
+      bannerHeight=35,
       alignment="v", //v for vertical, h for horizontal
-      nearestBorderThreshold=5,
+      nearestBorderThreshold=8,
       parent=null,
       enableReposition=false,
       enableResizing=false,
@@ -27,7 +28,7 @@ export class ScrollFrame extends Frame{
     } = {}) {
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-        cornerRadius, padx, pady, bannerHeight, nearestBorderThreshold, parent, "Frame",
+        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
       
       this.preferences = [];
@@ -110,7 +111,7 @@ export class ScrollFrame extends Frame{
       }
       
       //show the top banner
-      if(this.enableReposition && this.bannerFlag){
+      if(this.alwaysShowBanner || (this.enableReposition && this.bannerFlag)){
         noStroke();
         fill(0);
         rect(this.x, this.y, this.width, this.bannerHeight);
@@ -134,9 +135,9 @@ export class ScrollFrame extends Frame{
       }
 
       //highlight the relevant border if cursor is sufficiently near to it
-      if(this.enableResizing && this.nearestBorder!=null){
-        this.showHighlightedBorder();
-      }
+      // if(this.enableResizing && this.nearestBorder!=null){
+      //   this.showHighlightedBorder();
+      // }
     }
   
     add(element,
@@ -311,7 +312,12 @@ export class ScrollFrame extends Frame{
     //corrects position and dimensions of all the child elements so that
     //they fit right in the parent frame
     redraw(){
-      this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+      if(this.alwaysShowBanner){
+        this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+      } else {
+        this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+      }
+      
       this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
     
