@@ -123,7 +123,7 @@ export class Frame extends FrameComponent{
       }
     }
 
-    isDragging(){
+    isRepositioning(){
       return (this.xDist!=null && this.yDist!=null);
     }
 
@@ -131,13 +131,13 @@ export class Frame extends FrameComponent{
       // console.log("mouse dragged...");
 
       if(this.enableResizing){
-        if(this.isNearBorder() && !this.isDragging()){
+        if(this.isNearBorder() && !this.isRepositioning()){
           this.updateDimensions();
           return;
         }
       }
 
-      if(this.enableReposition && this.isDragging()){
+      if(this.enableReposition && this.isRepositioning()){
         this.updatePosition();
       }
     }
@@ -149,7 +149,7 @@ export class Frame extends FrameComponent{
     updatePosUtil(){};
   
     mouseReleasedEventListener(){
-      if(this.enableReposition && this.isDragging()){
+      if(this.enableReposition && this.isRepositioning()){
         this.xDist=null;
         this.yDist=null;
       }
@@ -211,6 +211,18 @@ export class Frame extends FrameComponent{
         }
       }
       pop();
+    }
+
+    //corrects position and dimensions of all the child elements so that
+    //they fit right in the parent frame
+    redraw(){
+      if(this.alwaysShowBanner){
+        this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+      } else {
+        this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+      }
+      
+      this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
   
     updateDimensions(){

@@ -1,3 +1,4 @@
+import { Component } from '../Core/Component.js';
 import {Frame} from './Frame.js';
 
 export class ScrollFrame extends Frame{
@@ -153,7 +154,12 @@ export class ScrollFrame extends Frame{
         console.log("element to add can't be null");
         return;
       }
-      
+
+      if(this.findElement(element)){
+        console.log(`the component (id: ${element.id}) is already added to the scrollframe (${this.id})`);
+        console.log("component: ", element, "\nScrollFrame: ", this);
+        return;
+      }
   
       if(weight<=0){
         console.log("weight can't be non-positive");
@@ -164,11 +170,6 @@ export class ScrollFrame extends Frame{
         console.log(`component with duplicate id (${element.id}) found in ${this.constructor.name}; component (${element.constructor.name}) can't be added!`);
         console.log(this);
         console.log("");
-        return;
-      }
-
-      if(this.getElementById(element.id)){
-        console.log(`duplicate id (${element.id}) found; element (${element.constructor.name}) can't be added!`);
         return;
       }
 
@@ -192,6 +193,23 @@ export class ScrollFrame extends Frame{
         this.findTopper();
         this.findDeepest();
       }
+    }
+
+    remove(element){
+      let index = this.findIndexOfElement(element);
+      if(index==-1){
+        console.log(`element (id: ${element.id}) can't be removed from ScrollFrame (id: ${this.id})
+           because it was not found in immediate children!`);
+        return;
+      }
+
+      this.children[index].parent = null;
+      this.totalWeight -= this.preferences[index][0];
+      this.preferences = this.preferences.filter((_, i) => i!==index);
+      this.removeChild(element);
+      this.redraw();
+
+      console.log(`element (id: ${element.id}) successfully removed from ${this.constructor.name} (id: ${this.id})!`);
     }
 
     setWeight(index, weight){
@@ -307,18 +325,6 @@ export class ScrollFrame extends Frame{
       }
 
       return this.preferences[index][4];
-    }
-  
-    //corrects position and dimensions of all the child elements so that
-    //they fit right in the parent frame
-    redraw(){
-      if(this.alwaysShowBanner){
-        this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
-      } else {
-        this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
-      }
-      
-      this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
     
     //the following find methods find the relevant subjects by maintaing a

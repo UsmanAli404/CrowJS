@@ -69,7 +69,7 @@ export class Label extends UIComponent{
       this.updateLabelSize();
     }
     
-  
+    //needs heavy optimizations
     updateLabelSize() {
       let maxSize = min(this.width * 0.9, this.height * 0.8);
       let minSize = 1;

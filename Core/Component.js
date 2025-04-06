@@ -98,6 +98,18 @@ export class Component{
   
     return this.checkParent();
   }
+
+  //removes child from children array
+  //only from the immediate children
+  removeChild(element){
+    if(this.children.includes(element)){
+      this.children = this.children.filter((elem)=>elem!==element);
+      // console.log(`element (id: ${element.id}) removed successfully from ${this.constructor.name} (id: ${this.id})!`);
+      return true;
+    }
+
+    return false;
+  }
   
   // helper to deal with scrollable parent
   checkParent() {
@@ -123,6 +135,10 @@ export class Component{
     }
 
     return false;
+  }
+
+  findIndexOfElement(element){
+    return this.children.findIndex((elem)=> elem===element);
   }
 
   // cheking if it or any of its children have ids
@@ -163,6 +179,7 @@ export class Component{
     }
   }
 
+  //recursively finds element by ID
   getElementById(id){
     if(id===null){
       return null;
@@ -182,6 +199,7 @@ export class Component{
     return null;
   }
 
+  //recursively finds target component
   findTarget(){
     for(let i = this.children.length - 1; i >= 0; i--){
       let child = this.children[i];
@@ -197,6 +215,7 @@ export class Component{
     return null;
   }
 
+  //recursively sets root of itself and of its children
   setRoot(root){
     this.root = root;
     

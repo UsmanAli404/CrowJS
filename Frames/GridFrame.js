@@ -49,6 +49,24 @@ export class GridFrame extends Frame{
       padB=0
     }={})
     {
+      //check if grid is configured or not
+      if(this.grid===null){
+        console.log("element can't be added: gird not configured,");
+        console.log("call .gridConfig(rows, cols) to configure grid before adding any elements!");
+        return;
+      }
+
+      if(element===null){
+        console.log("element to add can't be null");
+        return;
+      }
+
+      if(this.findElement(element)){
+        console.log(`the component (id: ${element.id}) is already added to the Gridframe (${this.id})`);
+        console.log("component: ", element, "\nGridFrame: ", this);
+        return;
+      }
+
       if(row<0 || row>=this.rows || col<0 || col>=this.cols){
         console.log("index out of range; can't add the element at (",row,",",col,")");
         return;
@@ -71,6 +89,50 @@ export class GridFrame extends Frame{
       this.children.push(element);
       this.grid[row][col] = [element, rowSpan, colSpan, padL, padR, padT, padB];
       this.adjustToGrid(row, col, rowSpan, colSpan);
+
+      this.printGrid();
+    }
+
+    getElementPos(element){
+      for(let i=0; i<this.rows; i++){
+        for(let j=0; j<this.cols; j++){
+          if(this.grid[i][j][0]===element)
+            return [i, j];
+        }
+      }
+
+      return null;
+    }
+
+    remove(element){
+      let index = this.findIndexOfElement(element);
+      if(index==-1){
+        console.log(`element (id: ${element.id}) can't be removed from ScrollFrame (id: ${this.id})
+           because it was not found in immediate children!`);
+        return;
+      }
+
+      element.parent = null;
+      let res = this.getElementPos(element);
+      console.log(res);
+      let x = res[0];
+      let y = res[1];
+      let rowSpan = this.grid[x][y][1];
+      let colSpan = this.grid[x][y][2];
+      //reclaiming the space taken up by the 
+      //element in the grid
+      if(res !== null){
+        for(let i=x; i < x+rowSpan; i++){
+          for(let j=y; j< y+colSpan; j++){
+            this.grid[i][j] = null;
+          }
+        }
+      }
+      
+      this.removeChild(element);
+      this.redraw();
+      console.log(`element (id: ${element.id}) successfully removed from ${this.constructor.name} (id: ${this.id})!`);
+      this.printGrid();
     }
     
     rowConfig(rowNum, weight){
@@ -178,6 +240,7 @@ export class GridFrame extends Frame{
       }
     }
   
+    //only called when a new element is added
     //to make the element fit into the grid cell
     adjustToGrid(row, col, rowSpan, colSpan){
       let x = this.x + this.padx;
@@ -382,5 +445,19 @@ export class GridFrame extends Frame{
       // if(this.enableResizing && this.nearestBorder!=null){
       //   this.showHighlightedBorder();
       // }
+    }
+
+    printGrid(){
+      for(let i=0; i<this.rows; i++){
+        let row = "";
+        for(let j=0; j<this.cols; j++){
+          if(this.grid[i][j]){
+            row += "* ";
+          } else {
+            row += "_ ";
+          }
+        }
+        console.log(row);
+      }
     }
   }
