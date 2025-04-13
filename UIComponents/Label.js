@@ -15,6 +15,15 @@ export class Label extends UIComponent{
         shadowIntensity= 0.4,
         shadowSpread= 3,
         shadowDetail=5,
+        HTextAlign="center",
+        VTextAlign="center",
+        pad = 5,
+        padx = 0,
+        pady = 0,
+        padl = 0,
+        padr = 0,
+        padt = 0,
+        padb = 0,
       } = {}) {
       super(x, y, width, height, backgroundColor, borderFlag, borderColor,
         borderWidth, cornerRadius, enableShadow, shadowColor, shadowIntensity,
@@ -23,6 +32,17 @@ export class Label extends UIComponent{
       this.text = label;
       this.labelSize = 20;
       this.textColor = textColor;
+
+      this.HTextAlign = HTextAlign;
+      this.VTextAlign = VTextAlign;
+
+      this.pad = pad;
+      this.padx = padx;
+      this.pady = pady;
+      this.padl = padl;
+      this.padr = padr;
+      this.padt = padt;
+      this.padb = padb;
     }
 
     // if(this.enableShadow){
@@ -49,9 +69,37 @@ export class Label extends UIComponent{
       
       // Text
       fill(this.textColor);
-      textAlign(CENTER, CENTER);
+      // textAlign(CENTER, CENTER);
       textSize(this.labelSize);
-      text(this.text, this.width / 2, this.height / 2);
+
+      let x;
+      if(this.HTextAlign === "left"){
+        textAlign(LEFT, CENTER);
+        x = this.pad;
+      } else if(this.HTextAlign === "right"){
+        textAlign(RIGHT, CENTER);
+        x = this.width - this.pad;
+      } else{
+        //center
+        textAlign(CENTER, CENTER);
+        x = this.width / 2;
+      } 
+
+      let y;
+      if(this.VTextAlign === "top"){
+        textAlign(this.getHTextAlign(), BOTTOM);
+        y = this.labelSize + this.pad;
+      } else if(this.VTextAlign === "bottom"){
+        textAlign(this.getHTextAlign(), TOP);
+        y = this.height - this.labelSize - this.pad;
+      } else {
+        //center
+        textAlign(this.getHTextAlign(), CENTER);
+        y = this.height / 2;
+      }
+
+      text(this.text, x, y);
+      // rect(x, y, this.labelSize, this.labelSize);
       
       // Border
       if (this.borderFlag) {
@@ -63,6 +111,29 @@ export class Label extends UIComponent{
       
       pop();
     }
+
+    getHTextAlign(){
+      switch(this.HTextAlign){
+        case "left":
+          return LEFT;
+        case "right":
+          return RIGHT;
+        default:
+          return CENTER;
+      }
+    }
+
+    getVTextAlign(){
+      switch(this.VTextAlign){
+        case "top":
+          return TOP;
+        case "bottom":
+          return BOTTOM;
+        default:
+          return CENTER;
+      }
+    }
+    
 
     setText(text){
       this.text = text;

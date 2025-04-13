@@ -42,6 +42,7 @@ export class Component{
 
   //to take action upon event occurence
   dispatchEvent(event){
+    // console.log("Dispatching to:", event.target, "Event type:", event.type);
     if(this.eventListeners[event.type]){
       for(let callback of this.eventListeners[event.type]){
         callback(event);
@@ -213,6 +214,18 @@ export class Component{
     }
 
     return null;
+  }
+
+  isChildOf(elem){
+    if(!this.parent || !elem){
+      return false;
+    }
+
+    if(this.parent === elem){
+      return true;
+    }
+
+    return this.parent.isChildOf(elem);
   }
 
   //recursively sets root of itself and of its children

@@ -17,7 +17,9 @@ export class GridFrame extends Frame{
       bannerHeight=35,
       parent=null,
       enableReposition=false,
+      enableOptimisedReposition=false,
       enableResizing=false,
+      enableOptimisedResizing=false,
       enableShadow=false,
       shadowColor= 'rgb(0,0,0)',
       shadowIntensity= 0.4,
@@ -28,7 +30,7 @@ export class GridFrame extends Frame{
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
+        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
 
       //for storing child elements
       this.rows=rows;
@@ -90,7 +92,7 @@ export class GridFrame extends Frame{
       this.grid[row][col] = [element, rowSpan, colSpan, padL, padR, padT, padB];
       this.adjustToGrid(row, col, rowSpan, colSpan);
 
-      this.printGrid();
+      // this.printGrid();
     }
 
     getElementPos(element){
@@ -114,7 +116,7 @@ export class GridFrame extends Frame{
 
       element.parent = null;
       let res = this.getElementPos(element);
-      console.log(res);
+      // console.log(res);
       let x = res[0];
       let y = res[1];
       let rowSpan = this.grid[x][y][1];
@@ -132,7 +134,7 @@ export class GridFrame extends Frame{
       this.removeChild(element);
       this.redraw();
       console.log(`element (id: ${element.id}) successfully removed from ${this.constructor.name} (id: ${this.id})!`);
-      this.printGrid();
+      // this.printGrid();
     }
     
     rowConfig(rowNum, weight){
@@ -185,7 +187,7 @@ export class GridFrame extends Frame{
       //[element, rowSpan, colSpan, padL, padR, padT, padB];
       for(let i=0; i<this.cols; i++){
         for(let j=0; j<this.rows; j++){
-          if(this.grid[j][i]!=null && this.grid[j][i]!="taken"){
+          if(this.grid && this.grid[j][i]!=null && this.grid[j][i]!="taken"){
             let curr = this.grid[j][i];
   
             curr[0].x = x + curr[3];
@@ -214,7 +216,7 @@ export class GridFrame extends Frame{
       //[element, rowSpan, colSpan, padL, padR, padT, padB];
       for(let i=0; i<this.rows; i++){
         for(let j=0; j<this.cols; j++){
-          if(this.grid[i][j]!=null && this.grid[i][j]!="taken"){
+          if(this.grid && this.grid[i][j]!=null && this.grid[i][j]!="taken"){
             let curr = this.grid[i][j];
   
             curr[0].y = y + curr[5];
@@ -312,7 +314,7 @@ export class GridFrame extends Frame{
       for(let j=col+1; j<=cBoundary; j++){
         xLimit++;
         for(let i=row; i<=yLimit+row; i++){
-          if(this.grid[i][j]!=null){
+          if(this.grid && this.grid[i][j]!=null){
             if(xLimit>0){
               xLimit--;
               console.log("can't expand beyond col ",col+xLimit," since there's a non-null element in col ",col+xLimit+1);
@@ -356,18 +358,18 @@ export class GridFrame extends Frame{
     
     showBanner(){
       this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
-      this.bannerFlag=true;
+      this.isBannerShown=true;
     }
     
     hideBanner(){
       this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
-      this.bannerFlag=false;
+      this.isBannerShown=false;
     }
   
     updatePosUtil(xDiff, yDiff){
       for(let i=0; i<this.rows; i++){
         for(let j=0; j<this.cols; j++){
-          if(this.grid[i][j]!=null && this.grid[i][j]!="taken"){
+          if(this.grid && this.grid[i][j]!=null && this.grid[i][j]!="taken"){
             this.grid[i][j][0].x -= xDiff;
             this.grid[i][j][0].y -= yDiff;
             if(this.grid[i][j][0].type=="Frame"){
@@ -403,14 +405,14 @@ export class GridFrame extends Frame{
       //displaying all the child elements
       for(let i=0; i<this.rows; i++){
         for(let j=0; j<this.cols; j++){
-          if(this.grid[i][j]!=null && this.grid[i][j]!="taken"){
+          if(this.grid && this.grid[i][j]!=null && this.grid[i][j]!="taken"){
             this.grid[i][j][0].show();
           }
         }
       }
   
       //showing the top banner
-      if(this.alwaysShowBanner || (this.enableReposition && this.bannerFlag==true)){
+      if(this.alwaysShowBanner || (this.enableReposition && this.isBannerShown==true)){
         noStroke();
         fill(0);
         rect(this.x, this.y, this.width, this.bannerHeight);

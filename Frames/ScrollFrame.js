@@ -1,4 +1,3 @@
-import { Component } from '../Core/Component.js';
 import {Frame} from './Frame.js';
 
 export class ScrollFrame extends Frame{
@@ -20,7 +19,9 @@ export class ScrollFrame extends Frame{
       nearestBorderThreshold=8,
       parent=null,
       enableReposition=false,
+      enableOptimisedReposition=false,
       enableResizing=false,
+      enableOptimisedResizing=false,
       enableShadow=false,
       shadowColor= 'rgb(0,0,0)',
       shadowIntensity= 0.4,
@@ -30,7 +31,7 @@ export class ScrollFrame extends Frame{
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
+        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
       
       this.preferences = [];
       //used for calculating weighted dimensions of child elements
@@ -112,7 +113,7 @@ export class ScrollFrame extends Frame{
       }
       
       //show the top banner
-      if(this.alwaysShowBanner || (this.enableReposition && this.bannerFlag)){
+      if(this.alwaysShowBanner || (this.enableReposition && this.isBannerShown)){
         noStroke();
         fill(0);
         rect(this.x, this.y, this.width, this.bannerHeight);
@@ -223,6 +224,8 @@ export class ScrollFrame extends Frame{
         return;
       }
 
+      this.totalWeight -= this.preferences[index][0];
+      this.totalWeight += weight;
       this.preferences[index][0] = weight;
     }
 
@@ -503,17 +506,17 @@ export class ScrollFrame extends Frame{
       } else {
         this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
       }
-      this.bannerFlag=true;
+      this.isBannerShown=true;
     }
     
     hideBanner(){
-      if(this.enableReposition && this.bannerFlag){
+      if(this.enableReposition && this.isBannerShown){
         if(this.enableVScroll==true){
           this.BannerUtil(-1, this.bannerHeight);
         } else {
           this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
         }
-        this.bannerFlag=false;
+        this.isBannerShown=false;
       }
     }
   

@@ -1,3 +1,4 @@
+import { DummyFrame } from './DummyFrame.js';
 import { FrameComponent } from './FrameComponent.js';
 
 //frame should allow, closing off -> remove it and all of its childern from the root array
@@ -6,7 +7,7 @@ import { FrameComponent } from './FrameComponent.js';
 export class Frame extends FrameComponent{
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, type, 
-      enableReposition, enableResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
+      enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
       super(x, y, width, height, {parent: parent, type: type, id: id});
   
       this.backgroundColor = backgroundColor;
@@ -19,14 +20,16 @@ export class Frame extends FrameComponent{
   
       this.enableShadow = enableShadow;
       this.enableReposition = enableReposition;
+      this.enableOptimisedReposition = enableOptimisedReposition;
       this.enableResizing = enableResizing;
+      this.enableOptimisedResizing = enableOptimisedResizing;
       this.alwaysShowBanner = alwaysShowBanner;
 
       if(this.enableReposition || this.alwaysShowBanner){
         this.bannerHeight = bannerHeight;
         
         if(this.enableReposition){
-          this.bannerFlag = false;
+          this.isBannerShown = false;
           this.xDist = null;
           this.yDist = null;
           this.prevX = null;
@@ -34,7 +37,7 @@ export class Frame extends FrameComponent{
         }
 
         if(this.alwaysShowBanner){
-          this.bannerFlag = true;
+          this.isBannerShown = true;
         }
       }
 
@@ -78,7 +81,7 @@ export class Frame extends FrameComponent{
       if(this.enableResizing) {
         this.checkAndFindNearestBorder();
         if(this.isNearBorder()){
-          if(this.bannerFlag){
+          if(this.isBannerShown){
             this.clearHoverCache({clearResizingCache:false});
           }
           return;
@@ -93,11 +96,11 @@ export class Frame extends FrameComponent{
         cursor("");
       }
 
-      if(this.isOverBannerArea() && (this.enableReposition && !this.bannerFlag)) {
+      if(this.isOverBannerArea() && (this.enableReposition && !this.isBannerShown)) {
         this.showBanner();
       } else {
         if(!this.isOverBannerArea()) {
-          if(this.enableReposition && this.bannerFlag){
+          if(this.enableReposition && this.isBannerShown){
             this.clearHoverCache({clearResizingCache:false});
           }
 
@@ -109,16 +112,25 @@ export class Frame extends FrameComponent{
     }
 
     onMouseBtnPress(event) {
-      // console.log("mouse btn pressed...");
-      if(this.isNearBorder()){
+      if(this.enableResizing && this.isNearBorder()){
+        //dummy resize frame
+        if(this.enableOptimisedResizing){
+          this.createDummyFrame(DummyFrame.RESIZE_DF);
+        }
+
         return;
       }
-
+      
       if(this.isOverBannerArea()){
         if(this.enableReposition) {
           cursor("grabbing");
           this.xDist = mouseX - this.x;
           this.yDist = mouseY - this.y;
+
+          //dummy reposition frame
+          if(this.enableOptimisedReposition){
+            this.createDummyFrame(DummyFrame.REPOSITION_DF);
+          }
         }
       }
     }
@@ -129,7 +141,6 @@ export class Frame extends FrameComponent{
 
     onMouseDrag(event){
       // console.log("mouse dragged...");
-
       if(this.enableResizing){
         if(this.isNearBorder() && !this.isRepositioning()){
           this.updateDimensions();
@@ -140,6 +151,24 @@ export class Frame extends FrameComponent{
       if(this.enableReposition && this.isRepositioning()){
         this.updatePosition();
       }
+    }
+
+    createDummyFrame(type){
+      let DF = new DummyFrame(this.x, this.y, this.width, this.height, type);
+      DF.parent = this;
+      DF.root = this.root;
+
+      if(type === DummyFrame.RESIZE_DF){
+        DF.nearestBorder = this.nearestBorder;
+      } else if(type === DummyFrame.REPOSITION_DF){
+        DF.xDist = this.xDist;
+        DF.yDist = this.yDist;
+      }
+
+      this.root.add(DF);
+      this.root.activeElement = DF;
+
+      // console.log(DF);
     }
 
     isOverBannerArea(){
@@ -216,7 +245,7 @@ export class Frame extends FrameComponent{
     //corrects position and dimensions of all the child elements so that
     //they fit right in the parent frame
     redraw(){
-      if(this.alwaysShowBanner){
+      if(this.alwaysShowBanner || (this.isOverBannerArea() && this.enableReposition && !this.isBannerShown)){
         this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
       } else {
         this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
@@ -226,96 +255,91 @@ export class Frame extends FrameComponent{
     }
   
     updateDimensions(){
-      if(mouseIsPressed){
-        //call check function here
-        if(this.nearestBorder=="left" || this.nearestBorder=="right"){
-          if( this.nearestBorder=="left"){
-            if(this.x+this.width-mouseX>=this.bannerHeight){
-              this.width = this.x + this.width - mouseX;
-              this.x = mouseX;
-            }
-          } else {
-            if(mouseX-this.x>=this.bannerHeight){
-              this.width = mouseX - this.x;
-            }
+      if(this.nearestBorder=="left" || this.nearestBorder=="right"){
+        if( this.nearestBorder=="left"){
+          if(this.x+this.width-mouseX>=this.bannerHeight){
+            this.width = this.x + this.width - mouseX;
+            this.x = mouseX;
           }
-  
-          if(this.nearestBorder=="right" && this.xScroll==true){
-            return;
-          }
-  
-          this.adjustWidth(this.x + this.padx, this.width - 2*(this.padx));
-  
-        } else if(this.nearestBorder=="top"||this.nearestBorder=="bottom"){
-          if(this.nearestBorder=="top"){
-            if(this.y+this.height-mouseY>=this.bannerHeight){
-              this.height =this.y + this.height - mouseY;
-              this.y = mouseY;
-            }
-          } else {
-            if(mouseY-this.y>=this.bannerHeight){
-              this.height = mouseY - this.y;
-            }
-          }
-          
-          if(this.yScroll==true && this.nearestBorder=="bottom"){
-            return;
-          }
-  
-          if(this.alwaysShowBanner){
-            this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
-          } else {
-            this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
-          }
-
         } else {
-          if(this.nearestBorder=="top-left"){
-            if(this.x+this.width-mouseX>=50){
-              this.width = this.x + this.width - mouseX;
-              this.x = mouseX;
-            }
-  
-            if(this.y+this.height-mouseY>=50){
-              this.height =this.y + this.height - mouseY;
-              this.y = mouseY;
-            }
-          } else if(this.nearestBorder=="top-right"){
-            if(mouseX-this.x>=50){
-              this.width = mouseX - this.x;
-            }
-  
-            if(this.y+this.height-mouseY>=50){
-              this.height =this.y + this.height - mouseY;
-              this.y = mouseY;
-            }
-          } else if(this.nearestBorder=="bottom-left"){
-            if(this.x+this.width-mouseX>=50){
-              this.width = this.x + this.width - mouseX;
-              this.x = mouseX;
-            }
-  
-            if(mouseY-this.y>=50){
-              this.height = mouseY - this.y;
-            }
-          } else if(this.nearestBorder=="bottom-right"){
-            if(mouseX-this.x>=50){
-              this.width = mouseX - this.x;
-            }
-  
-            if(mouseY-this.y>=50){
-              this.height = mouseY - this.y;
-            }
-          }
-  
-          this.adjustWidth(this.x + this.padx, this.width - 2*(this.padx));
-          if(this.alwaysShowBanner){
-            this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
-          } else {
-            this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+          if(mouseX-this.x>=this.bannerHeight){
+            this.width = mouseX - this.x;
           }
         }
-  
-        //console.log("(",this.width,"x",this.height,")");
+
+        if(this.nearestBorder=="right" && this.xScroll==true){
+          return;
+        }
+
+        this.adjustWidth(this.x + this.padx, this.width - 2*(this.padx));
+
+      } else if(this.nearestBorder=="top"||this.nearestBorder=="bottom"){
+        if(this.nearestBorder=="top"){
+          if(this.y+this.height-mouseY>=this.bannerHeight){
+            this.height =this.y + this.height - mouseY;
+            this.y = mouseY;
+          }
+        } else {
+          if(mouseY-this.y>=this.bannerHeight){
+            this.height = mouseY - this.y;
+          }
+        }
+        
+        if(this.yScroll==true && this.nearestBorder=="bottom"){
+          return;
+        }
+
+        if(this.alwaysShowBanner){
+          this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+        } else {
+          this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+        }
+
+      } else {
+        if(this.nearestBorder=="top-left"){
+          if(this.x+this.width-mouseX>=50){
+            this.width = this.x + this.width - mouseX;
+            this.x = mouseX;
+          }
+
+          if(this.y+this.height-mouseY>=50){
+            this.height =this.y + this.height - mouseY;
+            this.y = mouseY;
+          }
+        } else if(this.nearestBorder=="top-right"){
+          if(mouseX-this.x>=50){
+            this.width = mouseX - this.x;
+          }
+
+          if(this.y+this.height-mouseY>=50){
+            this.height =this.y + this.height - mouseY;
+            this.y = mouseY;
+          }
+        } else if(this.nearestBorder=="bottom-left"){
+          if(this.x+this.width-mouseX>=50){
+            this.width = this.x + this.width - mouseX;
+            this.x = mouseX;
+          }
+
+          if(mouseY-this.y>=50){
+            this.height = mouseY - this.y;
+          }
+        } else if(this.nearestBorder=="bottom-right"){
+          if(mouseX-this.x>=50){
+            this.width = mouseX - this.x;
+          }
+
+          if(mouseY-this.y>=50){
+            this.height = mouseY - this.y;
+          }
+        }
+
+        this.adjustWidth(this.x + this.padx, this.width - 2*(this.padx));
+        if(this.alwaysShowBanner){
+          this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
+        } else {
+          this.adjustHeight(this.y+this.pady, this.height-2*this.pady);
+        }
       }
     }
     

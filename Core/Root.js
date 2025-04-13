@@ -8,14 +8,14 @@ export class Root{
       this.activeElement = -1;
       //for keeping track of entry order,
       //useful for mouseEnter and mouseLeave events
-      this.enterStack = [];
+      this.entryOrderStack = [];
       this.elementsMap = new Map();//for storing ids
       // this.preferences = {};
     }
 
     printEnterStack(){
-      for(let i=this.enterStack.length-1; i>=0; i--){
-        console.log(this.enterStack[i]);
+      for(let i=this.entryOrderStack.length-1; i>=0; i--){
+        console.log(this.entryOrderStack[i]);
       }
     }
 
@@ -41,12 +41,61 @@ export class Root{
 
       this.layers.push(element);
       element.setRoot(this);
-      // console.log(this.layers[this.layers.length-1]);
+    }
+
+    isNum(val){
+      return Number.isInteger(val);
+    }
+
+    remove(element){
+      let index = this.getElementIndex(element);
+      if(index===-1){
+        return;
+      }
+
+      this.layers.splice(index, 1);
+
+      if(this.lastActiveElement === element || 
+        (!this.isNum(this.lastActiveElement) &&
+         this.lastActiveElement.isChildOf(element))
+      ){
+        this.lastActiveElement = -2;
+      }
+
+      if(this.activeElement === element ||
+        (!this.isNum(this.activeElement) &&
+        this.activeElement.isChildOf(element))
+      ){
+        this.activeElement = -1;
+      }
+
+      this.entryOrderStack.splice(index, 1);
+      if(element.id!==null){
+        this.elementsMap.delete(element.id);
+      }
+
+      // console.log(`Element ${element.type} removed successfully from root!`);
+      // console.log(element);
+      // console.log("");
+    }
+
+    //finds element only in layers
+    getElementIndex(element){
+      for(let i=0; i<this.layers.length; i++){
+        if(this.layers[i]===element){
+          return i;
+        }
+      }
+
+      console.log("Element not found!\n");
+      return -1;
     }
   
-    findElement(element){
-      // if it's a child of an element, then return 
-      // the element's index
+    // if it's a child of an element in layers,
+    // return paren't index
+    // else if is an element in layers,
+    // return the element's index
+    getElementIndexRec(element){
       for(let i=0; i<this.layers.length; i++){
         if(this.layers[i].findElement(element)){
           return i;
@@ -58,7 +107,7 @@ export class Root{
     }
   
     sendBackwards(element){
-      let i = this.findElement(element);
+      let i = this.getElementIndexRec(element);
       if(i!=1){
         if(i-1>=0){
           let temp = this.layers[i-1];
@@ -75,7 +124,7 @@ export class Root{
         }
       }
   
-      let i = this.findElement(element);
+      let i = this.getElementIndexRec(element);
       if(i!=-1){
         let temp = this.layers[i];
         for(let j=i; j>0; j--){
@@ -86,7 +135,7 @@ export class Root{
     }
   
     sendForwards(element){
-      let i = this.findElement(element);
+      let i = this.getElementIndexRec(element);
       if(i!=-1){
         if(i+1<this.layers.length){
           let temp = this.layers[i+1];
@@ -104,7 +153,7 @@ export class Root{
         }
       }
   
-      let i=this.findElement(element);
+      let i=this.getElementIndexRec(element);
       if(i!=-1){
         let temp = this.layers[i];
         for(let j=i; j<this.layers.length-1; j++){
@@ -114,13 +163,13 @@ export class Root{
       }
     }
 
-    handleMouseEvent(type, x, y){
+    handleMouseEvent(type, x, y, {e=null}={}){
       //currently engaged element
-      if(mouseIsPressed && !Number.isInteger(this.activeElement)){
+      if(mouseIsPressed && !this.isNum(this.activeElement)){
         this.sendToFront(this.activeElement);
 
         let target = this.activeElement;
-        let event = new MouseEvent(x, y, type, target);
+        let event = new MouseEvent(x, y, type, target, {event: e});
         target.dispatchEvent(event);
         return;
       }
@@ -131,14 +180,10 @@ export class Root{
         target = this.layers[i].findTarget();
         if(target!=null){
           if(this.activeElement!=this.lastActiveElement){
-            // console.log("component to component...");
-            // console.log(this.lastActiveElement);
-            // console.log(this.activeElement);
             this.mouseLeaveEventHandler(x, y);
           }
           this.lastActiveElement = this.activeElement;
           this.activeElement = target;
-          // this.sendToFront(this.activeElement);
           break;
         }
       }
@@ -148,7 +193,7 @@ export class Root{
         return;
       }
 
-      let event = new MouseEvent(x, y, type, target);
+      let event = new MouseEvent(x, y, type, target, {event: e});
       target.dispatchEvent(event);
     }
 
@@ -210,6 +255,15 @@ export class Root{
     //runs once after a mouse button is released
     //separate function
     mouseReleasedEventListeners(x, y){
+      if(!this.isNum(this.activeElement)){
+        // this.sendToFront(this.activeElement);
+
+        let target = this.activeElement;
+        let event = new MouseEvent(x, y, "release", target);
+        target.dispatchEvent(event);
+        return;
+      }
+
       this.handleMouseEvent("release", x, y);
     }
   
@@ -225,7 +279,7 @@ export class Root{
         return;
       }
 
-      if(this.enterStack.includes(this.activeElement)){
+      if(this.entryOrderStack.includes(this.activeElement)){
         return;
       }
 
@@ -234,8 +288,9 @@ export class Root{
 
       let event = new MouseEvent(x, y, "mouseEnter", target);
       target.dispatchMouseEnterEvent(event);
-      this.enterStack.push(target);
+      this.entryOrderStack.push(target);
       // console.log(target);
+      // console.log(this.entryOrderStack);
     }
 
     pushParent(element){
@@ -243,52 +298,53 @@ export class Root{
         return;
       }
 
-      if(this.enterStack.includes(element.parent)){
+      if(this.entryOrderStack.includes(element.parent)){
         return;
       }
 
       this.pushParent(element.parent);
-      this.enterStack.push(element.parent);
+      this.entryOrderStack.push(element.parent);
     }
 
 
 
     //in draw function
     mouseLeaveEventListeners(x, y){
-      if(mouseIsPressed && !Number.isInteger(this.activeElement)){
+      if(mouseIsPressed && !this.isNum(this.activeElement)){
         return;
       }
 
-      if(this.enterStack.length==0){
+      if(this.entryOrderStack.length==0){
         return;
       }
 
       // console.log("mouseLeaveEventListeners...");
 
-      while(true && this.enterStack.length>0){
-        let top = this.enterStack.pop();
+      while(true && this.entryOrderStack.length>0){
+        let top = this.entryOrderStack.pop();
         if(!top.isInside()){
           let event = new MouseEvent(x, y, "mouseLeave", top);
           top.dispatchMouseLeaveEvent(event);
         } else {
-          this.enterStack.push(top);
+          this.entryOrderStack.push(top);
           break;
         }
       }
+
+      // console.log(this.entryOrderStack);
     }
 
     //used for component to component cursor transition
     //triggered on the component the cursor left from
     mouseLeaveEventHandler(x, y){
       // console.log("mouseLeaveEventHandler ...");
-      // this.printEnterStack();
-      if(this.activeElement==-1 || Number.isInteger(this.lastActiveElement)){
+      if(this.activeElement==-1 || this.isNum(this.lastActiveElement)){
         return;
       }
 
       let index = -1;
-      for(let i=this.enterStack.length-1; i>=0; i--){
-        if(this.layers.includes(this.enterStack[i])){
+      for(let i=this.entryOrderStack.length-1; i>=0; i--){
+        if(this.layers.includes(this.entryOrderStack[i])){
           index = i;
           // console.log("index:", index);
           break;
@@ -299,7 +355,7 @@ export class Root{
         return;
       }
 
-      let temp = this.enterStack.slice(0, index);
+      let temp = this.entryOrderStack.slice(0, index);
       // console.log(temp);
       while(temp.length>0){
         let top = temp.pop();
@@ -307,17 +363,12 @@ export class Root{
         top.dispatchMouseLeaveEvent(event);
       }
 
-      this.enterStack.splice(0, index);
-      // this.printEnterStack();
+      this.entryOrderStack.splice(0, index);
     }
 
     //separate function
     mouseWheelEventListeners(x, y, event){
-      if(event.delta > 0){
-        this.handleMouseEvent("scrollUp", x, y);
-      } else{
-        this.handleMouseEvent("scrollDown", x, y);
-      }
+      this.handleMouseEvent("scroll", x, y, {e:event});
     }
 
     //runs once
