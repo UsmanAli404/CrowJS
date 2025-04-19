@@ -11,6 +11,7 @@ export class Root{
       this.entryOrderStack = [];
       this.elementsMap = new Map();//for storing ids
       // this.preferences = {};
+      this.focusedField = null;//for focusable input fields
     }
 
     printEnterStack(){
@@ -184,20 +185,45 @@ export class Root{
           }
           this.lastActiveElement = this.activeElement;
           this.activeElement = target;
+          if(target)
           break;
         }
       }
 
+      //clicked somewhere outside
       if(target==null){
+        if(type=="click"||type=="press"){
+          if(!this.focusedField){
+            return;
+          }
+
+          this.focusedField.blur();
+          this.focusedField = null;
+        }
         this.activeElement = -1;
         return;
       }
 
       let event = new MouseEvent(x, y, type, target, {event: e});
       target.dispatchEvent(event);
+      if(event.type=="click" || event.type=="press"){
+        if(target.type=="Input"){
+          this.focusedField = target;
+          this.focusedField.focus();
+        }
+      }
     }
 
     handleKeyboardEvent(type, x, y){
+      if(this.focusedField){
+        // console.log(this.focusedField);
+        let target = this.focusedField;
+        let event = new KeyboardEvent(x, y, type, target);
+        // console.log(event);
+        target.dispatchEvent(event);
+        return;
+      }
+
       let target = null;
       for(let i=this.layers.length-1; i>=0; i--){
         target = this.layers[i].findTarget();
