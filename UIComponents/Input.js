@@ -15,7 +15,7 @@ export class Input extends UIComponent{
         console.log("Focus!");
         if(!this.isFocused){
             this.isFocused = true;
-            this.borderWidth += 2;
+            this.borderWidth += 3;
         }
     }
 
@@ -23,7 +23,7 @@ export class Input extends UIComponent{
         console.log("Blur!");
         if(this.isFocused){
             this.isFocused = false;
-            this.borderWidth -= 2;
+            this.borderWidth -= 3;
         }
     }
 }

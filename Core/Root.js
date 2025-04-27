@@ -208,6 +208,10 @@ export class Root{
       target.dispatchEvent(event);
       if(event.type=="click" || event.type=="press"){
         if(target.type=="Input"){
+          if(this.focusedField){
+            this.focusedField.blur();
+          }
+
           this.focusedField = target;
           this.focusedField.focus();
         }

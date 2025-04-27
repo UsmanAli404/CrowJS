@@ -22,9 +22,9 @@ export class GridFrame extends Frame{
       enableOptimisedResizing=false,
       enableShadow=false,
       shadowColor= 'rgb(0,0,0)',
-      shadowIntensity= 0.4,
-      shadowSpread= 3,
-      shadowDetail=5,
+      shadowIntensity = 0.3,
+      shadowSpread = 1,
+      shadowDetail = 10,
     }
     ){
       bannerHeight = bannerHeight%height;

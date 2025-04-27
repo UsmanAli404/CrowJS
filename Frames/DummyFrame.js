@@ -146,7 +146,9 @@ export class DummyFrame extends Component{
     
     show(){
         push();
-        stroke(this.parent.borderColor);
+        if(this.parent.borderColor){
+            stroke(this.parent.borderColor);
+        }
         strokeWeight(this.parent.borderWidth);
         noFill();
         rect(this.x, this.y, this.width, this.height, this.parent.cornerRadius);
