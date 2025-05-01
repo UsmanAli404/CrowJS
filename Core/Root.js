@@ -93,7 +93,7 @@ export class Root{
     }
   
     // if it's a child of an element in layers,
-    // return paren't index
+    // return parent's index
     // else if is an element in layers,
     // return the element's index
     getElementIndexRec(element){

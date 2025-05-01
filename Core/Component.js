@@ -57,6 +57,26 @@ export class Component{
     }
   }
 
+  dispatchEventOnlyOnSelf(event){
+    if(this.eventListeners[event.type]){
+      for(let callback of this.eventListeners[event.type]){
+        callback(event);
+      }
+    }
+  }
+
+  dispatchTrickleDownEvent(event){
+    if(this.eventListeners[event.type]){
+      for(let callback of this.eventListeners[event.type]){
+        callback(event);
+      }
+    }
+
+    for(let i=0; i<this.children.length; i++){
+      this.children[i].dispatchTrickleDownEvent(event);
+    }
+  }
+
   turnResizingAndRepositionOff(){
     if(this.type==="Frame"){
       this.enableResizing=false;

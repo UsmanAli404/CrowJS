@@ -1,3 +1,4 @@
+import { GUIEvent } from '../Core/GUIEvent/GUIEvent.js';
 import { DummyFrame } from './DummyFrame.js';
 import { FrameComponent } from './FrameComponent.js';
 
@@ -58,6 +59,16 @@ export class Frame extends FrameComponent{
       this.addEventListener("drag", (event)=> this.onMouseDrag(event));
       this.addEventListener("press", (event) => this.onMouseBtnPress(event));
       this.addEventListener("release", (event) => this.onMouseRelease(event));
+      // this.addEventListener("resize", (event) => this.onResize(event));
+      // this.addEventListener("reposition", (event) => this.onRepos(event));
+    }
+
+    onResize(event){
+      console.log("resizing...");
+    }
+
+    onRepos(event){
+      console.log("repositioning...")
     }
 
     onMouseRelease(event){
@@ -140,16 +151,17 @@ export class Frame extends FrameComponent{
     }
 
     onMouseDrag(event){
-      // console.log("mouse dragged...");
       if(this.enableResizing){
         if(this.isNearBorder() && !this.isRepositioning()){
           this.updateDimensions();
+          this.dispatchTrickleDownEvent(new GUIEvent(event.x, event.y, "resize", this));
           return;
         }
       }
 
       if(this.enableReposition && this.isRepositioning()){
         this.updatePosition();
+        this.dispatchTrickleDownEvent(new GUIEvent(event.x, event.y, "reposition", this));
       }
     }
 

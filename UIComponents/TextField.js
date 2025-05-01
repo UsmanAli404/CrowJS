@@ -87,7 +87,7 @@ export class TextField extends Input{
             this.scrollCursorIntoView();
         }
 
-        event.stopPropagation();
+        // event.stopPropagation();
     }
 
     onKeyPress(event) {
