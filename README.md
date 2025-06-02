@@ -1,6 +1,8 @@
 # CrowJS 🐦‍⬛
 **CrowJS** is a lightweight and extensible GUI library built on top of [p5.js](https://p5js.org/), designed for creative coders and simulation builders who need intuitive, canvas-native UI components like buttons, sliders, input fields, and more — all rendered directly inside the p5.js canvas.
 
+![Logo](/crowjs-01-01.png)
+
 ## ✨ Features
 - 🪶 Minimal and canvas-native UI for p5.js sketches  
 - 🧱 Frames, nested layouts, scrollable & grid containers  
