@@ -37,9 +37,10 @@ function setup() {
   createCanvas(400, 400);
   root = new Root();
 
-  btn = new Button("Click Me", () => {
-    console.log("Button Clicked!");
-  });
+  btn = new Label("Click Me");
+  btn.addEventListener("click", ()=>{
+    console.log("btn clicked!");
+  })
 
   root.add(btn);
 }
