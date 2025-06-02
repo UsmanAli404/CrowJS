@@ -28,13 +28,16 @@ Or include the source directly if you're contributing or customizing:
 
 ### 2. Basic Example
 ```javascript
+import Root from "./CrowJS/Core/Root"
+import Button from "./CrowJS/UIComponents/Button"
+
 let root, btn;
 
 function setup() {
   createCanvas(400, 400);
-  root = new Crow.Root();
+  root = new Root();
 
-  btn = new Crow.Button("Click Me", () => {
+  btn = new Button("Click Me", () => {
     console.log("Button Clicked!");
   });
 
@@ -54,7 +57,7 @@ function mousePressed() {
 ## 🧰 Components Overview
 - `Button(text, callback)`   
 - `TextField(placeholder, callback)`  
-- `ScrollFrame`, `GridFrame`, `Panel`, `Label`, etc.  
+- `ScrollFrame`, `GridFrame`, `Label`, etc.  
 
 More components and documentation coming soon.
 
