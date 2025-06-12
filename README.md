@@ -29,7 +29,7 @@ Or include the source directly if you're contributing or customizing:
 ### 2. Basic Example
 ```javascript
 import Root from "./CrowJS/Core/Root"
-import Button from "./CrowJS/UIComponents/Button"
+import Label from "./CrowJS/UIComponents/Label"
 
 let root, btn;
 
