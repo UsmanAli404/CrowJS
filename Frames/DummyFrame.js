@@ -128,7 +128,6 @@ export class DummyFrame extends Component{
         }
     }
 
-    //not being triggered
     onMouseRelease(event){
         // console.log("mouse released...");
         this.parent.x = this.x;

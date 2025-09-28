@@ -29,8 +29,6 @@ export class TextField extends Input{
             this.text = text;
             this.textSize = 30;
             this.displayXOffset = 0;
-            this.leftCount = 0;
-            this.prevWidth = 0;
 
             this.textAlign = textAlign;
             this.padding = padding;

@@ -59,8 +59,8 @@ export class Frame extends FrameComponent{
       this.addEventListener("drag", (event)=> this.onMouseDrag(event));
       this.addEventListener("press", (event) => this.onMouseBtnPress(event));
       this.addEventListener("release", (event) => this.onMouseRelease(event));
-      // this.addEventListener("resize", (event) => this.onResize(event));
-      // this.addEventListener("reposition", (event) => this.onRepos(event));
+      this.addEventListener("resize", (event) => this.onResize(event));
+      this.addEventListener("reposition", (event) => this.onRepos(event));
     }
 
     onResize(event){
