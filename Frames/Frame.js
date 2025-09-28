@@ -6,6 +6,35 @@ import { FrameComponent } from './FrameComponent.js';
 //frames should also allow docking -> adding frames in frames
 
 export class Frame extends FrameComponent{
+  /**
+   * Creates a resizable and draggable frame container
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {string|null} id - Component ID
+   * @param {p5.Color} backgroundColor - Background color
+   * @param {p5.Color} borderColor - Border color
+   * @param {p5.Color} highlightedBorderColor - Highlighted border color
+   * @param {number} borderWidth - Border width
+   * @param {number} cornerRadius - Corner radius
+   * @param {number} padx - Horizontal padding
+   * @param {number} pady - Vertical padding
+   * @param {boolean} alwaysShowBanner - Whether to always show the banner
+   * @param {number} bannerHeight - Height of the top banner
+   * @param {number} nearestBorderThreshold - Distance threshold for border detection
+   * @param {Component|null} parent - Parent component
+   * @param {string} type - Component type
+   * @param {boolean} enableReposition - Allow dragging
+   * @param {boolean} enableOptimisedReposition - Use optimized repositioning
+   * @param {boolean} enableResizing - Allow resizing
+   * @param {boolean} enableOptimisedResizing - Use optimized resizing
+   * @param {boolean} enableShadow - Enable shadow rendering
+   * @param {string} shadowColor - Shadow color
+   * @param {number} shadowIntensity - Shadow opacity
+   * @param {number} shadowSpread - Shadow spread
+   * @param {number} shadowDetail - Number of shadow layers
+   */
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, type, 
       enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
@@ -63,30 +92,54 @@ export class Frame extends FrameComponent{
       this.addEventListener("reposition", (event) => this.onRepos(event));
     }
 
+    /**
+   * Handles frame resize events
+   * @param {GUIEvent} event - The resize event
+   */
     onResize(event){
       console.log("resizing...");
     }
 
+    /**
+   * Handles frame reposition events
+   * @param {GUIEvent} event - The reposition event
+   */
     onRepos(event){
       console.log("repositioning...")
     }
 
+    /**
+   * Handles mouse button release events
+   * @param {GUIEvent} event - The release event
+   */
     onMouseRelease(event){
       if(!this.isOverBannerArea()){
         cursor("");
       }
     }
 
+    /**
+   * Handles mouse leave events
+   * @param {GUIEvent} event - The mouse leave event
+   */
     onMouseLeave(event){
       // console.log("mouse left...");
       this.clearHoverCache();
       cursor("");
     }
 
+    /**
+   * Checks if cursor is near any border for resizing
+   * @returns {boolean} True if cursor is near a border
+   */
     isNearBorder(){
       return this.nearestBorder!==null;
     }
 
+    /**
+   * Handles mouse hover events for banner and cursor changes
+   * @param {GUIEvent} event - The hover event
+   */
     onMouseHover(event){
       // console.log("mouse hovering...");
       if(this.enableResizing) {
@@ -122,6 +175,10 @@ export class Frame extends FrameComponent{
       }
     }
 
+    /**
+   * Handles mouse button press events for dragging and resizing
+   * @param {GUIEvent} event - The press event
+   */
     onMouseBtnPress(event) {
       if(this.enableResizing && this.isNearBorder()){
         //dummy resize frame
@@ -146,10 +203,18 @@ export class Frame extends FrameComponent{
       }
     }
 
+    /**
+   * Checks if the frame is currently being repositioned
+   * @returns {boolean} True if repositioning is in progress
+   */
     isRepositioning(){
       return (this.xDist!=null && this.yDist!=null);
     }
 
+    /**
+   * Handles mouse drag events for resizing and repositioning
+   * @param {GUIEvent} event - The drag event
+   */
     onMouseDrag(event){
       if(this.enableResizing){
         if(this.isNearBorder() && !this.isRepositioning()){
@@ -165,6 +230,10 @@ export class Frame extends FrameComponent{
       }
     }
 
+    /**
+   * Creates a temporary dummy frame for smooth resizing/repositioning
+   * @param {string} type - Type of dummy frame (RESIZE_DF or REPOSITION_DF)
+   */
     createDummyFrame(type){
       let DF = new DummyFrame(this.x, this.y, this.width, this.height, type);
       DF.parent = this;
@@ -183,12 +252,22 @@ export class Frame extends FrameComponent{
       // console.log(DF);
     }
 
+    /**
+   * Checks if mouse is over the banner area
+   * @returns {boolean} True if mouse is over the banner
+   */
     isOverBannerArea(){
       return (mouseX>this.x && mouseX<this.x+this.width && mouseY>this.y && mouseY<this.y+(this.bannerHeight));
     }
 
+    /**
+   * Utility method for position updates (to be overridden)
+   */
     updatePosUtil(){};
   
+    /**
+   * Handles mouse release events for repositioning
+   */
     mouseReleasedEventListener(){
       if(this.enableReposition && this.isRepositioning()){
         this.xDist=null;
@@ -196,6 +275,9 @@ export class Frame extends FrameComponent{
       }
     }
   
+    /**
+   * Detects which border is nearest to the cursor for resizing
+   */
     checkAndFindNearestBorder(){
       if(mouseX>=this.x && mouseX<=this.x+this.nearestBorderThreshold && mouseY>=this.y+this.cornerRadius && mouseY<=this.y+this.height-this.cornerRadius){
         this.nearestBorder = "left";
@@ -226,6 +308,9 @@ export class Frame extends FrameComponent{
       }
     }
   
+    /**
+   * Draws highlighted borders when cursor is near them
+   */
     showHighlightedBorder(){
       push();
       stroke(this.highlightedBorderColor);
@@ -256,6 +341,9 @@ export class Frame extends FrameComponent{
 
     //corrects position and dimensions of all the child elements so that
     //they fit right in the parent frame
+    /**
+   * Adjusts child components to fit within the frame's new dimensions
+   */
     redraw(){
       if(this.alwaysShowBanner || (this.isOverBannerArea() && this.enableReposition && !this.isBannerShown)){
         this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
@@ -265,7 +353,9 @@ export class Frame extends FrameComponent{
       
       this.adjustWidth(this.x+this.padx, this.width-2*this.padx);
     }
-  
+    /**
+   * Updates frame dimensions during resizing
+   */
     updateDimensions(){
       if(this.nearestBorder=="left" || this.nearestBorder=="right"){
         if( this.nearestBorder=="left"){
@@ -354,7 +444,9 @@ export class Frame extends FrameComponent{
         }
       }
     }
-    
+    /**
+   * Updates frame position during dragging
+   */
     updatePosition(){
       this.prevX = this.x;
       this.prevY = this.y;
@@ -370,7 +462,12 @@ export class Frame extends FrameComponent{
       
       this.updatePosUtil(this.prevX-this.x, this.prevY-this.y);
     }
-  
+   /**
+   * Clears hover and interaction cache
+   * @param {Object} options - Clear options
+   * @param {boolean} options.clearRepositionCache - Clear reposition cache
+   * @param {boolean} options.clearResizingCache - Clear resizing cache
+   */
     clearHoverCache({clearRepositionCache=true, clearResizingCache=true}={}){
       // console.log("Hover cache cleared...");
       if(clearRepositionCache && this.enableReposition){
@@ -392,12 +489,19 @@ export class Frame extends FrameComponent{
 
       // console.log("");
     }
-
+    /**
+   * Converts RGB color string to array
+   * @param {string} shadowColor - RGB color string
+   * @returns {number[]|null} Array of RGB values or null
+   */
     rgbToArray(shadowColor) {
       let match = shadowColor.match(/\d+/g);
       return match ? match.map(Number) : null;
     }
-
+    /**
+   * Renders shadow effect around the frame
+   * @param {Object} options - Shadow options
+   */
     drawShadow({}={}){
       let color = this.rgbToArray(this.shadowColor);
       if(color==null){

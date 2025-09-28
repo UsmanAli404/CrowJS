@@ -1,6 +1,37 @@
 import {Frame} from './Frame.js';
 
 export class GridFrame extends Frame{
+  /**
+   * Creates a grid-based layout container
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {Object} options - Configuration options
+   * @param {string|null} options.id - Component ID
+   * @param {p5.Color} options.backgroundColor - Background color
+   * @param {p5.Color} options.borderColor - Border color
+   * @param {p5.Color} options.highlightedBorderColor - Highlighted border color
+   * @param {number} options.borderWidth - Border width
+   * @param {number} options.cornerRadius - Corner radius
+   * @param {number} options.padx - Horizontal padding
+   * @param {number} options.pady - Vertical padding
+   * @param {boolean} options.alwaysShowBanner - Always show banner
+   * @param {number} options.rows - Number of rows in grid
+   * @param {number} options.cols - Number of columns in grid
+   * @param {number} options.nearestBorderThreshold - Border detection threshold
+   * @param {number} options.bannerHeight - Banner height
+   * @param {Component|null} options.parent - Parent component
+   * @param {boolean} options.enableReposition - Allow dragging
+   * @param {boolean} options.enableOptimisedReposition - Optimized repositioning
+   * @param {boolean} options.enableResizing - Allow resizing
+   * @param {boolean} options.enableOptimisedResizing - Optimized resizing
+   * @param {boolean} options.enableShadow - Enable shadow
+   * @param {string} options.shadowColor - Shadow color
+   * @param {number} options.shadowIntensity - Shadow opacity
+   * @param {number} options.shadowSpread - Shadow spread
+   * @param {number} options.shadowDetail - Shadow layers
+   */
     constructor(x, y, width, height, {
       id=null,
       backgroundColor = color(255),
@@ -42,6 +73,19 @@ export class GridFrame extends Frame{
       this.totalColWeight = 0;
     }
   
+    /**
+   * Adds an element to the grid at specified position
+   * @param {Component} element - The component to add
+   * @param {number} row - Grid row index
+   * @param {number} col - Grid column index
+   * @param {Object} options - Placement options
+   * @param {number} options.rowSpan - Number of rows to span
+   * @param {number} options.colSpan - Number of columns to span
+   * @param {number} options.padL - Left padding
+   * @param {number} options.padR - Right padding
+   * @param {number} options.padT - Top padding
+   * @param {number} options.padB - Bottom padding
+   */
     add(element, row, col, {
       rowSpan=1,
       colSpan=1,
@@ -95,6 +139,11 @@ export class GridFrame extends Frame{
       // this.printGrid();
     }
 
+    /**
+   * Finds the grid position of an element
+   * @param {Component} element - The element to find
+   * @returns {number[]|null} [row, col] or null if not found
+   */
     getElementPos(element){
       for(let i=0; i<this.rows; i++){
         for(let j=0; j<this.cols; j++){
@@ -106,6 +155,10 @@ export class GridFrame extends Frame{
       return null;
     }
 
+    /**
+   * Removes an element from the grid
+   * @param {Component} element - The element to remove
+   */
     remove(element){
       let index = this.findIndexOfElement(element);
       if(index==-1){
@@ -137,6 +190,11 @@ export class GridFrame extends Frame{
       // this.printGrid();
     }
     
+    /**
+   * Configures row weight for proportional sizing
+   * @param {number} rowNum - Row index to configure
+   * @param {number} weight - Weight value for proportional sizing
+   */
     rowConfig(rowNum, weight){
       if(rowNum<0 || rowNum>=this.rows){
         return;
@@ -148,6 +206,11 @@ export class GridFrame extends Frame{
       this.totalRowWeight+=weight;
     }
   
+    /**
+   * Configures column weight for proportional sizing
+   * @param {number} colNum - Column index to configure
+   * @param {number} weight - Weight value for proportional sizing
+   */
     colConfig(colNum, weight){
       if(colNum<0 || colNum>=this.cols){
         return;
@@ -159,6 +222,11 @@ export class GridFrame extends Frame{
       this.totalColWeight+=weight;
     }
   
+    /**
+   * Initializes the grid structure with specified rows and columns
+   * @param {number} rows - Number of rows
+   * @param {number} cols - Number of columns
+   */
     gridConfig(rows, cols){
       this.rows = rows;
       this.cols = cols;
@@ -183,6 +251,11 @@ export class GridFrame extends Frame{
       }
     }
   
+    /**
+   * Adjusts child component widths based on grid weights
+   * @param {number} x - Starting x position
+   * @param {number} w - Available width
+   */
     adjustWidth(x, w){
       //[element, rowSpan, colSpan, padL, padR, padT, padB];
       for(let i=0; i<this.cols; i++){
@@ -212,6 +285,11 @@ export class GridFrame extends Frame{
       }
     }
   
+    /**
+   * Adjusts child component heights based on grid weights
+   * @param {number} y - Starting y position
+   * @param {number} h - Available height
+   */
     adjustHeight(y, h){
       //[element, rowSpan, colSpan, padL, padR, padT, padB];
       for(let i=0; i<this.rows; i++){
@@ -244,6 +322,13 @@ export class GridFrame extends Frame{
   
     //only called when a new element is added
     //to make the element fit into the grid cell
+    /**
+   * Positions a new element within the grid cell
+   * @param {number} row - Row index
+   * @param {number} col - Column index
+   * @param {number} rowSpan - Row span
+   * @param {number} colSpan - Column span
+   */
     adjustToGrid(row, col, rowSpan, colSpan){
       let x = this.x + this.padx;
       let y = this.y + this.pady;
@@ -287,6 +372,13 @@ export class GridFrame extends Frame{
   
     //expand the element to as much grid cells as possible
     //while keeping the desired row and col spans in consideration
+    /**
+   * Expands element to span multiple grid cells
+   * @param {number} row - Starting row
+   * @param {number} col - Starting column
+   * @param {number} rowSpan - Desired row span
+   * @param {number} colSpan - Desired column span
+   */
     expandElement(row, col, rowSpan, colSpan){
       let xLimit = 0;
       let yLimit = 0;
@@ -356,16 +448,27 @@ export class GridFrame extends Frame{
       this.grid[row][col][2] = xLimit+1;
     }
     
+    /**
+   * Shows the frame banner and adjusts layout
+   */
     showBanner(){
       this.adjustHeight(this.y + (this.bannerHeight) + this.pady, this.height - (this.bannerHeight) - 2*(this.pady));
       this.isBannerShown=true;
     }
     
+     /**
+   * Hides the frame banner and adjusts layout
+   */
     hideBanner(){
       this.adjustHeight(this.y + this.pady, this.height-2*(this.pady));
       this.isBannerShown=false;
     }
   
+  /**
+   * Updates child component positions during frame movement
+   * @param {number} xDiff - X position difference
+   * @param {number} yDiff - Y position difference
+   */
     updatePosUtil(xDiff, yDiff){
       for(let i=0; i<this.rows; i++){
         for(let j=0; j<this.cols; j++){
@@ -380,6 +483,9 @@ export class GridFrame extends Frame{
       }
     }
   
+    /**
+   * Renders the grid frame and all child components
+   */
     show(){
 
       //shadow
@@ -449,6 +555,9 @@ export class GridFrame extends Frame{
       // }
     }
 
+    /**
+   * Prints grid structure to console for debugging
+   */
     printGrid(){
       for(let i=0; i<this.rows; i++){
         let row = "";

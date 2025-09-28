@@ -4,6 +4,14 @@ export class DummyFrame extends Component{
     static RESIZE_DF = "ResizeDF";
     static REPOSITION_DF = "RepositionDF";
 
+    /**
+   * Creates a temporary frame used during resize/reposition operations
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {string} type - Type of dummy frame (RESIZE_DF or REPOSITION_DF)
+   */
     constructor(x, y, width, height, type){
         super(x, y, width, height, {type: type});
         //parent will store reference to the attached frame
@@ -23,11 +31,19 @@ export class DummyFrame extends Component{
         this.addEventListener("release", (event) => this.onMouseRelease(event));
     }
 
+    /**
+   * Handles mouse hover events on the dummy frame
+   * @param {GUIEvent} event - The hover event
+   */
     onMouseHover(event){
         // console.log("hovering ...");
         event.stopPropagation();
     }
 
+    /**
+   * Handles mouse drag events for resizing or repositioning
+   * @param {GUIEvent} event - The drag event
+   */
     onMouseDrag(event){
         if(this.type === "ResizeDF"){
             this.updateDimensions();
@@ -38,6 +54,9 @@ export class DummyFrame extends Component{
         event.stopPropagation();
     }
 
+    /**
+   * Updates position during repositioning operations
+   */
     updatePosition(){
         // console.log("updating position...");
         this.prevX = this.x;
@@ -47,6 +66,9 @@ export class DummyFrame extends Component{
         this.y = mouseY - abs(this.yDist);
     }
 
+    /**
+   * Updates dimensions during resizing operations
+   */
     updateDimensions(){
         // console.log("updating dimensions...");
 
@@ -128,6 +150,10 @@ export class DummyFrame extends Component{
         }
     }
 
+    /**
+   * Handles mouse release to finalize operations and transfer values to parent
+   * @param {GUIEvent} event - The release event
+   */
     onMouseRelease(event){
         // console.log("mouse released...");
         this.parent.x = this.x;
@@ -143,6 +169,9 @@ export class DummyFrame extends Component{
         // event.stopPropagation();
     }
     
+    /**
+   * Renders the dummy frame outline during operations
+   */
     show(){
         push();
         if(this.parent.borderColor){

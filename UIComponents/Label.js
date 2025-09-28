@@ -1,6 +1,38 @@
 import {UIComponent} from './UIComponent.js';
+import { Component } from '../Core/Component.js';
 
 export class Label extends UIComponent{
+  /**
+   * Creates a text label component
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {string} label - The text to display
+   * @param {Object} options - Configuration options
+   * @param {string|null} options.id - Component ID
+   * @param {Component|null} options.parent - Parent component
+   * @param {p5.Color} options.backgroundColor - Background color
+   * @param {p5.Color} options.textColor - Text color
+   * @param {boolean} options.borderFlag - Whether to show border
+   * @param {p5.Color} options.borderColor - Border color
+   * @param {number} options.borderWidth - Border width
+   * @param {number} options.cornerRadius - Corner radius
+   * @param {boolean} options.enableShadow - Enable shadow rendering
+   * @param {string} options.shadowColor - Shadow color
+   * @param {number} options.shadowIntensity - Shadow opacity
+   * @param {number} options.shadowSpread - Shadow spread
+   * @param {number} options.shadowDetail - Shadow layers
+   * @param {string} options.HTextAlign - Horizontal text alignment
+   * @param {string} options.VTextAlign - Vertical text alignment
+   * @param {number} options.pad - General padding
+   * @param {number} options.padx - Horizontal padding
+   * @param {number} options.pady - Vertical padding
+   * @param {number} options.padl - Left padding
+   * @param {number} options.padr - Right padding
+   * @param {number} options.padt - Top padding
+   * @param {number} options.padb - Bottom padding
+   */
     constructor(x, y, width, height, label,
        {id=null,
         parent = null,
@@ -51,7 +83,9 @@ export class Label extends UIComponent{
     //   this.shadowSpread = shadowSpread;//stroke width of each of those rectangles
     //   this.shadowDetail = shadowDetail;//number of rectangles that will be drawn around the component
     // }
-  
+    /**
+     * Renders the label with text, background, and border
+     */
     show() {
       if(this.enableShadow){
         this.drawShadow();
@@ -112,6 +146,10 @@ export class Label extends UIComponent{
       pop();
     }
 
+    /**
+   * Converts horizontal alignment string to P5 constant
+   * @returns {number} P5 alignment constant
+   */
     getHTextAlign(){
       switch(this.HTextAlign){
         case "left":
@@ -123,6 +161,10 @@ export class Label extends UIComponent{
       }
     }
 
+    /**
+   * Converts vertical alignment string to P5 constant
+   * @returns {number} P5 alignment constant
+   */
     getVTextAlign(){
       switch(this.VTextAlign){
         case "top":
@@ -134,13 +176,20 @@ export class Label extends UIComponent{
       }
     }
     
-
+    /**
+   * Updates the label text and recalculates text size
+   * @param {string} text - The new text to display
+   */
     setText(text){
       this.text = text;
       this.updateLabelSize();
     }
     
     //needs heavy optimizations
+    /**
+   * Dynamically calculates the optimal text size to fit the container
+   * Uses binary search for efficient size calculation
+   */
     updateLabelSize() {
       let maxSize = min(this.width * 0.9, this.height * 0.8);
       let minSize = 1;
@@ -168,10 +217,16 @@ export class Label extends UIComponent{
       this.labelSize = bestSize;
     }
 
+    /**
+   * Handles width changes and updates text size accordingly
+   */
     updateWidth(){
       this.updateLabelSize();
     }
 
+    /**
+   * Handles height changes and updates text size accordingly
+   */
     updateHeight(){
       this.updateLabelSize();
     }

@@ -1,7 +1,29 @@
 import { GUIEvent } from "../Core/GUIEvent/GUIEvent.js";
 import { UIComponent } from "./UIComponent.js";
+import { Component } from "../Core/Component.js";
 
 export class Input extends UIComponent{
+     /**
+   * Creates a base input component
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {p5.Color} backgroundColor - Background color
+   * @param {boolean} borderFlag - Whether to show border
+   * @param {p5.Color} borderColor - Border color
+   * @param {number} borderWidth - Border width
+   * @param {number} cornerRadius - Corner radius
+   * @param {boolean} enableShadow - Enable shadow
+   * @param {string} shadowColor - Shadow color
+   * @param {number} shadowIntensity - Shadow opacity
+   * @param {number} shadowSpread - Shadow spread
+   * @param {number} shadowDetail - Shadow layers
+   * @param {Object} options - Additional options
+   * @param {Component|null} options.parent - Parent component
+   * @param {string} options.type - Component type
+   * @param {string|null} options.id - Component ID
+   */
     constructor(x, y, width, height, backgroundColor, borderFlag, borderColor, borderWidth,
         cornerRadius, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail,
         {parent=null, type="", id=null} = {}
@@ -14,14 +36,24 @@ export class Input extends UIComponent{
         // this.addEventListener("blur", (event)=>this.onBlur());
     }
 
+    /**
+   * Handles focus event
+   * @param {GUIEvent} event - The focus event
+   */
     onFocus(event){
         console.log("focused...");
     }
 
+    /**
+   * Handles blur event
+   * @param {GUIEvent} event - The blur event
+   */
     onBlur(event){
         console.log("blurred...");
     }
-
+    /**
+   * Sets focus on the input field with visual feedback
+   */
     focus(){
         // console.log("Focus!");
         if(!this.isFocused){
@@ -31,7 +63,9 @@ export class Input extends UIComponent{
 
         this.dispatchEventOnlyOnSelf(new GUIEvent(0, 0, "focus", this));
     }
-
+    /**
+   * Removes focus from the input field
+   */
     blur(){
         // console.log("Blur!");
         if(this.isFocused){

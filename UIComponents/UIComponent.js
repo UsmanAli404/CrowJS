@@ -1,6 +1,27 @@
 import { Component } from "../Core/Component.js";
 
 export class UIComponent extends Component{
+    /**
+   * Creates a new UIComponent with visual styling
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {p5.Color} backgroundColor - Background color
+   * @param {boolean} borderFlag - Whether to show border
+   * @param {p5.Color} borderColor - Border color
+   * @param {number} borderWidth - Border width
+   * @param {number} cornerRadius - Corner radius for rounded corners
+   * @param {boolean} enableShadow - Whether to render shadow
+   * @param {string} shadowColor - Shadow color in RGB format
+   * @param {number} shadowIntensity - Shadow opacity (0-1)
+   * @param {number} shadowSpread - Shadow spread amount
+   * @param {number} shadowDetail - Number of shadow layers
+   * @param {Object} options - Additional options
+   * @param {Component|null} options.parent - Parent component
+   * @param {string} options.type - Component type
+   * @param {string|null} options.id - Component ID
+   */
     constructor(x, y, width, height, backgroundColor, borderFlag, borderColor,
          borderWidth, cornerRadius, enableShadow, shadowColor, shadowIntensity,
          shadowSpread, shadowDetail, {parent=null, type="", id=null} = {}){
@@ -25,15 +46,29 @@ export class UIComponent extends Component{
 
         this.cornerRadius = cornerRadius;
     }
-
+    /**
+   * Updates the component's width (abstract method)
+   * @abstract
+   */
     updateWidth(){};
+    /**
+   * Updates the component's height (abstract method)
+   * @abstract
+   */
     updateHeight(){};
-
+    /**
+   * Converts RGB color string to array of numbers
+   * @param {string} shadowColor - RGB color string like "rgb(255,255,255)"
+   * @returns {number[]|null} Array of [r, g, b] values or null if invalid
+   */
     rgbToArray(shadowColor) {
         let match = shadowColor.match(/\d+/g);
         return match ? match.map(Number) : null;
     }
-
+    /**
+   * Renders a shadow effect around the component
+   * @param {Object} options - Shadow rendering options
+   */
     drawShadow({}={}){
         let color = this.rgbToArray(this.shadowColor);
         if(color==null){

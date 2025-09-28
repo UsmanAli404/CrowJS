@@ -1,6 +1,39 @@
 import {Frame} from './Frame.js';
 
 export class ScrollFrame extends Frame{
+  /**
+   * Creates a scrollable container for child components
+   * @param {number} x - The x-coordinate
+   * @param {number} y - The y-coordinate
+   * @param {number} width - The width
+   * @param {number} height - The height
+   * @param {Object} options - Configuration options
+   * @param {string|null} options.id - Component ID
+   * @param {p5.Color} options.backgroundColor - Background color
+   * @param {p5.Color} options.borderColor - Border color
+   * @param {p5.Color} options.highlightedBorderColor - Highlighted border color
+   * @param {number} options.borderWidth - Border width
+   * @param {number} options.cornerRadius - Corner radius
+   * @param {number} options.padx - Horizontal padding
+   * @param {number} options.pady - Vertical padding
+   * @param {boolean} options.alwaysShowBanner - Always show banner
+   * @param {boolean} options.enableVScroll - Enable vertical scrolling
+   * @param {boolean} options.enableHScroll - Enable horizontal scrolling
+   * @param {number} options.scrollSensitivity - Scroll speed
+   * @param {number} options.bannerHeight - Banner height
+   * @param {string} options.alignment - Layout alignment ("v" or "h")
+   * @param {number} options.nearestBorderThreshold - Border detection threshold
+   * @param {Component|null} options.parent - Parent component
+   * @param {boolean} options.enableReposition - Allow dragging
+   * @param {boolean} options.enableOptimisedReposition - Optimized repositioning
+   * @param {boolean} options.enableResizing - Allow resizing
+   * @param {boolean} options.enableOptimisedResizing - Optimized resizing
+   * @param {boolean} options.enableShadow - Enable shadow
+   * @param {string} options.shadowColor - Shadow color
+   * @param {number} options.shadowIntensity - Shadow opacity
+   * @param {number} options.shadowSpread - Shadow spread
+   * @param {number} options.shadowDetail - Shadow layers
+   */
     constructor(x, y, width, height, {
       id=null,
       backgroundColor = color(255),
@@ -73,6 +106,10 @@ export class ScrollFrame extends Frame{
       this.addEventListener("keyDown", (event) => this.onKeyDown(event));
     }
 
+    /**
+   * Handles keyboard navigation for scrolling
+   * @param {KeyboardEvent} event - The key down event
+   */
     onKeyDown(event) {
       // console.log("key is pressed...");
       if(keyIsDown(LEFT_ARROW)){
@@ -86,6 +123,9 @@ export class ScrollFrame extends Frame{
       }
     }
   
+    /**
+   * Renders the scroll frame and child components
+   */
     show() {
       //shadow
       if(this.enableShadow){
@@ -142,6 +182,16 @@ export class ScrollFrame extends Frame{
       // }
     }
   
+    /**
+   * Adds a component to the scroll frame with weighted sizing
+   * @param {Component} element - The component to add
+   * @param {Object} options - Placement options
+   * @param {number} options.weight - Proportional weight for sizing
+   * @param {number} options.padL - Left padding
+   * @param {number} options.padR - Right padding
+   * @param {number} options.padT - Top padding
+   * @param {number} options.padB - Bottom padding
+   */
     add(element,
       {
         weight=1,
@@ -196,6 +246,10 @@ export class ScrollFrame extends Frame{
       }
     }
 
+    /**
+   * Removes a component from the scroll frame
+   * @param {Component} element - The component to remove
+   */
     remove(element){
       let index = this.findIndexOfElement(element);
       if(index==-1){
@@ -213,6 +267,11 @@ export class ScrollFrame extends Frame{
       console.log(`element (id: ${element.id}) successfully removed from ${this.constructor.name} (id: ${this.id})!`);
     }
 
+    /**
+   * Sets the weight of a child component
+   * @param {number} index - Child index
+   * @param {number} weight - New weight value
+   */
     setWeight(index, weight){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new weight");
@@ -229,6 +288,11 @@ export class ScrollFrame extends Frame{
       this.preferences[index][0] = weight;
     }
 
+    /**
+   * Gets the weight of a child component
+   * @param {number} index - Child index
+   * @returns {number} The weight value
+   */
     getWeight(index){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new weight");
@@ -238,6 +302,11 @@ export class ScrollFrame extends Frame{
       return this.preferences[index][0];
     }
 
+    /**
+   * Sets left padding for a child component
+   * @param {number} index - Child index
+   * @param {number} padL - Left padding value
+   */
     setPadL(index, padL){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padL");
@@ -252,6 +321,11 @@ export class ScrollFrame extends Frame{
       this.preferences[index][1] = padL;
     }
 
+    /**
+   * Gets left padding of a child component
+   * @param {number} index - Child index
+   * @returns {number} Left padding value
+   */
     getPadL(index){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padL");
@@ -261,6 +335,11 @@ export class ScrollFrame extends Frame{
       return this.preferences[index][1];
     }
 
+    /**
+   * Sets right padding for a child component
+   * @param {number} index - Child index
+   * @param {number} padR - Right padding value
+   */
     setPadR(index, padR){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padR");
@@ -275,6 +354,11 @@ export class ScrollFrame extends Frame{
       this.preferences[index][2] = padR;
     }
 
+    /**
+   * Gets right padding of a child component
+   * @param {number} index - Child index
+   * @returns {number} Right padding value
+   */
     getPadR(index){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padR");
@@ -284,6 +368,11 @@ export class ScrollFrame extends Frame{
       return this.preferences[index][2];
     }
 
+    /**
+   * Sets top padding for a child component
+   * @param {number} index - Child index
+   * @param {number} padT - Top padding value
+   */
     setPadT(index, padT){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padT");
@@ -298,6 +387,11 @@ export class ScrollFrame extends Frame{
       this.preferences[index][3] = padT;
     }
 
+    /**
+   * Gets top padding of a child component
+   * @param {number} index - Child index
+   * @returns {number} Top padding value
+   */
     getPadT(index){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padT");
@@ -307,6 +401,11 @@ export class ScrollFrame extends Frame{
       return this.preferences[index][3];
     }
 
+    /**
+   * Sets bottom padding for a child component
+   * @param {number} index - Child index
+   * @param {number} padB - Bottom padding value
+   */
     setPadB(index, padB){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padB");
@@ -321,6 +420,11 @@ export class ScrollFrame extends Frame{
       this.preferences[index][4] = padB;
     }
 
+    /**
+   * Gets bottom padding of a child component
+   * @param {number} index - Child index
+   * @returns {number} Bottom padding value
+   */
     getPadB(index){
       if(index<0 || index>this.children.length-1){
         console.log("index out of range! can't set new padB");
@@ -336,6 +440,9 @@ export class ScrollFrame extends Frame{
     //no need to loop over all the elements every single time any element is added.
   
     //finds the element nearest to the top
+    /**
+   * Finds the topmost child component
+   */
     findTopper(){
       if(this.topper==-1){
         this.topper=0;
@@ -352,6 +459,10 @@ export class ScrollFrame extends Frame{
     }
   
     //finds the element that is farther down than any other element
+    /**
+   * Finds the bottommost child component
+   */
+
     findDeepest(){
       if(this.deepest==-1){
         this.deepest=0;
@@ -370,6 +481,9 @@ export class ScrollFrame extends Frame{
     }
   
     //finds the element nearest to the left boundary
+    /**
+   * Finds the leftmost child component
+   */
     findLeftist(){
       if(this.leftist==-1){
         this.leftist=0;
@@ -386,6 +500,9 @@ export class ScrollFrame extends Frame{
     }
   
     //finds the element farthest to the right
+    /**
+   * Finds the rightmost child component
+   */
     findRightist(){
       if(this.rightist==-1){
         this.rightist=0;
@@ -402,7 +519,9 @@ export class ScrollFrame extends Frame{
         this.rightist = i;
       }
     }
-    
+    /**
+   * Scrolls content downward
+   */
     scrollDown(){
       if(!this.enableVScroll || this.children.length==0){
         return;
@@ -420,7 +539,9 @@ export class ScrollFrame extends Frame{
         }
       }
     }
-    
+    /**
+   * Scrolls content upward
+   */
     scrollUp(){
       if(!this.enableVScroll || this.children.length==0){
         return;
@@ -438,7 +559,10 @@ export class ScrollFrame extends Frame{
         }
       }
     }
-    
+    /**
+   * Utility method for vertical scrolling
+   * @param {number} multiple - Scroll direction and multiplier
+   */
     vScrollUtil(multiple){
       for(let i=0; i<this.children.length; i++){
         let elem = this.children[i];
@@ -450,7 +574,9 @@ export class ScrollFrame extends Frame{
         elem.y+=multiple*this.scrollSensitivity;
       }
     }
-    
+    /**
+   * Scrolls content to the left
+   */
     scrollLeft(){
       if(!this.enableHScroll || this.children.length==0){
         return;
@@ -469,7 +595,9 @@ export class ScrollFrame extends Frame{
         }
       }
     }
-    
+    /**
+   * Scrolls content to the right
+   */
     scrollRight(){
       if(!this.enableHScroll || this.children.length==0){
         return;
@@ -487,7 +615,10 @@ export class ScrollFrame extends Frame{
         }
       }
     }
-    
+    /**
+   * Utility method for horizontal scrolling
+   * @param {number} multiple - Scroll direction and multiplier
+   */
     hScrollUtil(multiple){
       for(let i=0; i<this.children.length; i++){
         let elem = this.children[i];
@@ -499,7 +630,9 @@ export class ScrollFrame extends Frame{
         elem.x+=multiple*this.scrollSensitivity;
       }
     }
-    
+    /**
+   * Shows banner and adjusts content position
+   */
     showBanner(){
       if(this.enableVScroll==true){
         this.BannerUtil(1, this.bannerHeight);
@@ -508,7 +641,9 @@ export class ScrollFrame extends Frame{
       }
       this.isBannerShown=true;
     }
-    
+    /**
+   * Hides banner and adjusts content position
+   */
     hideBanner(){
       if(this.enableReposition && this.isBannerShown){
         if(this.enableVScroll==true){
@@ -519,7 +654,11 @@ export class ScrollFrame extends Frame{
         this.isBannerShown=false;
       }
     }
-  
+  /**
+   * Utility for banner visibility changes
+   * @param {number} dir - Direction (1 for show, -1 for hide)
+   * @param {number} heightAdjustment - Height adjustment amount
+   */
     BannerUtil(dir, heightAdjustment){
       for(let i=0; i<this.children.length; i++){
         let curr = this.children[i];
@@ -530,7 +669,11 @@ export class ScrollFrame extends Frame{
         }
       }
     }
-    
+    /**
+   * Adjusts child component heights based on weights and alignment
+   * @param {number} y - Starting y position
+   * @param {number} h - Available height
+   */
     adjustHeight(y, h){
       //[element, weight, padL, padR, padT, padB]
       for(let i=0; i<this.children.length; i++){
@@ -566,7 +709,11 @@ export class ScrollFrame extends Frame{
   
       }
     }
-  
+    /**
+   * Adjusts child component widths based on weights and alignment
+   * @param {number} x - Starting x position
+   * @param {number} w - Available width
+   */
     adjustWidth(x, w){
       //[element, weight, padL, padR, padT, padB]
       for(let i=0; i<this.children.length; i++){
@@ -600,7 +747,11 @@ export class ScrollFrame extends Frame{
   
       }
     }
-  
+    /**
+   * Updates child positions during frame movement
+   * @param {number} xDiff - X position difference
+   * @param {number} yDiff - Y position difference
+   */
     updatePosUtil(xDiff, yDiff){
       for(let i=0; i<this.children.length; i++){
         this.children[i].x -= xDiff;

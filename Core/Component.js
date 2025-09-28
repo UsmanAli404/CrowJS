@@ -1,4 +1,14 @@
 export class Component{
+  /**
+   * Creates a new Component instance
+   * @param {number} x - The x-coordinate of the component
+   * @param {number} y - The y-coordinate of the component
+   * @param {number} width - The width of the component
+   * @param {number} height - The height of the component
+   * @param {Object} options - Configuration options
+   * @param {string} options.type - The type identifier of the component
+   * @param {string|null} options.id - Unique identifier for the component
+   */
   constructor(x, y, width, height, {type="", id=null} = {}){
     this.x = x;
     this.y = y;
@@ -13,25 +23,44 @@ export class Component{
   }
 
   //to show itself
+  /**
+   * Renders the component on the canvas
+   * @abstract
+   */
   show(){};
 
   //you can add multiple callback functions to one eventType
   //for each component
+  /**
+   * Registers an event listener for the component
+   * @param {string} eventType - The type of event to listen for
+   * @param {Function} callback - The function to call when event occurs
+   */
   addEventListener(eventType, callback){
     if(!this.eventListeners[eventType]){
       this.eventListeners[eventType] = [];
     }
     this.eventListeners[eventType].push(callback);
   }
-
+  /**
+   * Dispatches a mouse enter event to the component
+   * @param {MouseEvent} event - The mouse enter event
+   */
   dispatchMouseEnterEvent(event){
     this.dispatchMouseEnterLeaveEventUtil(event);
   }
-
+  /**
+   * Dispatches a mouse leave event to the component
+   * @param {MouseEvent} event - The mouse leave event
+   */
   dispatchMouseLeaveEvent(event){
     this.dispatchMouseEnterLeaveEventUtil(event);
   }
-
+  /**
+   * Internal utility for mouse enter/leave event handling
+   * @param {MouseEvent} event - The mouse event
+   * @private
+   */
   dispatchMouseEnterLeaveEventUtil(event){
     if(this.eventListeners[event.type]){
       for(let callback of this.eventListeners[event.type]){
@@ -41,6 +70,10 @@ export class Component{
   }
 
   //to take action upon event occurence
+  /**
+   * Dispatches an event to the component and propagates to parents
+   * @param {GUIEvent} event - The event to dispatch
+   */
   dispatchEvent(event){
     // console.log("Dispatching to:", event.target, "Event type:", event.type);
     if(this.eventListeners[event.type]){
@@ -57,6 +90,10 @@ export class Component{
     }
   }
 
+  /**
+   * Dispatches an event only to this component (no propagation)
+   * @param {GUIEvent} event - The event to dispatch
+   */
   dispatchEventOnlyOnSelf(event){
     if(this.eventListeners[event.type]){
       for(let callback of this.eventListeners[event.type]){
@@ -65,6 +102,10 @@ export class Component{
     }
   }
 
+  /**
+   * Dispatches an event to this component and all children
+   * @param {GUIEvent} event - The event to dispatch
+   */
   dispatchTrickleDownEvent(event){
     if(this.eventListeners[event.type]){
       for(let callback of this.eventListeners[event.type]){
@@ -77,6 +118,9 @@ export class Component{
     }
   }
 
+  /**
+   * Disables resizing and repositioning for this component (if Frame) and all of its children
+   */
   turnResizingAndRepositionOff(){
     if(this.type==="Frame"){
       this.enableResizing=false;
@@ -88,6 +132,10 @@ export class Component{
     }
   }
 
+  /**
+   * Checks if the mouse is inside the component boundaries
+   * @returns {boolean} True if mouse is inside the component
+   */
   isInside() {
     let insideRect = mouseX > this.x && mouseX < this.x + this.width &&
                      mouseY > this.y && mouseY < this.y + this.height;
@@ -122,6 +170,11 @@ export class Component{
 
   //removes child from children array
   //only from the immediate children
+  /**
+   * Removes a child component from immediate children
+   * @param {Component} element - The child component to remove
+   * @returns {boolean} True if component was found and removed
+   */
   removeChild(element){
     if(this.children.includes(element)){
       this.children = this.children.filter((elem)=>elem!==element);
@@ -133,6 +186,11 @@ export class Component{
   }
   
   // helper to deal with scrollable parent
+    /**
+   * Helper method to check parent boundaries for scrollable containers
+   * @returns {boolean} True if parent boundaries allow interaction
+   * @private
+   */
   checkParent() {
     if (this.parent && this.parent.constructor.name === "ScrollFrame" &&
         (this.parent.enableVScroll || this.parent.enableHScroll)) {
@@ -143,6 +201,11 @@ export class Component{
   
 
   //finds element recursively among children
+  /**
+   * Recursively searches for an element in the children tree
+   * @param {Component} element - The element to find
+   * @returns {boolean} True if element is found in the hierarchy or matches to self
+   */
   findElement(element){
     if(element==this){
       return true;
@@ -158,6 +221,11 @@ export class Component{
     return false;
   }
 
+  /**
+   * Finds the index of a child element
+   * @param {Component} element - The child element to find
+   * @returns {number} Index of the element or -1 if not found
+   */
   findIndexOfElement(element){
     return this.children.findIndex((elem)=> elem===element);
   }
@@ -165,6 +233,11 @@ export class Component{
   // cheking if it or any of its children have ids
   // already present in the map
   // if there is, then the duplicate id is returned
+  /**
+   * Checks if this component can be safely added to the elements map
+   * @param {Map} map - The elements map to check against
+   * @returns {string} "<<no_match_found>>" if safe, duplicate ID otherwise
+   */
   safeToFillElementsMap(map){
     if(map.has(this.id)){
       return this.id;//false
@@ -179,7 +252,11 @@ export class Component{
 
     return "<<no_match_found>>";//true
   }
-
+  /**
+   * Fills the elements map with this component and all children
+   * @param {Map} map - The elements map to populate
+   * @returns {string} "<<map_filled_successfully>>" or duplicate ID
+   */
   fillElementsMap(map){
     let res = this.safeToFillElementsMap(map);
     if(res!=="<<no_match_found>>"){
@@ -189,7 +266,11 @@ export class Component{
     this.fillElementsMapUtil(map);
     return "<<map_filled_successfully>>";
   }
-
+  /**
+   * Internal recursive method to populate elements map
+   * @param {Map} map - The elements map to populate
+   * @private
+   */
   fillElementsMapUtil(map){
     if(this.id!==null){
       map.set(this.id, this);
@@ -201,6 +282,11 @@ export class Component{
   }
 
   //recursively finds element by ID
+  /**
+   * Recursively finds a component by its ID
+   * @param {string} id - The ID to search for
+   * @returns {Component|null} The found component or null
+   */
   getElementById(id){
     if(id===null){
       return null;
@@ -221,6 +307,10 @@ export class Component{
   }
 
   //recursively finds target component
+  /**
+   * Recursively finds the target component for mouse events
+   * @returns {Component|null} The deepest component under the mouse
+   */
   findTarget(){
     for(let i = this.children.length - 1; i >= 0; i--){
       let child = this.children[i];
@@ -235,7 +325,11 @@ export class Component{
 
     return null;
   }
-
+  /**
+   * Checks if this component is a child of the specified element
+   * @param {Component} elem - The potential parent element
+   * @returns {boolean} True if this is a child of the element
+   */
   isChildOf(elem){
     if(!this.parent || !elem){
       return false;
@@ -249,6 +343,10 @@ export class Component{
   }
 
   //recursively sets root of itself and of its children
+  /**
+   * Sets the root reference for this component and all children
+   * @param {Root} root - The root manager instance
+   */
   setRoot(root){
     this.root = root;
     
