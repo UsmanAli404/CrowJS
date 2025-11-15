@@ -69,10 +69,13 @@ export class TextField extends Input{
             this.isSelecting = false;
 
             this.addEventListener("keyPress", (event)=>this.onKeyPress(event));
-            this.addEventListener("click", (event)=>this.onMouseClick(event));
+            // this.addEventListener("click", (event)=>this.onMouseClick(event));
+            this.addEventListener("press", (event)=>this.onMousePress(event)); // NEW
             this.addEventListener("drag", (event)=>this.onMouseDrag(event));
             this.addEventListener("release", (event)=>this.onMouseRelease(event));
             this.addEventListener("hover", (event)=>this.onMouseHover(event));
+            this.addEventListener("blur", (event)=>this.onBlur(event));
+            this.addEventListener("focus", (event)=>this.onFocus(event));
     }
 
     /**
@@ -87,132 +90,191 @@ export class TextField extends Input{
    * Handles mouse release events
    * @param {MouseEvent} event - The release event
    */
-    onMouseRelease(event){
+    onMouseRelease(event) {
         this.isSelecting = false;
     }
 
-    /**
-   * Handles mouse drag events for text selection
-   * @param {MouseEvent} event - The drag event
-   */
-    onMouseDrag(event){
-        if (this.isSelecting && this.isFocused) {
-            let textStartX = this.textAlign === "left"
-                ? this.x + this.padding - this.displayXOffset
-                : this.x + this.width - this.textSize - this.displayXOffset;
-    
-            let relativeX = event.x - textStartX;
-    
-            textSize(this.textSize);
-            let cumulativeWidth = 0;
-            let pos = 0;
-    
-            for (let i = 0; i <= this.text.length; i++) {
-                let nextWidth = textWidth(this.text.charAt(i));
-                if (relativeX < cumulativeWidth + nextWidth / 2) {
-                    pos = i;
-                    break;
-                }
-                cumulativeWidth += nextWidth;
-                pos = i;
-            }
-    
-            this.cursorPos = pos;
-            this.selectionEnd = pos;
-            this.scrollCursorIntoView();
-        }
-
-        // event.stopPropagation();
+    onFocus(event){
+        console.log("focus called!");
     }
 
-    /**
-   * Handles keyboard input for text editing and navigation
-   * @param {KeyboardEvent} event - The key press event
-   */
+    onBlur(event){
+        this.isSelecting = false;
+
+        // Clear selection
+        this.selectionStart = null;
+        this.selectionEnd = null;
+
+        // Cursor usually hides after blur in textfields
+        this.cursorVisible = false;
+
+        console.log("blur called!");
+
+        event.stopPropagation();
+    }
+
+
+    onMousePress(event) {
+        this.isSelecting = true;
+
+        // Clamp X for initial cursor position
+        let x = event.x;
+        if (x <= this.x - 1000) x = this.x - 1000;
+        if (x >= this.x + this.width + 1000) x = this.x + this.width + 1000;
+
+        // Convert X → character index
+        let idx = this.getCursorIndexFromX(x);
+
+        // Set selection start and cursor immediately (start selecting instantly)
+        this.selectionStart = idx;
+        this.selectionEnd = idx;
+        this.cursorPos = idx;
+
+        // Ensure cursor visible & auto scroll
+        this.scrollCursorIntoView();
+        this.cursorVisible = true;
+        this.lastCursorToggle = millis();
+
+        event.stopPropagation();
+    }
+
+    onMouseDrag(event) {
+        if (this.isSelecting && this.isFocused) {
+
+            let x = event.x;
+            if (x <= this.x - 1000) x = this.x - 1000;
+            if (x >= this.x + this.width + 1000) x = this.x + this.width + 1000;
+
+            let pos = this.getCursorIndexFromX(x);
+
+            this.selectionEnd = pos;
+            this.cursorPos = pos;
+
+            this.scrollCursorIntoView();
+            this.cursorVisible = true;
+            this.lastCursorToggle = millis();
+
+            event.stopPropagation();
+        }
+    }
+
     onKeyPress(event) {
+        // ADDED: if there's an active selection and user types or presses backspace/delete,
+        // we should remove the selection first (so typed char replaces selection)
+        const hasSelection = this.selectionStart !== null && this.selectionStart !== this.selectionEnd;
+
         if (keyCode === LEFT_ARROW) {
-            if(keyIsDown(CONTROL)){
+            if (keyIsDown(CONTROL)) {
                 this.jumpLeftByOneWord();
             } else {
                 this.moveCursorLeft(1);
             }
+            // collapse selection when using arrows (typical behavior)
+            this.selectionStart = this.selectionEnd = this.cursorPos;
         } else if (keyCode === RIGHT_ARROW) {
-            if(keyIsDown(CONTROL)){
+            if (keyIsDown(CONTROL)) {
                 this.jumpRightByOneWord();
             } else {
                 this.moveCursorRight(1);
             }
+            this.selectionStart = this.selectionEnd = this.cursorPos;
         } else if (keyCode === BACKSPACE) {
-            if (keyIsDown(CONTROL)) {
+            if (hasSelection) {
+                // ADDED: delete selection (Backspace with selection deletes selection)
+                this.deleteSelectedText();
+            } else if (keyIsDown(CONTROL)) {
                 this.deleteOneWord();
             } else {
                 this.deleteOneChar();
             }
+            // collapse selection after deletion
+            this.selectionStart = this.selectionEnd = this.cursorPos;
         } else if (key.length === 1) {
+            // ADDED: if a selection exists, remove it before insertion so typed char replaces selection
+            if (hasSelection) {
+                this.deleteSelectedText();
+            }
+            // Insert the character at cursor
             this.text = this.text.slice(0, this.cursorPos) + key + this.text.slice(this.cursorPos);
             this.moveCursorRight(1);
+            // collapse selection after insertion
+            this.selectionStart = this.selectionEnd = this.cursorPos;
         }
-    
+
         this.cursorVisible = true;
         this.lastCursorToggle = millis();
     }
 
+
     /**
-   * Deletes the currently selected text
-   */
-    deleteSelectedText(){
-        if (this.selectionStart !== null && this.selectionStart !== this.selectionEnd) {
-            let start = min(this.selectionStart, this.selectionEnd);
-            let end = max(this.selectionStart, this.selectionEnd);
-        
-            this.text = this.text.slice(0, start) + this.text.slice(end);
-            this.cursorPos = start;
-        
-            this.selectionStart = this.selectionEnd = null;
+     * Compute the X coordinate where the rendered text starts (accounts for alignment & displayXOffset)
+     * ADDED helper -- use this from click/drag/any cursor-from-x routines.
+     */
+    computeTextStartX() {
+        // ADDED: measure full text width once
+        push();
+        textSize(this.textSize);
+        let fullWidth = textWidth(this.text || ""); // safe for empty string
+        pop();
+
+        if (this.textAlign === "left") {
+            // left aligned starts at left padding, minus the scroll offset
+            return this.x + this.padding - this.displayXOffset;
+        } else if (this.textAlign === "right") {
+            // right aligned: text ends at width - padding, so start is that minus fullWidth
+            return this.x + this.width - this.padding - fullWidth - this.displayXOffset;
+        } else { // center or anything else
+            return this.x + this.width / 2 - fullWidth / 2 - this.displayXOffset;
         }
     }
 
     /**
-   * Handles mouse click events for cursor positioning
-   * @param {MouseEvent} event - The click event
-   */
-    onMouseClick(event) {
-        this.selectionStart = this.cursorPos;
-        this.selectionEnd = this.cursorPos;
-        this.isSelecting = true;
+     * Convert absolute click X into cursor index (0..text.length).
+     * ADDED helper - replaces duplicated click/drag loop logic.
+     */
+    getCursorIndexFromX(clickX) {
+        // Compute text start and relative click
+        let textStartX = this.computeTextStartX(); // ADDED use centralized function
+        let relativeX = clickX - textStartX;
 
-        if (event.x >= this.x && event.x <= this.x + this.width &&
-            event.y >= this.y && event.y <= this.y + this.height) {
-    
-            let textStartX;
-            if (this.textAlign === "left") {
-                textStartX = this.x + this.padding - this.displayXOffset;
-            } else if (this.textAlign === "right") {
-                textStartX = this.x + this.width - this.textSize - this.displayXOffset;
+        // Early out: before start
+        if (relativeX <= 0) return 0;
+
+        // Measure and walk characters
+        push();
+        textSize(this.textSize);
+        let cumulativeWidth = 0;
+        let pos = 0;
+        const len = this.text.length;
+        for (let i = 0; i < len; i++) { // ADDED: loop < len (avoid charAt(len))
+            let ch = this.text.charAt(i);
+            let nextWidth = textWidth(ch);
+            // Midpoint rule: place cursor before the character if closer to left half
+            if (relativeX < cumulativeWidth + nextWidth / 2) {
+                pos = i;
+                pop();
+                return pos;
             }
-    
-            let clickX = event.x;
-            let relativeX = clickX - textStartX;
-    
-            textSize(this.textSize);
-            let cumulativeWidth = 0;
-    
-            this.cursorPos = 0;
+            cumulativeWidth += nextWidth;
+            pos = i + 1; // cursor after this char
+        }
+        pop();
 
-            for (let i = 0; i <= this.text.length; i++) {
-                let nextWidth = textWidth(this.text.charAt(i));
-                if (relativeX < cumulativeWidth + nextWidth / 2) {
-                    this.cursorPos = i;
-                    break;
-                }
-                cumulativeWidth += nextWidth;
-                this.cursorPos = i;
-            }
+        // If we got here, click is after all characters -> cursor at end
+        return len;
+    }
 
-            this.scrollCursorIntoView()
 
-            this.cursorVisible = true;
-            this.lastCursorToggle = millis();
+    deleteSelectedText(){
+        if (this.selectionStart !== null && this.selectionStart !== this.selectionEnd) {
+            let start = min(this.selectionStart, this.selectionEnd);
+            let end = max(this.selectionStart, this.selectionEnd);
+
+            this.text = this.text.slice(0, start) + this.text.slice(end);
+            this.cursorPos = start;
+
+            // ADDED: clear selection anchors and ensure they reflect cursor
+            this.selectionStart = this.selectionEnd = null;
         }
     }
 
