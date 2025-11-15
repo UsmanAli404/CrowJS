@@ -1,3 +1,5 @@
+import { GUIEvent } from "./GUIEvent/GUIEvent.js";
+
 export class Component{
   /**
    * Creates a new Component instance
@@ -33,9 +35,74 @@ export class Component{
   //for each component
   /**
    * Registers an event listener for the component
-   * @param {string} eventType - The type of event to listen for
-   * @param {Function} callback - The function to call when event occurs
+   * 
+   * @param {EventType} eventType - The type of event to listen for. Available options:
+   * 
+   * ## Mouse Events
+   * - `"hover"` - Fires continuously while mouse is over the component (use in draw loop)
+   * - `"mouseEnter"` - Fires once when mouse enters component boundaries
+   * - `"mouseLeave"` - Fires once when mouse leaves component boundaries  
+   * - `"click"` - Fires on mouse click (press + release on same component)
+   * - `"press"` - Fires when mouse button is pressed down
+   * - `"release"` - Fires when mouse button is released
+   * - `"drag"` - Fires continuously while mouse is dragged with button pressed
+   * - `"doubleClick"` - Fires on double click
+   * - `"scroll"` - Fires on mouse wheel scroll
+   * 
+   * ## Keyboard Events
+   * - `"keyPress"` - Fires once when a key is pressed
+   * - `"keyDown"` - Fires continuously while a key is held down (use in draw loop)
+   * 
+   * ## Frame Events (Frame, GridFrame, ScrollFrame only)
+   * - `"resize"` - Fires when frame is being resized by user
+   * - `"reposition"` - Fires when frame is being dragged/moved by user
+   * 
+   * ## Input Events (TextField, Input only)  
+   * - `"focus"` - Fires when input field gains focus
+   * - `"blur"` - Fires when input field loses focus
+   * 
+   * @param {function(GUIEvent): void} callback - The function to call when event occurs.
+   * The callback receives a GUIEvent object with the following properties:
+   * - `x` {number} - The x-coordinate where event occurred
+   * - `y` {number} - The y-coordinate where event occurred  
+   * - `type` {string} - The event type that triggered
+   * - `target` {Component} - The component that received the event
+   * - `propagationStopped` {boolean} - Whether event propagation was stopped
+   * 
+   * For specific event types:
+   * - **MouseEvent** (extends GUIEvent): All mouse-related events
+   * - **KeyboardEvent** (extends GUIEvent): `keyPress`, `keyDown`
+   * - **Scroll events**: Includes `delta` property for scroll direction
+   * 
+   * @example
+   * // Basic click handler
+   * component.addEventListener("click", (event) => {
+   *   console.log(`Clicked at ${event.x}, ${event.y}`);
+   * });
+   * 
+   * @example
+   * // Frame resize handler
+   * frame.addEventListener("resize", (event) => {
+   *   console.log(`Frame resized to ${event.target.width}x${event.target.height}`);
+   * });
+   * 
+   * @example  
+   * // Input focus handler
+   * textField.addEventListener("focus", (event) => {
+   *   event.target.borderWidth += 2; // Visual feedback
+   * });
+   * 
+   * @example
+   * // Stop event propagation
+   * component.addEventListener("click", (event) => {
+   *   event.stopPropagation(); // Prevents parent components from receiving event
+   *   console.log("Event handled here only");
+   * });
+   * 
+   * @throws {Error} If eventType is not a string or callback is not a function
+   * 
    */
+
   addEventListener(eventType, callback){
     if(!this.eventListeners[eventType]){
       this.eventListeners[eventType] = [];

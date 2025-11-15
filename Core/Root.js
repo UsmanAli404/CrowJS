@@ -7,6 +7,7 @@ export class Root{
    * Creates the root manager that handles all GUI components and events
    */
     constructor(){
+      /** @type {Array<Component>} */
       this.layers = [];//determines order of display
       this.lastActiveElement = -2;
       this.activeElement = -1;
