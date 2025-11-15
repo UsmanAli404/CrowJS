@@ -121,7 +121,7 @@ This project is licensed under the MIT License.
 See the `LICENSE` file for details.
 
 ## 🌐 Links
-- GitHub: https://github.com/UsmanAli404
+- My sketches: [https://editor.p5js.org/Usman_Ali/sketches/](p5js.org/Usman_Ali/sketches/)
 - p5.js: [https://p5js.org](https://p5js.org)
 
 Created with ❤️ by **Usman**
