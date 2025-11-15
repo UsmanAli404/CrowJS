@@ -16,15 +16,23 @@
 
 ### 1. Install
 
-Via CDN (not yet available):
-```html
-<script src="https://your-cdn-link.com/crow.min.js"></script>
-```
+## 🚀 Getting Started
 
-Or include the source directly if you're contributing or customizing:
-```html
-<script src="crow.js"></script>
-```
+### 1. Install
+
+To use **CrowJS**, begin by downloading this repository and placing the `CrowJS` folder inside your project's source code.  
+Once included, open the `index.html` file in your browser — it already contains the required setup for p5.js and for loading CrowJS modules.
+
+All GUI development should be done inside **`sketch.js`**, which serves as the main entry point for both your p5.js sketch and all CrowJS components.
+
+---
+
+### ⚠ Important Notes
+- **Do not rename** the `sketch.js` file. CrowJS depends on this filename for consistent module loading.  
+- **Do not alter** the structure or script tags inside `index.html`. Modifying them may prevent CrowJS from running correctly.  
+- A **CDN-based installation** method will be added in the future to make setup even easier.
+
+---
 
 ### 2. Basic Example
 ```javascript
