@@ -4,19 +4,24 @@ import { Label } from "./UIComponents/Label.js";
 
 /** @type {Root} */
 let root;
+let clickTimes=0;
 
 window.setup = function(){
     createCanvas(windowWidth, windowHeight);
     root = new Root();
 
-    let btn = new Label(windowWidth/2, windowHeight/2, 200, 100, "Hello! 👋", 
+    let btnWidth = 200;
+    let btnHeight = 100;
+
+    let btn = new Label((windowWidth/2)-(btnWidth/2), (windowHeight/2)-(btnHeight/2), 200, 100, "Hello! 👋", 
       {cornerRadius: 20,
        backgroundColor: "rgba(0, 0, 0, 1)",
-       textColor: "rgba(255, 255, 255, 1)"
+       textColor: "rgba(255, 255, 255, 1)",
       });
-      
+
     btn.addEventListener("click", (event)=>{
-      event.target.setText("You clicked!");
+      clickTimes+=1;
+      event.target.setText(`You clicked ${clickTimes} \ntimes!`);
     });
 
     root.add(btn);
