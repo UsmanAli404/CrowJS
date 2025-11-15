@@ -4,13 +4,13 @@
 ![Logo](/crowjs-01-01.png)
 
 ## ✨ Features
-- 🪶 Minimal and canvas-native UI for p5.js sketches  
-- 🧱 Frames, nested layouts, scrollable & grid containers  
-- 🎛️ Customizable UI components: buttons, sliders, toggles, input fields, etc.  
-- 🧠 Event system inspired by the web (click, hover, focus, blur)  
-- 🧩 Modular design with support for custom components  
-- 🎨 Fully drawn inside p5.js (no HTML overlays or DOM interference)  
-- 🧪 Ideal for creative coding, simulations, visual experiments, and tools  
+- Minimal and canvas-native UI for p5.js sketches  
+- Frames, nested layouts, scrollable & grid containers  
+- Customizable UI components: buttons, sliders, toggles, input fields, etc.  
+- Event system inspired by the web (click, hover, focus, blur)  
+- Modular design with support for custom components  
+- Fully drawn inside p5.js (no HTML overlays or DOM interference)  
+- Ideal for creative coding, simulations, visual experiments, and tools  
 
 ## 🚀 Getting Started
 
