@@ -42,7 +42,7 @@ import { Label } from "./UIComponents/Label.js";
 
 /** @type {Root} */
 let root;
-let clickTimes=0;
+let clickTimes=1;
 
 window.setup = function(){
     createCanvas(windowWidth, windowHeight);
