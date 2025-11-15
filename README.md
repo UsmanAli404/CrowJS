@@ -100,8 +100,7 @@ window.keyPressed = function(event){
 ```
 
 ## 🧰 Components Overview
-- `Button(text, callback)`   
-- `TextField(placeholder, callback)`  
+- `Label(x, y, width, height, text, {options})`  
 - `ScrollFrame`, `GridFrame`, `Label`, etc.  
 
 More components and documentation coming soon.
