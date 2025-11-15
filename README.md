@@ -16,12 +16,8 @@
 
 ### 1. Install
 
-## 🚀 Getting Started
-
-### 1. Install
-
 To use **CrowJS**, begin by downloading this repository and placing the `CrowJS` folder inside your project's source code.  
-Once included, open the `index.html` file in your browser — it already contains the required setup for p5.js and for loading CrowJS modules.
+Once included, open the `index.html` file in your browser; it already contains the required setup for p5.js and for loading CrowJS modules.
 
 All GUI development should be done inside **`sketch.js`**, which serves as the main entry point for both your p5.js sketch and all CrowJS components.
 
@@ -104,8 +100,7 @@ window.keyPressed = function(event){
 ```
 
 ## 🧰 Components Overview
-- `Button(text, callback)`   
-- `TextField(placeholder, callback)`  
+- `Label(x, y, width, height, text, {options})`  
 - `ScrollFrame`, `GridFrame`, `Label`, etc.  
 
 More components and documentation coming soon.
