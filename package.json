@@ -16,7 +16,7 @@
   "license": "MIT",
   "author": "Usman Ali",
   "type": "commonjs",
-  "main": "sketch.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   }
