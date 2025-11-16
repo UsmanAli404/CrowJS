@@ -1,6 +1,6 @@
 {
   "name": "crowjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "lightweight and extensible GUI library built on top of p5.js",
   "keywords": [
     "CROWJS"
