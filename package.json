@@ -1,0 +1,23 @@
+{
+  "name": "crowjs",
+  "version": "1.0.0",
+  "description": "lightweight and extensible GUI library built on top of p5.js",
+  "keywords": [
+    "CROWJS"
+  ],
+  "homepage": "https://github.com/UsmanAli404/P5GUI#readme",
+  "bugs": {
+    "url": "https://github.com/UsmanAli404/P5GUI/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UsmanAli404/P5GUI.git"
+  },
+  "license": "MIT",
+  "author": "Usman Ali",
+  "type": "commonjs",
+  "main": "sketch.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

@@ -269,6 +269,7 @@ export class Root{
 
       let event = new MouseEvent(x, y, type, target, {event: e});
       target.dispatchEvent(event);
+      
       if(event.type=="click" || event.type=="press"){
         if(target.type=="Input"){
           if(this.focusedField && this.focusedField!=target){

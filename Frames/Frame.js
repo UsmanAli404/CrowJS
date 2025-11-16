@@ -98,6 +98,7 @@ export class Frame extends FrameComponent{
    */
     onResize(event){
       console.log("resizing...");
+      event.stopPropagation();
     }
 
     /**
@@ -105,7 +106,7 @@ export class Frame extends FrameComponent{
    * @param {GUIEvent} event - The reposition event
    */
     onRepos(event){
-      console.log("repositioning...")
+      console.log("repositioning...");
     }
 
     /**

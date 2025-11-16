@@ -75,7 +75,7 @@ export class TextField extends Input{
             this.addEventListener("release", (event)=>this.onMouseRelease(event));
             this.addEventListener("hover", (event)=>this.onMouseHover(event));
             this.addEventListener("blur", (event)=>this.onBlur(event));
-            this.addEventListener("focus", (event)=>this.onFocus(event));
+            // this.addEventListener("focus", (event)=>this.onFocus(event));
     }
 
     /**
@@ -94,9 +94,9 @@ export class TextField extends Input{
         this.isSelecting = false;
     }
 
-    onFocus(event){
-        console.log("focus called!");
-    }
+    // onFocus(event){
+    //     console.log("focus called!");
+    // }
 
     onBlur(event){
         this.isSelecting = false;
@@ -113,8 +113,11 @@ export class TextField extends Input{
         event.stopPropagation();
     }
 
-
     onMousePress(event) {
+        if (!this.isFocused) {
+            this.focus();
+        }
+
         this.isSelecting = true;
 
         // Clamp X for initial cursor position
