@@ -97,8 +97,11 @@ export class GridFrame extends Frame{
     {
       //check if grid is configured or not
       if(this.grid===null){
-        console.log("element can't be added: gird not configured,");
-        console.log("call .gridConfig(rows, cols) to configure grid before adding any elements!");
+        this.gridConfig(this.rows, this.cols);
+        console.log(`grid configured automatically [${this.rows}x${this.cols}]`);
+
+        // console.log("element can't be added: gird not configured,");
+        // console.log("call .gridConfig(rows, cols) first to configure grid before adding any elements!");
         return;
       }
 
