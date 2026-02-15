@@ -1,0 +1,90 @@
+/* Custom styles for CrowJS documentation */
+
+:root{
+    --crowjs-primary: #f8c200;
+}
+
+/* Make the hero name (CrowJS) yellow */
+.VPHero .name {
+  color: #FDD504 !important;
+  background: linear-gradient(120deg, #FDD504 30%, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Add yellow glow behind the crow logo */
+.VPHero .VPImage {
+  filter: 
+    drop-shadow(0 0 35px #FDD504)
+    drop-shadow(0 0 15px #ffe357);
+  transition: filter 0.3s ease;
+}
+
+.VPHero .VPImage:hover {
+  filter: 
+    drop-shadow(0 0 45px #FDD504)
+    drop-shadow(0 0 20px #ffe357);
+}
+
+/* Header navigation hover and active states */
+.VPNavBar .VPLink:hover,
+.VPNavBar .VPLink.active {
+  color: var(--crowjs-primary) !important;
+}
+
+.VPNavScreenMenuLink.active,
+.VPNavScreenMenuLink:hover {
+  color: var(--crowjs-primary) !important;
+}
+
+.VPNavBarMenu .VPLink:hover,
+.VPNavBarMenu .VPLink.active {
+  color: var(--crowjs-primary) !important;
+}
+
+
+/* Sidebar link selectors */
+.VPSidebarItem.is-active .text {
+  color: var(--crowjs-primary) !important;
+}
+
+.VPSidebarItem .link:hover .text {
+  color: var(--crowjs-primary) !important;
+}
+
+/* Outline marker color */
+.VPDocAsideOutline .outline-marker {
+  background-color: var(--crowjs-primary) !important;
+}
+
+/* Switch component focus and hover states */
+.VPSwitch:focus, .VPSwitch:hover {
+  border-color: var(--crowjs-primary) !important;
+}
+
+/* Link hover state */
+.VPLink:hover {
+  border-color: var(--crowjs-primary) !important;
+}
+
+.VPLink .title {
+  color: var(--crowjs-primary) !important;
+}
+
+/* big brand button*/
+.VPButton.medium.brand {
+  background-color: var(--crowjs-primary) !important;
+  color: #000000 !important;
+}
+
+/* big brand button hover*/
+.VPButton.medium.brand:hover {
+  background-color: rgb(255, 208, 39) !important;
+  color: #000000 !important;
+}
+
+/* dropdown top link color on mobile*/
+.VPLocalNavOutlineDropdown .top-link{
+  color: var(--crowjs-primary) !important;
+}
