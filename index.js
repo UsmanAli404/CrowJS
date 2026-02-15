@@ -15,6 +15,7 @@ const ScrollFrame = require('./Frames/ScrollFrame');
 // UIComponents
 const Input = require('./UIComponents/Input');
 const Label = require('./UIComponents/Label');
+const Button = require('./UIComponents/Button');
 const TextField = require('./UIComponents/TextField');
 const UIComponent = require('./UIComponents/UIComponent');
 
@@ -36,6 +37,7 @@ module.exports = {
   // UIComponents
   Input,
   Label,
+  Button,
   TextField,
   UIComponent
 };
