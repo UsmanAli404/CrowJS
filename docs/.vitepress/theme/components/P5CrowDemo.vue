@@ -1,7 +1,9 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { Icon } from '@iconify/vue'
 import { Root } from '../../../../Core/Root.js'
 import { Button } from '../../../../UIComponents/Button.js'
+import { ScrollFrame } from "../../../../Frames/ScrollFrame.js";
 
 const container = ref(null)
 let p5Instance = null
@@ -36,6 +38,7 @@ const loadP5 = () => {
 const bindGlobals = (p) => {
   const functions = [
     'createCanvas',
+    'createGraphics',
     'background',
     'rect',
     'fill',
@@ -45,17 +48,24 @@ const bindGlobals = (p) => {
     'textDescent',
     'textSize',
     'textAlign',
+    'ellipse',
+    'image',
     'noFill',
+    'noStroke',
     'stroke',
     'strokeWeight',
+    'cursor',
     'push',
     'pop',
     'translate',
     'beginClip',
     'endClip',
+    'abs',
+    'dist',
     'min',
     'max',
-    'color'
+    'color',
+    'pow'
   ]
 
   functions.forEach((name) => {
@@ -69,31 +79,51 @@ const bindGlobals = (p) => {
     window[name] = p[name]
   })
 
-  Object.defineProperty(window, 'mouseIsPressed', {
-    get: () => p.mouseIsPressed
-  })
+  const defineLiveProp = (name, getter) => {
+    const existing = Object.getOwnPropertyDescriptor(window, name)
+    if (existing && existing.configurable === false) {
+      return
+    }
 
-  Object.defineProperty(window, 'mouseX', {
-    get: () => p.mouseX
-  })
-
-  Object.defineProperty(window, 'mouseY', {
-    get: () => p.mouseY
-  })
-
-  Object.defineProperty(window, 'keyIsPressed', {
-    get: () => p.keyIsPressed
-  })
-}
-
-onMounted(async () => {
-  isMounted = true
-  if (!container.value) {
-    return
+    Object.defineProperty(window, name, {
+      get: getter,
+      configurable: true
+    })
   }
 
-  await loadP5()
-  if (!isMounted || !window.p5) {
+  defineLiveProp('mouseIsPressed', () => p.mouseIsPressed)
+  defineLiveProp('mouseX', () => p.mouseX)
+  defineLiveProp('mouseY', () => p.mouseY)
+  defineLiveProp('keyIsPressed', () => p.keyIsPressed)
+  defineLiveProp('drawingContext', () => p.drawingContext)
+}
+
+const isTouchDevice = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return (
+    window.matchMedia?.('(pointer: coarse)').matches ||
+    'ontouchstart' in window ||
+    navigator.maxTouchPoints > 0
+  )
+}
+
+const teardownSketch = () => {
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler)
+    resizeHandler = null
+  }
+
+  if (p5Instance) {
+    p5Instance.remove()
+    p5Instance = null
+  }
+}
+
+const startSketch = () => {
+  if (!container.value || !window.p5) {
     return
   }
 
@@ -127,6 +157,28 @@ onMounted(async () => {
       bindGlobals(p)
       root = new Root()
 
+      const useScrollFrame = !isTouchDevice()
+      const scrollFrameWidth = 300
+      const scrollFrameHeight = 200
+      const scrollFrame = useScrollFrame
+        ? new ScrollFrame(
+          (width - scrollFrameWidth) / 2,
+          (height - scrollFrameHeight) / 2,
+          scrollFrameWidth,
+          scrollFrameHeight, {
+          cornerRadius: 13,
+          alwaysShowBanner: true,
+          enableHScroll: false,
+          enableReposition: true,
+          enableShadow: true,
+          shadowColor: 'rgba(0, 0, 0, 1)',
+          shadowBlur: 50,
+          shadowOffsetX: 0,
+          shadowOffsetY: 0,
+          pad: 20,
+        })
+        : null
+
       const btnWidth = 200
       const btnHeight = 100
       button = new Button(
@@ -134,9 +186,9 @@ onMounted(async () => {
         (height - btnHeight) / 2,
         btnWidth,
         btnHeight,
-        'Hello! 👋',
+        'Click Me! 🐦‍⬛',
         {
-          cornerRadius: 20,
+          cornerRadius: 13,
           backgroundColor: 'rgba(0, 0, 0, 1)',
           textColor: 'rgba(255, 255, 255, 1)',
         }
@@ -147,7 +199,12 @@ onMounted(async () => {
         event.target.setText(`You clicked ${clickTimes}\ntimes!`)
       })
 
-      root.add(button)
+      if (scrollFrame) {
+        scrollFrame.add(button)
+        root.add(scrollFrame)
+      } else {
+        root.add(button)
+      }
     }
 
     p.draw = () => {
@@ -155,7 +212,8 @@ onMounted(async () => {
         return
       }
 
-      p.background(255)
+      p.background(30)
+
       root.show()
       root.mouseEnterEventListeners(p.mouseX, p.mouseY)
       root.hoverEventListeners(p.mouseX, p.mouseY)
@@ -223,22 +281,47 @@ onMounted(async () => {
   if (resizeHandler) {
     window.addEventListener('resize', resizeHandler)
   }
+}
+
+const resetSketch = () => {
+  if (!isMounted) {
+    return
+  }
+
+  teardownSketch()
+  startSketch()
+}
+
+onMounted(async () => {
+  isMounted = true
+  if (!container.value) {
+    return
+  }
+
+  await loadP5()
+  if (!isMounted || !window.p5) {
+    return
+  }
+
+  startSketch()
 })
 
 onBeforeUnmount(() => {
   isMounted = false
-  if (p5Instance) {
-    p5Instance.remove()
-    p5Instance = null
-  }
 
-  if (resizeHandler) {
-    window.removeEventListener('resize', resizeHandler)
-    resizeHandler = null
-  }
+  teardownSketch()
 })
 </script>
 
 <template>
-  <div ref="container" class="p5-canvas"></div>
+  <div ref="container" class="p5-canvas">
+    <button
+      type="button"
+      class="p5-reset-button"
+      aria-label="Reset demo"
+      @click.stop="resetSketch"
+    >
+      <Icon icon="material-symbols:refresh-rounded" />
+    </button>
+  </div>
 </template>

@@ -30,14 +30,14 @@ export class Frame extends FrameComponent{
    * @param {boolean} enableResizing - Allow resizing
    * @param {boolean} enableOptimisedResizing - Use optimized resizing
    * @param {boolean} enableShadow - Enable shadow rendering
-   * @param {string} shadowColor - Shadow color
-   * @param {number} shadowIntensity - Shadow opacity
-   * @param {number} shadowSpread - Shadow spread
-   * @param {number} shadowDetail - Number of shadow layers
+  * @param {string} shadowColor - Shadow color (CSS color string)
+  * @param {number} shadowBlur - Shadow blur radius
+  * @param {number} shadowOffsetX - Shadow offset on X axis
+  * @param {number} shadowOffsetY - Shadow offset on Y axis
    */
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, type, 
-      enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail){
+      enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY){
       super(x, y, width, height, {parent: parent, type: type, id: id});
   
       this.backgroundColor = backgroundColor;
@@ -47,6 +47,7 @@ export class Frame extends FrameComponent{
       this.cornerRadius = cornerRadius;
       this.padx = padx;
       this.pady = pady;
+      this.pad = (this.padx === this.pady) ? this.padx : null;
   
       this.enableShadow = enableShadow;
       this.enableReposition = enableReposition;
@@ -77,10 +78,10 @@ export class Frame extends FrameComponent{
       }
 
       if(this.enableShadow){
-        this.shadowColor = shadowColor;//rgb value
-        this.shadowIntensity = shadowIntensity;//opacity value between 0 and 1
-        this.shadowSpread = shadowSpread;//stroke width of each of those rectangles
-        this.shadowDetail = shadowDetail;//number of rectangles that will be drawn around the component
+        this.shadowColor = shadowColor;
+        this.shadowBlur = shadowBlur;
+        this.shadowOffsetX = shadowOffsetX;
+        this.shadowOffsetY = shadowOffsetY;
       }
 
       this.addEventListener("hover", (event) => this.onMouseHover(event));
@@ -90,6 +91,16 @@ export class Frame extends FrameComponent{
       this.addEventListener("release", (event) => this.onMouseRelease(event));
       this.addEventListener("resize", (event) => this.onResize(event));
       this.addEventListener("reposition", (event) => this.onRepos(event));
+    }
+
+    /**
+   * Sets a unified padding value for both axes
+   * @param {number} pad - Padding value to apply to both axes
+   */
+    setPad(pad){
+      this.pad = pad;
+      this.padx = pad;
+      this.pady = pad;
     }
 
     /**
@@ -491,41 +502,67 @@ export class Frame extends FrameComponent{
       // console.log("");
     }
     /**
-   * Converts RGB color string to array
-   * @param {string} shadowColor - RGB color string
-   * @returns {number[]|null} Array of RGB values or null
+   * Updates shadow color
+   * @param {string} shadowColor - Shadow color (CSS color string)
    */
-    rgbToArray(shadowColor) {
-      let match = shadowColor.match(/\d+/g);
-      return match ? match.map(Number) : null;
+    setShadowColor(shadowColor){
+      this.shadowColor = shadowColor;
+    }
+
+    /**
+   * Updates shadow blur radius
+   * @param {number} shadowBlur - Shadow blur
+   */
+    setShadowBlur(shadowBlur){
+      this.shadowBlur = shadowBlur;
+    }
+
+    /**
+   * Updates shadow X offset
+   * @param {number} shadowOffsetX - Shadow offset on X axis
+   */
+    setShadowOffsetX(shadowOffsetX){
+      this.shadowOffsetX = shadowOffsetX;
+    }
+
+    /**
+   * Updates shadow Y offset
+   * @param {number} shadowOffsetY - Shadow offset on Y axis
+   */
+    setShadowOffsetY(shadowOffsetY){
+      this.shadowOffsetY = shadowOffsetY;
     }
     /**
    * Renders shadow effect around the frame
    * @param {Object} options - Shadow options
    */
     drawShadow({}={}){
-      let color = this.rgbToArray(this.shadowColor);
-      if(color==null){
-        console.log("shadow color value is not in the correct format: rgb(0,0,0)");
+      if(this.width<=0 || this.height<=0){
         return;
       }
 
-      if(this.shadowIntensity>1){
-        this.shadowIntensity=1;
-        console.log("shadow intensity should be between 0 and 1 inclusive.\nAny value given outside of the range will be clipped to the ends.");
-      } else if(this.shadowIntensity<0){
-        console.log("shadow intensity should be between 0 and 1 inclusive.\nAny value given outside of the range will be clipped to the ends.");
-        this.shadowIntensity=0;
+      let blur = Math.max(0, this.shadowBlur ?? 0);
+      let offsetX = this.shadowOffsetX ?? 0;
+      let offsetY = this.shadowOffsetY ?? 0;
+      let resolvedShadowColor = (typeof this.shadowColor === "string")
+        ? this.shadowColor
+        : (this.shadowColor && this.shadowColor.toString ? this.shadowColor.toString() : "rgba(0,0,0,0.35)");
+
+      if(blur===0 && offsetX===0 && offsetY===0){
+        return;
       }
 
-      for(let i=1; i<=this.shadowDetail; i++){
-        push();
-        noFill();
-        let alpha = this.shadowIntensity * pow(1 - i / this.shadowDetail, 2);
-        stroke(`rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`);
-        strokeWeight(this.shadowSpread);
-        rect(this.x-((i*this.shadowSpread)/2), this.y-((i*this.shadowSpread)/2), this.width+(i*this.shadowSpread), this.height+(i*this.shadowSpread), this.cornerRadius);
-        pop();
-      }
+      let baseFill = this.backgroundColor ?? color(0, 0, 0, 0);
+
+      push();
+      let ctx = drawingContext;
+      ctx.shadowColor = resolvedShadowColor;
+      ctx.shadowBlur = blur;
+      ctx.shadowOffsetX = offsetX;
+      ctx.shadowOffsetY = offsetY;
+      noStroke();
+      fill(baseFill);
+      rect(this.x, this.y, this.width, this.height, this.cornerRadius);
+      pop();
     }
   }

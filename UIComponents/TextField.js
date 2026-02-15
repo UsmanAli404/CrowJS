@@ -17,10 +17,10 @@ export class TextField extends Input{
    * @param {number} options.borderWidth - Border width
    * @param {number} options.cornerRadius - Corner radius
    * @param {boolean} options.enableShadow - Enable shadow
-   * @param {string} options.shadowColor - Shadow color
-   * @param {number} options.shadowIntensity - Shadow opacity
-   * @param {number} options.shadowSpread - Shadow spread
-   * @param {number} options.shadowDetail - Shadow layers
+    * @param {string} options.shadowColor - Shadow color (CSS color string)
+    * @param {number} options.shadowBlur - Shadow blur radius
+    * @param {number} options.shadowOffsetX - Shadow offset on X axis
+    * @param {number} options.shadowOffsetY - Shadow offset on Y axis
    * @param {string} options.placeholder - Placeholder text
    * @param {string} options.text - Initial text
    * @param {string} options.textAlign - Text alignment
@@ -37,18 +37,18 @@ export class TextField extends Input{
         borderWidth = 1, 
         cornerRadius = 0,
         enableShadow=false,
-        shadowColor= 'rgb(0,0,0)',
-        shadowIntensity= 0.4,
-        shadowSpread= 3,
-        shadowDetail=5,
+        shadowColor= 'rgba(0,0,0,0.35)',
+        shadowBlur= 12,
+        shadowOffsetX= 0,
+        shadowOffsetY= 4,
         placeholder="",
         text="",
         textAlign = "left",
         padding = 10,
     }={}) {
         super(x, y, width, height, backgroundColor, borderFlag, borderColor,
-            borderWidth, cornerRadius, enableShadow, shadowColor, shadowIntensity,
-            shadowSpread, shadowDetail, {parent: parent, type: "Input", id: id});
+            borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
+            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id});
         
             this.cursorPos = 0;
             this.text = text;

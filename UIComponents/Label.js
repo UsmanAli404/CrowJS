@@ -19,10 +19,10 @@ export class Label extends UIComponent{
    * @param {number} options.borderWidth - Border width
    * @param {number} options.cornerRadius - Corner radius
    * @param {boolean} options.enableShadow - Enable shadow rendering
-   * @param {string} options.shadowColor - Shadow color
-   * @param {number} options.shadowIntensity - Shadow opacity
-   * @param {number} options.shadowSpread - Shadow spread
-   * @param {number} options.shadowDetail - Shadow layers
+  * @param {string} options.shadowColor - Shadow color (CSS color string)
+  * @param {number} options.shadowBlur - Shadow blur radius
+  * @param {number} options.shadowOffsetX - Shadow offset on X axis
+  * @param {number} options.shadowOffsetY - Shadow offset on Y axis
    * @param {string} options.HTextAlign - Horizontal text alignment
    * @param {string} options.VTextAlign - Vertical text alignment
    * @param {number} options.pad - General padding
@@ -43,23 +43,23 @@ export class Label extends UIComponent{
         borderWidth = 1, 
         cornerRadius = 0,
         enableShadow=false,
-        shadowColor= 'rgb(0,0,0)',
-        shadowIntensity= 0.4,
-        shadowSpread= 3,
-        shadowDetail=5,
+        shadowColor= 'rgba(0,0,0,0.35)',
+        shadowBlur= 12,
+        shadowOffsetX= 0,
+        shadowOffsetY= 4,
         HTextAlign="center",
         VTextAlign="center",
         pad = 5,
-        padx = 0,
-        pady = 0,
-        padl = 0,
-        padr = 0,
-        padt = 0,
-        padb = 0,
+        padx = null,
+        pady = null,
+        padl = null,
+        padr = null,
+        padt = null,
+        padb = null,
       } = {}) {
       super(x, y, width, height, backgroundColor, borderFlag, borderColor,
-        borderWidth, cornerRadius, enableShadow, shadowColor, shadowIntensity,
-        shadowSpread, shadowDetail, {parent: parent, type: "UIComponent", id: id});
+        borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
+        shadowOffsetX, shadowOffsetY, {parent: parent, type: "UIComponent", id: id});
 
       this.text = label;
       this.labelSize = 20;
@@ -68,21 +68,17 @@ export class Label extends UIComponent{
       this.HTextAlign = HTextAlign;
       this.VTextAlign = VTextAlign;
 
+      const resolvedPadx = (padx ?? pad ?? 0)
+      const resolvedPady = (pady ?? pad ?? 0)
       this.pad = pad;
-      this.padx = padx;
-      this.pady = pady;
-      this.padl = padl;
-      this.padr = padr;
-      this.padt = padt;
-      this.padb = padb;
+      this.padx = resolvedPadx;
+      this.pady = resolvedPady;
+      this.padl = padl ?? resolvedPadx;
+      this.padr = padr ?? resolvedPadx;
+      this.padt = padt ?? resolvedPady;
+      this.padb = padb ?? resolvedPady;
     }
 
-    // if(this.enableShadow){
-    //   this.shadowColor = shadowColor;//rgb value
-    //   this.shadowIntensity = shadowIntensity;//opacity value between 0 and 1
-    //   this.shadowSpread = shadowSpread;//stroke width of each of those rectangles
-    //   this.shadowDetail = shadowDetail;//number of rectangles that will be drawn around the component
-    // }
     /**
      * Renders the label with text, background, and border
      */
@@ -109,10 +105,10 @@ export class Label extends UIComponent{
       let x;
       if(this.HTextAlign === "left"){
         textAlign(LEFT, CENTER);
-        x = this.pad;
+        x = this.padl;
       } else if(this.HTextAlign === "right"){
         textAlign(RIGHT, CENTER);
-        x = this.width - this.pad;
+        x = this.width - this.padr;
       } else{
         //center
         textAlign(CENTER, CENTER);
@@ -122,10 +118,10 @@ export class Label extends UIComponent{
       let y;
       if(this.VTextAlign === "top"){
         textAlign(this.getHTextAlign(), BOTTOM);
-        y = this.labelSize + this.pad;
+        y = this.labelSize + this.padt;
       } else if(this.VTextAlign === "bottom"){
         textAlign(this.getHTextAlign(), TOP);
-        y = this.height - this.labelSize - this.pad;
+        y = this.height - this.labelSize - this.padb;
       } else {
         //center
         textAlign(this.getHTextAlign(), CENTER);

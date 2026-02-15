@@ -14,6 +14,7 @@ export class ScrollFrame extends Frame{
    * @param {p5.Color} options.highlightedBorderColor - Highlighted border color
    * @param {number} options.borderWidth - Border width
    * @param {number} options.cornerRadius - Corner radius
+  * @param {number} options.pad - Unified padding for both axes
    * @param {number} options.padx - Horizontal padding
    * @param {number} options.pady - Vertical padding
    * @param {boolean} options.alwaysShowBanner - Always show banner
@@ -29,10 +30,10 @@ export class ScrollFrame extends Frame{
    * @param {boolean} options.enableResizing - Allow resizing
    * @param {boolean} options.enableOptimisedResizing - Optimized resizing
    * @param {boolean} options.enableShadow - Enable shadow
-   * @param {string} options.shadowColor - Shadow color
-   * @param {number} options.shadowIntensity - Shadow opacity
-   * @param {number} options.shadowSpread - Shadow spread
-   * @param {number} options.shadowDetail - Shadow layers
+  * @param {string} options.shadowColor - Shadow color (CSS color string)
+  * @param {number} options.shadowBlur - Shadow blur radius
+  * @param {number} options.shadowOffsetX - Shadow offset on X axis
+  * @param {number} options.shadowOffsetY - Shadow offset on Y axis
    */
     constructor(x, y, width, height, {
       id=null,
@@ -41,8 +42,9 @@ export class ScrollFrame extends Frame{
       highlightedBorderColor = color(0),
       borderWidth = 1,
       cornerRadius = 0,
-      padx=0,
-      pady=0,
+      pad=null,
+      padx=null,
+      pady=null,
       alwaysShowBanner = false,
       enableVScroll=false,
       enableHScroll=false,
@@ -56,15 +58,28 @@ export class ScrollFrame extends Frame{
       enableResizing=false,
       enableOptimisedResizing=false,
       enableShadow=false,
-      shadowColor= 'rgb(0,0,0)',
-      shadowIntensity= 0.3,
-      shadowSpread= 1,
-      shadowDetail=10,
+      shadowColor= 'rgba(0,0,0,0.35)',
+      shadowBlur= 12,
+      shadowOffsetX= 0,
+      shadowOffsetY= 4,
     } = {}) {
+      if (pad !== null && pad !== undefined) {
+        padx = pad;
+        pady = pad;
+      }
+
+      if (padx === null || padx === undefined) {
+        padx = 0;
+      }
+
+      if (pady === null || pady === undefined) {
+        pady = 0;
+      }
+
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowIntensity, shadowSpread, shadowDetail);
+        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY);
       
       this.preferences = [];
       //used for calculating weighted dimensions of child elements

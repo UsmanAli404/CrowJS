@@ -8,6 +8,13 @@ export default defineConfig({
     ['link', { rel: 'icon', href: '/crowjs_favicon.png' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js', defer: '' }]
   ],
+
+  markdown: {
+    image: {
+      lazyLoading: true
+    }
+  },
+
   themeConfig: {
     logo: '/crowjs_favicon.png',
     // https://vitepress.dev/reference/default-theme-config

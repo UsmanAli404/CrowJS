@@ -4,8 +4,8 @@ layout: home
 
 hero:
   name: "CrowJS"
-  text: "P5js Powered GUI framework"
-  tagline: A lightweight GUI framework for p5.js
+  text: "P5js Powered GUI Framework"
+  tagline: A lightweight GUI framework for ...
   image:
     src: /crow.png
     alt: CrowJS logo
@@ -27,7 +27,7 @@ features:
   - title: Lightweight & Extensible
     details: Minimal overhead with the ability to build custom components easily.
 ---
-## Build UI in Minutes
+## Build P5.js Native UI in Minutes
 
 <div class="home-build">
   <div class="home-build-text">
@@ -43,7 +43,7 @@ let clickTimes = 0;
 function setup(){
   root = new Root();
 
-  const button = new Button(0, 0, 200, 100, "Hello! 👋", {
+  const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
     cornerRadius: 20,
     backgroundColor: "rgba(0, 0, 0, 1)",
     textColor: "rgba(255, 255, 255, 1)"
