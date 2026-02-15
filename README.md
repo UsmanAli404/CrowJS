@@ -3,7 +3,7 @@
 
 ![Logo](/crowjs-01-01.png)
 
-## ✨ Features
+## Features
 - Minimal and canvas-native UI for p5.js sketches  
 - Frames, nested layouts, scrollable & grid containers  
 - Customizable UI components: buttons, sliders, toggles, input fields, etc.  
@@ -12,7 +12,7 @@
 - Fully drawn inside p5.js (no HTML overlays or DOM interference)  
 - Ideal for creative coding, simulations, visual experiments, and tools  
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Install
 
@@ -99,31 +99,31 @@ window.keyPressed = function(event){
 }
 ```
 
-## 🧰 Components Overview
+## Components Overview
 - `Label(x, y, width, height, text, {options})`  
 - `ScrollFrame`, `GridFrame`, `Label`, etc.  
 
 More components and documentation coming soon.
 
-## 📚 Documentation & Tutorials
+## Documentation & Tutorials
 A full **video series** and documentation site are in the works!  
 Stay tuned for:  
 - Getting started tutorials  
 - Custom component creation  
 - Internals of CrowJS for contributors  
 
-## 💡 Why CrowJS?
+## Why CrowJS?
 While p5.js is amazing for generative art and simulations, there's a noticeable gap when it comes to in-sketch UI. CrowJS fills that gap by giving you a canvas-first GUI framework that blends seamlessly with your visuals.
 
-## 🤝 Contributing
+## Contributing
 CrowJS is open-source! Contributions, bug reports, and ideas are welcome.  
 See the `CONTRIBUTING.md` file for details.
 
-## 📄 License
+## License
 This project is licensed under the MIT License.  
 See the `LICENSE` file for details.
 
-## 🌐 Links
+## Links
 - My sketches: [https://editor.p5js.org/Usman_Ali/sketches/](p5js.org/Usman_Ali/sketches/)
 - p5.js: [https://p5js.org](https://p5js.org)
 
