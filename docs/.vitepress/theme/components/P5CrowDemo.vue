@@ -155,7 +155,7 @@ const startSketch = () => {
       canvas.parent(container.value)
 
       bindGlobals(p)
-      root = new Root()
+      root = new Root({showDebugOverlay: false})
 
       const useScrollFrame = !isTouchDevice()
       const scrollFrameWidth = 300
@@ -172,11 +172,13 @@ const startSketch = () => {
           enableReposition: true,
           enableResizing: true,
           // enableShadow: true,
-          shadowColor: 'rgba(0, 0, 0, 1)',
-          shadowBlur: 50,
-          shadowOffsetX: 0,
-          shadowOffsetY: 0,
+          // shadowColor: 'rgba(0, 0, 0, 1)',
+          // shadowBlur: 50,
+          // shadowOffsetX: 0,
+          // shadowOffsetY: 0,
           pad: 20,
+          margin: 10,
+          
         })
         : null
 
@@ -189,20 +191,21 @@ const startSketch = () => {
         btnHeight,
         'Click Me! 🐦‍⬛',
         {
-          cornerRadius: 13,
-          backgroundColor: 'rgba(0, 0, 0, 1)',
-          textColor: 'rgba(255, 255, 255, 1)',
-          wrap: false,
-          wrapMode: 'char',
-          noWrapMode: 'font-size',
-          ellipsisMode: 'trailing',
-          pad: 5,
+          // cornerRadius: 13,
+          // backgroundColor: 'rgba(0, 0, 0, 1)',
+          // textColor: 'rgba(255, 255, 255, 1)',
+          // wrap: false,
+          // wrapMode: 'char',
+          // noWrapMode: 'font-size',
+          // ellipsisMode: 'trailing',
+          pad: 10,
+          margin: 10,
         }
       )
 
       button.addEventListener('click', (event) => {
         clickTimes += 1
-        event.target.setText(`You clicked ${clickTimes} times \n because it is so \n annoying to `)
+        event.target.setText(`You clicked ${clickTimes} times!`)
       })
 
       if (scrollFrame) {

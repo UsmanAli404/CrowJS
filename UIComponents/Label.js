@@ -36,18 +36,25 @@ export class Label extends TextComponent{
    * @param {string} options.wrapMode - Wrap mode: "word" or "char"
    * @param {string} options.noWrapMode - No-wrap mode: "ellipsis" or "font-size"
   * @param {string} options.ellipsisMode - Ellipsis mode: "leading", "center", or "trailing"
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
     constructor(x, y, width, height, label,
        {id=null,
         parent = null,
-        backgroundColor = color(200),
-        textColor = color(0),
+        backgroundColor = color('#1e1e2e'),
+        textColor = color('#e0e0e0'),
         borderFlag = true,
-        borderColor = color(0),
+        borderColor = color('#3a3a4d'),
         borderWidth = 1, 
-        cornerRadius = 0,
+        cornerRadius = 8,
         enableShadow=false,
-        shadowColor= 'rgba(0,0,0,0.35)',
+        shadowColor= 'rgba(0,0,0,0.5)',
         shadowBlur= 12,
         shadowOffsetX= 0,
         shadowOffsetY= 4,
@@ -64,6 +71,13 @@ export class Label extends TextComponent{
         wrapMode = "word",
         noWrapMode = "font-size",
         ellipsisMode = "trailing",
+        margin = 0,
+        marginx = null,
+        marginy = null,
+        marginl = null,
+        marginr = null,
+        margint = null,
+        marginb = null,
       } = {}) {
       super(x, y, width, height, label, {
         id,
@@ -92,6 +106,13 @@ export class Label extends TextComponent{
         wrapMode,
         noWrapMode,
         ellipsisMode,
+        margin,
+        marginx,
+        marginy,
+        marginl,
+        marginr,
+        margint,
+        marginb,
       });
     }
 

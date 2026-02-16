@@ -40,24 +40,31 @@ export class Button extends TextComponent {
    * @param {string} options.wrapMode - Wrap mode: "word" or "char"
    * @param {string} options.noWrapMode - No-wrap mode: "ellipsis" or "font-size"
    * @param {string} options.ellipsisMode - Ellipsis mode: "leading", "center", or "trailing"
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    * @param {boolean} options.enabled - Whether the button is enabled
    */
   constructor(x, y, width, height, label,
     {
       id = null,
       parent = null,
-      backgroundColor = color(200),
-      textColor = color(0),
-      hoverBackgroundColor = null,
-      hoverTextColor = null,
-      pressedBackgroundColor = null,
-      pressedTextColor = null,
+      backgroundColor = color('#2a2a3d'),
+      textColor = color('#e0e0e0'),
+      hoverBackgroundColor = color('#3a3a5a'),
+      hoverTextColor = color('#ffffff'),
+      pressedBackgroundColor = color('#4a4a6a'),
+      pressedTextColor = color('#ffffff'),
       borderFlag = true,
-      borderColor = color(0),
+      borderColor = color('#3a3a4d'),
       borderWidth = 1,
-      cornerRadius = 0,
+      cornerRadius = 8,
       enableShadow = false,
-      shadowColor = 'rgba(0,0,0,0.35)',
+      shadowColor = 'rgba(0,0,0,0.5)',
       shadowBlur = 12,
       shadowOffsetX = 0,
       shadowOffsetY = 4,
@@ -70,10 +77,17 @@ export class Button extends TextComponent {
       padr = null,
       padt = null,
       padb = null,
-      wrap = false,
+      wrap = true,
       wrapMode = 'word',
       noWrapMode = 'font-size',
       ellipsisMode = 'trailing',
+      margin = 0,
+      marginx = null,
+      marginy = null,
+      marginl = null,
+      marginr = null,
+      margint = null,
+      marginb = null,
       enabled = true,
     } = {}) {
     super(x, y, width, height, label, {
@@ -103,6 +117,13 @@ export class Button extends TextComponent {
       wrapMode,
       noWrapMode,
       ellipsisMode,
+      margin,
+      marginx,
+      marginy,
+      marginl,
+      marginr,
+      margint,
+      marginb,
     });
 
     this.hoverBackgroundColor = hoverBackgroundColor;
@@ -117,11 +138,13 @@ export class Button extends TextComponent {
     this.addEventListener('mouseEnter', () => {
       if (!this.enabled) return;
       this.isHovered = true;
+      cursor('pointer');
     });
 
     this.addEventListener('mouseLeave', () => {
       this.isHovered = false;
       this.isPressed = false;
+      cursor('');
     });
 
     this.addEventListener('press', () => {
@@ -156,9 +179,10 @@ export class Button extends TextComponent {
     fill(this.getTextColor());
     this.renderText();
 
+    // Border
     if (this.borderFlag) {
       noFill();
-      stroke(this.borderColor);
+      stroke(this.getBorderColor());
       strokeWeight(this.borderWidth);
       rect(0, 0, this.width, this.height, this.cornerRadius);
     }
@@ -208,5 +232,21 @@ export class Button extends TextComponent {
     }
 
     return this.textColor;
+  }
+
+  getBorderColor() {
+    if (!this.enabled) {
+      return this.borderColor;
+    }
+
+    if (this.isPressed) {
+      return color('#6a6a9a');
+    }
+
+    if (this.isHovered) {
+      return color('#5a5a7a');
+    }
+
+    return this.borderColor;
   }
 }

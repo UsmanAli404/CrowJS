@@ -25,19 +25,26 @@ export class TextField extends Input{
    * @param {string} options.text - Initial text
    * @param {string} options.textAlign - Text alignment
    * @param {number} options.padding - Internal padding
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
     constructor(x, y, width, height, 
     {
         id=null,
         parent=null,
-        backgroundColor='rgb(255, 255, 255)',
-        textColor='rgb(0, 0, 0)',
+        backgroundColor='rgb(30, 30, 46)',
+        textColor='rgb(224, 224, 224)',
         borderFlag = true,
-        borderColor = color(0),
+        borderColor = color('#3a3a4d'),
         borderWidth = 1, 
-        cornerRadius = 0,
+        cornerRadius = 8,
         enableShadow=false,
-        shadowColor= 'rgba(0,0,0,0.35)',
+        shadowColor= 'rgba(0,0,0,0.5)',
         shadowBlur= 12,
         shadowOffsetX= 0,
         shadowOffsetY= 4,
@@ -45,10 +52,17 @@ export class TextField extends Input{
         text="",
         textAlign = "left",
         padding = 10,
+        margin = 0,
+        marginx = null,
+        marginy = null,
+        marginl = null,
+        marginr = null,
+        margint = null,
+        marginb = null,
     }={}) {
         super(x, y, width, height, backgroundColor, borderFlag, borderColor,
             borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id});
+            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
         
             this.cursorPos = 0;
             this.text = text;

@@ -5,8 +5,10 @@ import { Component } from "./Component.js";
 export class Root{
    /**
    * Creates the root manager that handles all GUI components and events
+   * @param {Object} options - Configuration options
+   * @param {boolean} options.showDebugOverlay - When true, visualizes margin (orange) and padding (blue) for all components
    */
-    constructor(){
+    constructor({showDebugOverlay = false} = {}){
       /** @type {Array<Component>} */
       this.layers = [];//determines order of display
       this.lastActiveElement = -2;
@@ -17,6 +19,7 @@ export class Root{
       this.elementsMap = new Map();//for storing ids
       // this.preferences = {};
       this.focusedField = null;//for focusable input fields
+      this.showDebugOverlay = showDebugOverlay;//for visualizing padding and margin
     }
 
     /**
@@ -38,11 +41,18 @@ export class Root{
     }
   
     /**
-   * Renders all components in the correct z-order
+   * Renders all components in the correct z-order.
+   * When showDebugOverlay is true, also draws margin/padding visualization.
    */
     show(){
       for(let i=0; i<this.layers.length; i++){
         this.layers[i].show();
+      }
+
+      if(this.showDebugOverlay){
+        for(let i=0; i<this.layers.length; i++){
+          this.layers[i].drawDebugOverlayRecursive();
+        }
       }
     }
   

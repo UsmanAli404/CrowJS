@@ -10,8 +10,15 @@ export class Component{
    * @param {Object} options - Configuration options
    * @param {string} options.type - The type identifier of the component
    * @param {string|null} options.id - Unique identifier for the component
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
-  constructor(x, y, width, height, {type="", id=null} = {}){
+  constructor(x, y, width, height, {type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}){
     this.x = x;
     this.y = y;
     this.id = id;
@@ -22,6 +29,49 @@ export class Component{
     this.root = null;
     this.eventListeners = {};
     this.children = [];
+
+    // Margin resolution
+    const resolvedMarginx = (marginx ?? margin ?? 0);
+    const resolvedMarginy = (marginy ?? margin ?? 0);
+    this.margin = margin;
+    this.marginx = resolvedMarginx;
+    this.marginy = resolvedMarginy;
+    this.marginl = marginl ?? resolvedMarginx;
+    this.marginr = marginr ?? resolvedMarginx;
+    this.margint = margint ?? resolvedMarginy;
+    this.marginb = marginb ?? resolvedMarginy;
+  }
+
+  /**
+   * Returns the x-coordinate including left margin (outer bound)
+   * @returns {number}
+   */
+  get outerX() {
+    return this.x - this.marginl;
+  }
+
+  /**
+   * Returns the y-coordinate including top margin (outer bound)
+   * @returns {number}
+   */
+  get outerY() {
+    return this.y - this.margint;
+  }
+
+  /**
+   * Returns the total width including left and right margins
+   * @returns {number}
+   */
+  get outerWidth() {
+    return this.width + this.marginl + this.marginr;
+  }
+
+  /**
+   * Returns the total height including top and bottom margins
+   * @returns {number}
+   */
+  get outerHeight() {
+    return this.height + this.margint + this.marginb;
   }
 
   //to show itself
@@ -420,6 +470,133 @@ export class Component{
     for(let i=0; i<this.children.length; i++){
       let child = this.children[i];
       child.setRoot(root);
+    }
+  }
+
+  /**
+   * Draws debug overlay for margin and padding visualization.
+   * Margin is shown in orange, padding in blue, both with low opacity.
+   * Small numbers are drawn when there is enough room.
+   */
+  drawDebugOverlay(){
+    const marginColor = [255, 140, 0, 80];   // orange, low opacity
+    const marginBorder = [255, 100, 0];       // orange, high contrast border
+    const paddingColor = [0, 120, 255, 80];   // blue, low opacity
+    const paddingBorder = [0, 80, 220];       // blue, high contrast border
+    const borderWeight = 1.5;
+    const labelColor = [0, 0, 0, 200];
+    const minLabelSize = 8;
+    const labelFontSize = 9;
+
+    push();
+
+    // --- Margin areas (orange) ---
+    // Top margin
+    if(this.margint > 0){
+      fill(...marginColor);
+      stroke(...marginBorder);
+      strokeWeight(borderWeight);
+      rect(this.x, this.y - this.margint, this.width, this.margint);
+      this._drawDebugLabel(this.margint, this.x, this.y - this.margint, this.width, this.margint, labelColor, labelFontSize, minLabelSize);
+    }
+    // Bottom margin
+    if(this.marginb > 0){
+      fill(...marginColor);
+      stroke(...marginBorder);
+      strokeWeight(borderWeight);
+      rect(this.x, this.y + this.height, this.width, this.marginb);
+      this._drawDebugLabel(this.marginb, this.x, this.y + this.height, this.width, this.marginb, labelColor, labelFontSize, minLabelSize);
+    }
+    // Left margin (full outer height including top/bottom margins)
+    if(this.marginl > 0){
+      fill(...marginColor);
+      stroke(...marginBorder);
+      strokeWeight(borderWeight);
+      rect(this.x - this.marginl, this.y - this.margint, this.marginl, this.height + this.margint + this.marginb);
+      this._drawDebugLabel(this.marginl, this.x - this.marginl, this.y - this.margint, this.marginl, this.height + this.margint + this.marginb, labelColor, labelFontSize, minLabelSize);
+    }
+    // Right margin (full outer height including top/bottom margins)
+    if(this.marginr > 0){
+      fill(...marginColor);
+      stroke(...marginBorder);
+      strokeWeight(borderWeight);
+      rect(this.x + this.width, this.y - this.margint, this.marginr, this.height + this.margint + this.marginb);
+      this._drawDebugLabel(this.marginr, this.x + this.width, this.y - this.margint, this.marginr, this.height + this.margint + this.marginb, labelColor, labelFontSize, minLabelSize);
+    }
+
+    // --- Padding areas (blue) ---
+    // Resolve padding values: TextComponent uses padl/padr/padt/padb, Frame uses padx/pady
+    let pl = this.padl ?? this.padx ?? 0;
+    let pr = this.padr ?? this.padx ?? 0;
+    let pt = this.padt ?? this.pady ?? 0;
+    let pb = this.padb ?? this.pady ?? 0;
+
+    // Top padding
+    if(pt > 0){
+      fill(...paddingColor);
+      stroke(...paddingBorder);
+      strokeWeight(borderWeight);
+      rect(this.x, this.y, this.width, pt);
+      this._drawDebugLabel(pt, this.x, this.y, this.width, pt, labelColor, labelFontSize, minLabelSize);
+    }
+    // Bottom padding
+    if(pb > 0){
+      fill(...paddingColor);
+      stroke(...paddingBorder);
+      strokeWeight(borderWeight);
+      rect(this.x, this.y + this.height - pb, this.width, pb);
+      this._drawDebugLabel(pb, this.x, this.y + this.height - pb, this.width, pb, labelColor, labelFontSize, minLabelSize);
+    }
+    // Left padding (between top and bottom padding)
+    if(pl > 0){
+      fill(...paddingColor);
+      stroke(...paddingBorder);
+      strokeWeight(borderWeight);
+      rect(this.x, this.y + pt, pl, this.height - pt - pb);
+      this._drawDebugLabel(pl, this.x, this.y + pt, pl, this.height - pt - pb, labelColor, labelFontSize, minLabelSize);
+    }
+    // Right padding (between top and bottom padding)
+    if(pr > 0){
+      fill(...paddingColor);
+      stroke(...paddingBorder);
+      strokeWeight(borderWeight);
+      rect(this.x + this.width - pr, this.y + pt, pr, this.height - pt - pb);
+      this._drawDebugLabel(pr, this.x + this.width - pr, this.y + pt, pr, this.height - pt - pb, labelColor, labelFontSize, minLabelSize);
+    }
+
+    pop();
+  }
+
+  /**
+   * Draws a small numeric label centered in a debug overlay region if there's enough room
+   * @param {number} value - The numeric value to display
+   * @param {number} rx - Region x
+   * @param {number} ry - Region y
+   * @param {number} rw - Region width
+   * @param {number} rh - Region height
+   * @param {number[]} labelColor - RGBA color array for text
+   * @param {number} fontSize - Font size for the label
+   * @param {number} minSize - Minimum region dimension to show label
+   * @private
+   */
+  _drawDebugLabel(value, rx, ry, rw, rh, labelColor, fontSize, minSize){
+    if(rw < minSize || rh < minSize) return;
+    push();
+    fill(...labelColor);
+    noStroke();
+    textSize(fontSize);
+    textAlign(CENTER, CENTER);
+    text(Math.round(value), rx + rw / 2, ry + rh / 2);
+    pop();
+  }
+
+  /**
+   * Recursively draws debug overlays for this component and all children
+   */
+  drawDebugOverlayRecursive(){
+    this.drawDebugOverlay();
+    for(let i = 0; i < this.children.length; i++){
+      this.children[i].drawDebugOverlayRecursive();
     }
   }
 

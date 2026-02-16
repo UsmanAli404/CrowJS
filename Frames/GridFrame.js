@@ -22,6 +22,8 @@ export class GridFrame extends Frame{
    * @param {number} options.cols - Number of columns in grid
    * @param {number} options.nearestBorderThreshold - Border detection threshold
    * @param {number} options.bannerHeight - Banner height
+   * @param {p5.Color|string} options.bannerColor - Banner background color
+   * @param {p5.Color|string} options.bannerDotColor - Banner dot indicator color
    * @param {Component|null} options.parent - Parent component
    * @param {boolean} options.enableReposition - Allow dragging
    * @param {boolean} options.enableOptimisedReposition - Optimized repositioning
@@ -32,14 +34,21 @@ export class GridFrame extends Frame{
   * @param {number} options.shadowBlur - Shadow blur radius
   * @param {number} options.shadowOffsetX - Shadow offset on X axis
   * @param {number} options.shadowOffsetY - Shadow offset on Y axis
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
     constructor(x, y, width, height, {
       id=null,
-      backgroundColor = color(255),
-      borderColor = color(0),
-      highlightedBorderColor = color(0),
+      backgroundColor = color('#1e1e2e'),
+      borderColor = color('#3a3a4d'),
+      highlightedBorderColor = color('#5a5a7a'),
       borderWidth = 1,
-      cornerRadius = 0,
+      cornerRadius = 8,
       pad=null,
       padx=null,
       pady=null,
@@ -48,16 +57,25 @@ export class GridFrame extends Frame{
       cols=1,
       nearestBorderThreshold=8,
       bannerHeight=35,
+      bannerColor='#2a2a3d',
+      bannerDotColor='#6a6a8a',
       parent=null,
       enableReposition=false,
       enableOptimisedReposition=false,
       enableResizing=false,
       enableOptimisedResizing=false,
       enableShadow=false,
-      shadowColor= 'rgba(0,0,0,0.35)',
+      shadowColor= 'rgba(0,0,0,0.5)',
       shadowBlur = 12,
       shadowOffsetX = 0,
       shadowOffsetY = 4,
+      margin = 0,
+      marginx = null,
+      marginy = null,
+      marginl = null,
+      marginr = null,
+      margint = null,
+      marginb = null,
     }
     ){
       if (pad !== null && pad !== undefined) {
@@ -75,8 +93,9 @@ export class GridFrame extends Frame{
 
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY);
+        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, "Frame",
+        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
+        {margin, marginx, marginy, marginl, marginr, margint, marginb});
 
       //for storing child elements
       this.rows=rows;
@@ -281,14 +300,14 @@ export class GridFrame extends Frame{
           if(this.grid && this.grid[j][i]!=null && this.grid[j][i]!="taken"){
             let curr = this.grid[j][i];
   
-            curr[0].x = x + curr[3];
+            curr[0].x = x + curr[3] + curr[0].marginl;
             curr[0].width = 0;
   
             for(let k=0; k<curr[2]; k++){
               curr[0].width += (this.colWeights[i+k]/this.totalColWeight) * w;
             }
   
-            curr[0].width -= curr[3] + curr[4];
+            curr[0].width -= curr[3] + curr[4] + curr[0].marginl + curr[0].marginr;
   
             if(curr[0].type=="Frame"){
               curr[0].adjustWidth(curr[0].x + curr[0].padx, curr[0].width - 2*curr[0].padx);
@@ -315,14 +334,14 @@ export class GridFrame extends Frame{
           if(this.grid && this.grid[i][j]!=null && this.grid[i][j]!="taken"){
             let curr = this.grid[i][j];
   
-            curr[0].y = y + curr[5];
+            curr[0].y = y + curr[5] + curr[0].margint;
             curr[0].height = 0;
   
             for(let k=0; k<curr[1]; k++){
               curr[0].height += (this.rowWeights[i+k]/this.totalRowWeight) * h;
             }
   
-            curr[0].height -= curr[5] + curr[6];
+            curr[0].height -= curr[5] + curr[6] + curr[0].margint + curr[0].marginb;
   
             //console.log("curr[0].type:"+curr[0].type);
 
@@ -368,8 +387,8 @@ export class GridFrame extends Frame{
         y += (this.rowWeights[i]/this.totalRowWeight) * h;
       }
   
-      this.grid[row][col][0].x = x + this.grid[row][col][3];
-      this.grid[row][col][0].y = y + this.grid[row][col][5];
+      this.grid[row][col][0].x = x + this.grid[row][col][3] + this.grid[row][col][0].marginl;
+      this.grid[row][col][0].y = y + this.grid[row][col][5] + this.grid[row][col][0].margint;
   
       this.expandElement(row, col, rowSpan, colSpan);
   
@@ -460,8 +479,8 @@ export class GridFrame extends Frame{
         }
       }
   
-      this.grid[row][col][0].width = w - this.grid[row][col][3] - this.grid[row][col][4];
-      this.grid[row][col][0].height = h - this.grid[row][col][5] - this.grid[row][col][6];
+      this.grid[row][col][0].width = w - this.grid[row][col][3] - this.grid[row][col][4] - this.grid[row][col][0].marginl - this.grid[row][col][0].marginr;
+      this.grid[row][col][0].height = h - this.grid[row][col][5] - this.grid[row][col][6] - this.grid[row][col][0].margint - this.grid[row][col][0].marginb;
       this.grid[row][col][1] = yLimit+1;
       this.grid[row][col][2] = xLimit+1;
     }
@@ -538,10 +557,10 @@ export class GridFrame extends Frame{
       //showing the top banner
       if(this.alwaysShowBanner || (this.enableReposition && this.isBannerShown==true)){
         noStroke();
-        fill(0);
-        rect(this.x, this.y, this.width, this.bannerHeight);
+        fill(this.bannerColor);
+        rect(this.x, this.y, this.width, this.bannerHeight, this.cornerRadius, this.cornerRadius, 0, 0);
   
-        fill(255);        
+        fill(this.bannerDotColor);
         ellipse(this.x+this.width/2,
            this.y+(this.bannerHeight)/2,
            (this.bannerHeight)/4,

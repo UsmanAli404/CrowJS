@@ -22,6 +22,8 @@ export class Frame extends FrameComponent{
    * @param {number} pady - Vertical padding
    * @param {boolean} alwaysShowBanner - Whether to always show the banner
    * @param {number} bannerHeight - Height of the top banner
+   * @param {p5.Color|string} bannerColor - Banner background color
+   * @param {p5.Color|string} bannerDotColor - Banner dot indicator color
    * @param {number} nearestBorderThreshold - Distance threshold for border detection
    * @param {Component|null} parent - Parent component
    * @param {string} type - Component type
@@ -34,11 +36,20 @@ export class Frame extends FrameComponent{
   * @param {number} shadowBlur - Shadow blur radius
   * @param {number} shadowOffsetX - Shadow offset on X axis
   * @param {number} shadowOffsetY - Shadow offset on Y axis
+   * @param {Object} marginOptions - Margin options
+   * @param {number} marginOptions.margin - General margin for all sides
+   * @param {number} marginOptions.marginx - Horizontal margin (left and right)
+   * @param {number} marginOptions.marginy - Vertical margin (top and bottom)
+   * @param {number} marginOptions.marginl - Left margin
+   * @param {number} marginOptions.marginr - Right margin
+   * @param {number} marginOptions.margint - Top margin
+   * @param {number} marginOptions.marginb - Bottom margin
    */
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-      cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, type, 
-      enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY){
-      super(x, y, width, height, {parent: parent, type: type, id: id});
+      cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, type, 
+      enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
+      {margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}){
+      super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
   
       this.backgroundColor = backgroundColor;
       this.borderColor = borderColor;
@@ -58,6 +69,8 @@ export class Frame extends FrameComponent{
 
       if(this.enableReposition || this.alwaysShowBanner){
         this.bannerHeight = bannerHeight;
+        this.bannerColor = bannerColor;
+        this.bannerDotColor = bannerDotColor;
         
         if(this.enableReposition){
           this.isBannerShown = false;

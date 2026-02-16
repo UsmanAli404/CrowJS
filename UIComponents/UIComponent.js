@@ -21,11 +21,18 @@ export class UIComponent extends Component{
    * @param {Component|null} options.parent - Parent component
    * @param {string} options.type - Component type
    * @param {string|null} options.id - Component ID
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
     constructor(x, y, width, height, backgroundColor, borderFlag, borderColor,
          borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-         shadowOffsetX, shadowOffsetY, {parent=null, type="", id=null} = {}){
-        super(x, y, width, height, {parent: parent, type: type, id: id});
+         shadowOffsetX, shadowOffsetY, {parent=null, type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}){
+        super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
 
         this.backgroundColor = backgroundColor;
 

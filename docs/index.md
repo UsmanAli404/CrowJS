@@ -51,7 +51,7 @@ function setup(){
 
   button.addEventListener('click', (event) => {
     clickTimes += 1
-    event.target.setText(`You clicked ${clickTimes}\ntimes!`)
+    event.target.setText(`You clicked ${clickTimes} times!`)
   });
 
   root.add(button);

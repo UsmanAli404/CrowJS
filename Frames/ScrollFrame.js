@@ -22,6 +22,8 @@ export class ScrollFrame extends Frame{
    * @param {boolean} options.enableHScroll - Enable horizontal scrolling
    * @param {number} options.scrollSensitivity - Scroll speed
    * @param {number} options.bannerHeight - Banner height
+   * @param {p5.Color|string} options.bannerColor - Banner background color
+   * @param {p5.Color|string} options.bannerDotColor - Banner dot indicator color
    * @param {string} options.alignment - Layout alignment ("v" or "h")
    * @param {number} options.nearestBorderThreshold - Border detection threshold
    * @param {Component|null} options.parent - Parent component
@@ -34,14 +36,21 @@ export class ScrollFrame extends Frame{
   * @param {number} options.shadowBlur - Shadow blur radius
   * @param {number} options.shadowOffsetX - Shadow offset on X axis
   * @param {number} options.shadowOffsetY - Shadow offset on Y axis
+   * @param {number} options.margin - General margin for all sides
+   * @param {number} options.marginx - Horizontal margin (left and right)
+   * @param {number} options.marginy - Vertical margin (top and bottom)
+   * @param {number} options.marginl - Left margin
+   * @param {number} options.marginr - Right margin
+   * @param {number} options.margint - Top margin
+   * @param {number} options.marginb - Bottom margin
    */
     constructor(x, y, width, height, {
       id=null,
-      backgroundColor = color(255),
-      borderColor = color(0),
-      highlightedBorderColor = color(0),
+      backgroundColor = color('#1e1e2e'),
+      borderColor = color('#3a3a4d'),
+      highlightedBorderColor = color('#5a5a7a'),
       borderWidth = 1,
-      cornerRadius = 0,
+      cornerRadius = 8,
       pad=null,
       padx=null,
       pady=null,
@@ -50,6 +59,8 @@ export class ScrollFrame extends Frame{
       enableHScroll=false,
       scrollSensitivity=20,
       bannerHeight=35,
+      bannerColor='#2a2a3d',
+      bannerDotColor='#6a6a8a',
       alignment="v", //v for vertical, h for horizontal
       nearestBorderThreshold=8,
       parent=null,
@@ -58,10 +69,17 @@ export class ScrollFrame extends Frame{
       enableResizing=false,
       enableOptimisedResizing=false,
       enableShadow=false,
-      shadowColor= 'rgba(0,0,0,0.35)',
+      shadowColor= 'rgba(0,0,0,0.5)',
       shadowBlur= 12,
       shadowOffsetX= 0,
       shadowOffsetY= 4,
+      margin = 0,
+      marginx = null,
+      marginy = null,
+      marginl = null,
+      marginr = null,
+      margint = null,
+      marginb = null,
     } = {}) {
       if (pad !== null && pad !== undefined) {
         padx = pad;
@@ -78,8 +96,9 @@ export class ScrollFrame extends Frame{
 
       bannerHeight = bannerHeight%height;
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
-        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, nearestBorderThreshold, parent, "Frame",
-        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY);
+        cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, "Frame",
+        enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
+        {margin, marginx, marginy, marginl, marginr, margint, marginb});
       
       this.preferences = [];
       //used for calculating weighted dimensions of child elements
@@ -170,10 +189,10 @@ export class ScrollFrame extends Frame{
       //show the top banner
       if(this.alwaysShowBanner || (this.enableReposition && this.isBannerShown)){
         noStroke();
-        fill(0);
-        rect(this.x, this.y, this.width, this.bannerHeight);
+        fill(this.bannerColor);
+        rect(this.x, this.y, this.width, this.bannerHeight, this.cornerRadius, this.cornerRadius, 0, 0);
   
-        fill(255);        
+        fill(this.bannerDotColor);
         ellipse(this.x+this.width/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
         ellipse(this.x+this.width/2 - (this.bannerHeight)/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
         ellipse(this.x+this.width/2 + (this.bannerHeight)/2, this.y+(this.bannerHeight)/2, (this.bannerHeight)/4, (this.bannerHeight)/4);
@@ -700,19 +719,19 @@ export class ScrollFrame extends Frame{
         if(i > 0){
           let prev = this.children[i-1];
           if(this.alignment=="v"){
-            curr.y = prev.y + prev.height + this.preferences[i-1][4] + pref[3];
+            curr.y = prev.y + prev.height + prev.marginb + this.preferences[i-1][4] + curr.margint + pref[3];
           } else {
-            curr.y = y + pref[3];
+            curr.y = y + curr.margint + pref[3];
           }
         } else {
-          curr.y = y + pref[3];
+          curr.y = y + curr.margint + pref[3];
         }
         
         if(this.enableVScroll==false){
           if(this.alignment=="v"){
-            curr.height = (pref[0] * invWeight) * h - pref[3] - pref[4];
+            curr.height = (pref[0] * invWeight) * h - pref[3] - pref[4] - curr.margint - curr.marginb;
           } else {
-            curr.height = h - pref[3] - pref[4];
+            curr.height = h - pref[3] - pref[4] - curr.margint - curr.marginb;
           }
         }
   
@@ -740,19 +759,19 @@ export class ScrollFrame extends Frame{
         if(i > 0){
           let prev = this.children[i-1];
           if(this.alignment!="v"){
-            curr.x = prev.x + prev.width + this.preferences[i-1][2] + pref[1];
+            curr.x = prev.x + prev.width + prev.marginr + this.preferences[i-1][2] + curr.marginl + pref[1];
           } else {
-            curr.x = x + pref[1];
+            curr.x = x + curr.marginl + pref[1];
           }
         } else {
-          curr.x = x + pref[1];
+          curr.x = x + curr.marginl + pref[1];
         }
   
         if(this.enableHScroll==false){
           if(this.alignment=="v"){
-            curr.width = w - pref[1] - pref[2];
+            curr.width = w - pref[1] - pref[2] - curr.marginl - curr.marginr;
           } else {
-            curr.width = (pref[0] * invWeight) * w - pref[1] - pref[2];
+            curr.width = (pref[0] * invWeight) * w - pref[1] - pref[2] - curr.marginl - curr.marginr;
           }
         }
   
