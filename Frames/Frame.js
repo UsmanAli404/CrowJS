@@ -75,6 +75,7 @@ export class Frame extends FrameComponent{
       if(this.enableResizing){
         this.nearestBorder = null;
         this.nearestBorderThreshold = nearestBorderThreshold;
+        this._isResizing = false;
       }
 
       if(this.enableShadow){
@@ -108,7 +109,6 @@ export class Frame extends FrameComponent{
    * @param {GUIEvent} event - The resize event
    */
     onResize(event){
-      console.log("resizing...");
       event.stopPropagation();
     }
 
@@ -117,7 +117,6 @@ export class Frame extends FrameComponent{
    * @param {GUIEvent} event - The reposition event
    */
     onRepos(event){
-      console.log("repositioning...");
     }
 
     /**
@@ -125,6 +124,10 @@ export class Frame extends FrameComponent{
    * @param {GUIEvent} event - The release event
    */
     onMouseRelease(event){
+      if(this.enableResizing){
+        this._isResizing = false;
+      }
+
       if(!this.isOverBannerArea()){
         cursor("");
       }
@@ -155,7 +158,9 @@ export class Frame extends FrameComponent{
     onMouseHover(event){
       // console.log("mouse hovering...");
       if(this.enableResizing) {
-        this.checkAndFindNearestBorder();
+        if(!this._isResizing){
+          this.checkAndFindNearestBorder();
+        }
         if(this.isNearBorder()){
           if(this.isBannerShown){
             this.clearHoverCache({clearResizingCache:false});
@@ -193,6 +198,8 @@ export class Frame extends FrameComponent{
    */
     onMouseBtnPress(event) {
       if(this.enableResizing && this.isNearBorder()){
+        this._isResizing = true;
+
         //dummy resize frame
         if(this.enableOptimisedResizing){
           this.createDummyFrame(DummyFrame.RESIZE_DF);
@@ -229,16 +236,14 @@ export class Frame extends FrameComponent{
    */
     onMouseDrag(event){
       if(this.enableResizing){
-        if(this.isNearBorder() && !this.isRepositioning()){
+        if((this.isNearBorder() || this._isResizing) && !this.isRepositioning()){
           this.updateDimensions();
-          this.dispatchTrickleDownEvent(new GUIEvent(event.x, event.y, "resize", this));
           return;
         }
       }
 
       if(this.enableReposition && this.isRepositioning()){
         this.updatePosition();
-        this.dispatchTrickleDownEvent(new GUIEvent(event.x, event.y, "reposition", this));
       }
     }
 
@@ -466,13 +471,14 @@ export class Frame extends FrameComponent{
       this.x = mouseX - abs(this.xDist);
       this.y = mouseY - abs(this.yDist);
   
-      if(this.prevX-this.x==0 && this.prevY-this.y==0){
+      let xDiff = this.prevX - this.x;
+      let yDiff = this.prevY - this.y;
+
+      if(xDiff === 0 && yDiff === 0){
         return;
       }
   
-      //console.log("(",this.x,",",this.y,")");
-      
-      this.updatePosUtil(this.prevX-this.x, this.prevY-this.y);
+      this.updatePosUtil(xDiff, yDiff);
     }
    /**
    * Clears hover and interaction cache
@@ -496,6 +502,7 @@ export class Frame extends FrameComponent{
       
       if(clearResizingCache && this.enableResizing){
         this.nearestBorder=null;
+        this._isResizing = false;
         // console.log("resizing cache removed...");
       }
 

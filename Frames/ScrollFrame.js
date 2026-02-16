@@ -690,27 +690,29 @@ export class ScrollFrame extends Frame{
    * @param {number} h - Available height
    */
     adjustHeight(y, h){
-      //[element, weight, padL, padR, padT, padB]
-      for(let i=0; i<this.children.length; i++){
+      let len = this.children.length;
+      let invWeight = this.totalWeight > 0 ? 1 / this.totalWeight : 0;
+      for(let i=0; i<len; i++){
   
         let curr = this.children[i];
+        let pref = this.preferences[i];
   
-        if(i-1>=0){
+        if(i > 0){
           let prev = this.children[i-1];
           if(this.alignment=="v"){
-            curr.y = prev.y + prev.height + this.preferences[i-1][4] + this.preferences[i][3];
+            curr.y = prev.y + prev.height + this.preferences[i-1][4] + pref[3];
           } else {
-            curr.y = y + this.preferences[i][3];
+            curr.y = y + pref[3];
           }
         } else {
-          curr.y = y + this.preferences[i][3];
+          curr.y = y + pref[3];
         }
         
         if(this.enableVScroll==false){
           if(this.alignment=="v"){
-            curr.height = (this.preferences[i][0]/(this.totalWeight))*(h) - this.preferences[i][3] - this.preferences[i][4];
+            curr.height = (pref[0] * invWeight) * h - pref[3] - pref[4];
           } else {
-            curr.height = h - this.preferences[i][3] - this.preferences[i][4];
+            curr.height = h - pref[3] - pref[4];
           }
         }
   
@@ -730,25 +732,27 @@ export class ScrollFrame extends Frame{
    * @param {number} w - Available width
    */
     adjustWidth(x, w){
-      //[element, weight, padL, padR, padT, padB]
-      for(let i=0; i<this.children.length; i++){
+      let len = this.children.length;
+      let invWeight = this.totalWeight > 0 ? 1 / this.totalWeight : 0;
+      for(let i=0; i<len; i++){
         let curr = this.children[i];
-        if(i-1>=0){
+        let pref = this.preferences[i];
+        if(i > 0){
           let prev = this.children[i-1];
           if(this.alignment!="v"){
-            curr.x = prev.x + prev.width + this.preferences[i-1][2] + this.preferences[i][1];
+            curr.x = prev.x + prev.width + this.preferences[i-1][2] + pref[1];
           } else {
-            curr.x = x + this.preferences[i][1];
+            curr.x = x + pref[1];
           }
         } else {
-          curr.x = x + this.preferences[i][1];
+          curr.x = x + pref[1];
         }
   
         if(this.enableHScroll==false){
           if(this.alignment=="v"){
-            curr.width = w - this.preferences[i][1] - this.preferences[i][2];
+            curr.width = w - pref[1] - pref[2];
           } else {
-            curr.width = (this.preferences[i][0]/(this.totalWeight))*(w) - this.preferences[i][1] - this.preferences[i][2];
+            curr.width = (pref[0] * invWeight) * w - pref[1] - pref[2];
           }
         }
   
@@ -768,11 +772,13 @@ export class ScrollFrame extends Frame{
    * @param {number} yDiff - Y position difference
    */
     updatePosUtil(xDiff, yDiff){
-      for(let i=0; i<this.children.length; i++){
-        this.children[i].x -= xDiff;
-        this.children[i].y -= yDiff;
-        if(this.children[i].type=="Frame"){
-          this.children[i].updatePosUtil(xDiff, yDiff);
+      let len = this.children.length;
+      for(let i=0; i<len; i++){
+        let child = this.children[i];
+        child.x -= xDiff;
+        child.y -= yDiff;
+        if(child.type==="Frame"){
+          child.updatePosUtil(xDiff, yDiff);
         }
       }
     }

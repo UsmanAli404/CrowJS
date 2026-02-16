@@ -202,7 +202,7 @@ const startSketch = () => {
 
       button.addEventListener('click', (event) => {
         clickTimes += 1
-        event.target.setText(`You clicked ${clickTimes} times because it is so annoying to `)
+        event.target.setText(`You clicked ${clickTimes} times \n because it is so \n annoying to `)
       })
 
       if (scrollFrame) {

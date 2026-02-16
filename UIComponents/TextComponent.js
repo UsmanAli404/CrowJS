@@ -142,6 +142,7 @@ export class TextComponent extends UIComponent {
   /**
    * Dynamically calculates the optimal text size to fit the container.
    * Strictly fits text within the padded content area.
+   * Supports multi-line text (newline characters are respected).
    */
   updateLabelSize() {
     const maxLabelWidth = this.getContentWidth();
@@ -152,6 +153,9 @@ export class TextComponent extends UIComponent {
       return;
     }
 
+    const lines = (this.text ?? '').split('\n');
+    const lineCount = Math.max(1, lines.length);
+
     let low = 1;
     let high = Math.floor(maxLabelHeight);
     let bestSize = 1;
@@ -159,10 +163,16 @@ export class TextComponent extends UIComponent {
     while (low <= high) {
       let mid = Math.floor((low + high) / 2);
       textSize(mid);
-      let labelWidth = textWidth(this.text);
-      let labelHeight = textAscent() + textDescent();
+      let lineHeight = textAscent() + textDescent();
+      let totalHeight = lineHeight * lineCount;
 
-      if (labelWidth <= maxLabelWidth && labelHeight <= maxLabelHeight) {
+      let maxLineWidth = 0;
+      for (let i = 0; i < lines.length; i++) {
+        let w = textWidth(lines[i]);
+        if (w > maxLineWidth) maxLineWidth = w;
+      }
+
+      if (maxLineWidth <= maxLabelWidth && totalHeight <= maxLabelHeight) {
         bestSize = mid;
         low = mid + 1;
       } else {
@@ -172,7 +182,13 @@ export class TextComponent extends UIComponent {
 
     // Final verification: ensure the chosen size truly fits
     textSize(bestSize);
-    if (textWidth(this.text) > maxLabelWidth || (textAscent() + textDescent()) > maxLabelHeight) {
+    let lineHeight = textAscent() + textDescent();
+    let maxLineWidth = 0;
+    for (let i = 0; i < lines.length; i++) {
+      let w = textWidth(lines[i]);
+      if (w > maxLineWidth) maxLineWidth = w;
+    }
+    if (maxLineWidth > maxLabelWidth || lineHeight * lineCount > maxLabelHeight) {
       bestSize = max(1, bestSize - 1);
     }
 
@@ -282,9 +298,44 @@ export class TextComponent extends UIComponent {
       return;
     }
 
+    // Multi-line support for no-wrap font-size mode
+    if (this.noWrapMode === 'font-size') {
+      const lines = (this.text ?? '').split('\n');
+      if (lines.length > 1) {
+        this.renderNoWrapFontSizeLines(lines);
+        return;
+      }
+    }
+
     const line = this.getNoWrapLine();
     const { x, y } = this.getTextPosition();
     text(line, x, y);
+  }
+
+  /**
+   * Renders multiple lines for no-wrap font-size mode
+   * @param {string[]} lines - The lines to render
+   */
+  renderNoWrapFontSizeLines(lines) {
+    const lineHeight = textAscent() + textDescent();
+    const contentHeight = this.getContentHeight();
+    const baseX = this.getAlignedTextX();
+
+    let startY;
+    if (this.VTextAlign === 'top') {
+      startY = this.padt + textAscent();
+    } else if (this.VTextAlign === 'bottom') {
+      const renderedHeight = lineHeight * lines.length;
+      startY = this.height - this.padb - renderedHeight + textAscent();
+    } else {
+      const renderedHeight = lineHeight * lines.length;
+      startY = this.padt + (contentHeight - renderedHeight) / 2 + textAscent();
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      const y = startY + i * lineHeight;
+      text(lines[i], baseX, y);
+    }
   }
 
   getContentWidth() {
