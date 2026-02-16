@@ -18,6 +18,7 @@ const Label = require('./UIComponents/Label');
 const Button = require('./UIComponents/Button');
 const TextField = require('./UIComponents/TextField');
 const UIComponent = require('./UIComponents/UIComponent');
+const Icon = require('./UIComponents/Icon');
 
 module.exports = {
   // Core
@@ -39,5 +40,6 @@ module.exports = {
   Label,
   Button,
   TextField,
-  UIComponent
+  UIComponent,
+  Icon
 };

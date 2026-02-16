@@ -3,6 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { Root } from '../../../../Core/Root.js'
 import { Button } from '../../../../UIComponents/Button.js'
+import { Label } from '../../../../UIComponents/Label.js'
 import { ScrollFrame } from "../../../../Frames/ScrollFrame.js";
 import { TextField } from '../../../../UIComponents/TextField.js'
 
@@ -51,8 +52,12 @@ const bindGlobals = (p) => {
     'textAlign',
     'ellipse',
     'image',
+    'imageMode',
+    'loadImage',
     'noFill',
     'noStroke',
+    'noTint',
+    'tint',
     'stroke',
     'strokeWeight',
     'cursor',
@@ -81,7 +86,7 @@ const bindGlobals = (p) => {
     }
   })
 
-  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM', 'BASELINE', 'PI', 'HALF_PI', 'TWO_PI', 'LEFT_ARROW', 'RIGHT_ARROW', 'UP_ARROW', 'DOWN_ARROW', 'BACKSPACE', 'CONTROL', 'ENTER', 'DELETE', 'TAB', 'ESCAPE', 'SHIFT', 'ALT']
+  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM', 'BASELINE', 'CORNER', 'PI', 'HALF_PI', 'TWO_PI', 'LEFT_ARROW', 'RIGHT_ARROW', 'UP_ARROW', 'DOWN_ARROW', 'BACKSPACE', 'CONTROL', 'ENTER', 'DELETE', 'TAB', 'ESCAPE', 'SHIFT', 'ALT']
   constants.forEach((name) => {
     window[name] = p[name]
   })
@@ -138,24 +143,22 @@ const startSketch = () => {
 
   const sketch = (p) => {
     let root = null
-    let button = null
+    let crowImg = null
     let clickTimes = 0
 
     const getSize = () => {
       const bounds = container.value?.getBoundingClientRect()
       return {
         width: Math.max(320, Math.floor(bounds?.width || 420)),
-        height: Math.max(240, Math.floor(bounds?.height || 280))
+        height: Math.max(320, Math.floor(bounds?.height || 400))
       }
     }
 
     const layoutButton = (width, height) => {
-      if (!button) {
-        return
-      }
+    }
 
-      button.x = (width - button.width) / 2
-      button.y = (height - button.height) / 2
+    p.preload = () => {
+      crowImg = p.loadImage('/crow.png')
     }
 
     p.setup = () => {
@@ -164,11 +167,11 @@ const startSketch = () => {
       canvas.parent(container.value)
 
       bindGlobals(p)
-      root = new Root()
+      root = new Root({showDebugOverlay: false})
 
       const useScrollFrame = !isTouchDevice()
-      const scrollFrameWidth = 300
-      const scrollFrameHeight = 200
+      const scrollFrameWidth = 320
+      const scrollFrameHeight = 360
       const scrollFrame = useScrollFrame
         ? new ScrollFrame(
           (width - scrollFrameWidth) / 2,
@@ -180,66 +183,116 @@ const startSketch = () => {
           enableHScroll: false,
           enableReposition: true,
           enableResizing: true,
-          // enableShadow: true,
-          // shadowColor: 'rgba(0, 0, 0, 1)',
-          // shadowBlur: 50,
-          // shadowOffsetX: 0,
-          // shadowOffsetY: 0,
-          pad: 20,
+          pad: 10,
           margin: 10,
-          
         })
         : null
 
-      const btnWidth = 200
-      const btnHeight = 100
-      button = new Button(
-        (width - btnWidth) / 2,
-        (height - btnHeight) / 2,
-        btnWidth,
-        btnHeight,
-        'Click Me! 🐦‍⬛',
+      // ---- 1. Text-only button (existing behaviour) ----
+      const textOnlyBtn = new Button(
+        0, 0, 200, 45,
+        'Text Only 🐦‍⬛',
         {
-          // cornerRadius: 13,
-          // backgroundColor: 'rgba(0, 0, 0, 1)',
-          // textColor: 'rgba(255, 255, 255, 1)',
-          // wrap: false,
-          // wrapMode: 'char',
-          // noWrapMode: 'font-size',
-          // ellipsisMode: 'trailing',
           pad: 10,
-          margin: 10,
-          // showDebugOverlay: true,
+          margin: 5,
+        }
+      )
+      textOnlyBtn.addEventListener('click', (event) => {
+        clickTimes += 1
+        event.target.setText(`Clicked ${clickTimes} times!`)
+      })
+
+      // ---- 2. Text + icon button (icon left) ----
+      const textIconBtn = new Button(
+        0, 0, 200, 45,
+        'Text + Icon',
+        {
+          icon: crowImg,
+          iconSize: 22,
+          iconPosition: 'left',
+          iconGap: 8,
+          pad: 10,
+          margin: 5,
         }
       )
 
-      button.addEventListener('click', (event) => {
-        clickTimes += 1
-        event.target.setText(`You clicked ${clickTimes} times!`)
-      })
+      // ---- 3. Icon-only button ----
+      const iconOnlyBtn = new Button(
+        0, 0, 50, 45,
+        '',
+        {
+          icon: crowImg,
+          iconSize: 26,
+          pad: 8,
+          margin: 5,
+        }
+      )
 
+      // ---- 4. Text-only label ----
+      const textOnlyLabel = new Label(
+        0, 0, 200, 40,
+        'Text-only Label',
+        {
+          pad: 8,
+          margin: 5,
+        }
+      )
+
+      // ---- 5. Text + icon label (icon right) ----
+      const textIconLabel = new Label(
+        0, 0, 200, 40,
+        'Label + Icon',
+        {
+          icon: crowImg,
+          iconSize: 20,
+          iconPosition: 'right',
+          iconGap: 6,
+          pad: 8,
+          margin: 5,
+        }
+      )
+
+      // ---- 6. Icon-only label ----
+      const iconOnlyLabel = new Label(
+        0, 0, 45, 40,
+        '',
+        {
+          icon: crowImg,
+          iconSize: 24,
+          pad: 6,
+          margin: 5,
+        }
+      )
+
+      // ---- TextField ----
       const textField = new TextField(
         20,
         height - 60,
         width - 40,
         40,
         {
-          // cornerRadius: 13,
-          // backgroundColor: 'rgba(0, 0, 0, 1)',
-          // textColor: 'rgba(255, 255, 255, 1)',
-          // borderFlag: false,
           pad: 10,
-          margin: 10,
-          showDebugOverlay: true,
+          margin: 5,
+          placeholder: 'Type something...'
         }
       )
 
       if (scrollFrame) {
-        scrollFrame.add(button)
+        scrollFrame.add(textOnlyBtn)
+        scrollFrame.add(textIconBtn)
+        scrollFrame.add(iconOnlyBtn)
+        scrollFrame.add(textOnlyLabel)
+        scrollFrame.add(textIconLabel)
+        scrollFrame.add(iconOnlyLabel)
         scrollFrame.add(textField)
         root.add(scrollFrame)
       } else {
-        root.add(button)
+        root.add(textOnlyBtn)
+        root.add(textIconBtn)
+        root.add(iconOnlyBtn)
+        root.add(textOnlyLabel)
+        root.add(textIconLabel)
+        root.add(iconOnlyLabel)
         root.add(textField)
       }
     }

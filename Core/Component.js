@@ -18,7 +18,7 @@ export class Component{
    * @param {number} options.margint - Top margin
    * @param {number} options.marginb - Bottom margin
    */
-  constructor(x, y, width, height, {type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, showDebugOverlay=false} = {}){
+  constructor(x, y, width, height, {type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, minWidth=0, minHeight=0, showDebugOverlay=false} = {}){
     this.x = x;
     this.y = y;
     this.id = id;
@@ -41,6 +41,10 @@ export class Component{
     this.marginr = marginr ?? resolvedMarginx;
     this.margint = margint ?? resolvedMarginy;
     this.marginb = marginb ?? resolvedMarginy;
+
+    // Minimum dimensions
+    this.minWidth = minWidth;
+    this.minHeight = minHeight;
   }
 
   /**
@@ -73,6 +77,26 @@ export class Component{
    */
   get outerHeight() {
     return this.height + this.margint + this.marginb;
+  }
+
+  /**
+   * Returns the effective minimum width, accounting for children's constraints.
+   * Subclasses (e.g. GridFrame, ScrollFrame) override this to compute
+   * the minimum from their children's requirements.
+   * @returns {number}
+   */
+  getEffectiveMinWidth() {
+    return this.minWidth;
+  }
+
+  /**
+   * Returns the effective minimum height, accounting for children's constraints.
+   * Subclasses (e.g. GridFrame, ScrollFrame) override this to compute
+   * the minimum from their children's requirements.
+   * @returns {number}
+   */
+  getEffectiveMinHeight() {
+    return this.minHeight;
   }
 
   //to show itself

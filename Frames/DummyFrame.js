@@ -71,74 +71,76 @@ export class DummyFrame extends Component{
    */
     updateDimensions(){
         // console.log("updating dimensions...");
+        const effMinW = this.parent.getEffectiveMinWidth();
+        const effMinH = this.parent.getEffectiveMinHeight();
 
         switch(this.nearestBorder){
             case "left":
-                if(this.x+this.width-mouseX>=this.parent.bannerHeight){
+                if(this.x+this.width-mouseX>=effMinW){
                     this.width = this.x + this.width - mouseX;
                     this.x = mouseX;
                 }
 
                 break;
             case "right":
-                if(mouseX-this.x>=this.parent.bannerHeight){
+                if(mouseX-this.x>=effMinW){
                     this.width = mouseX - this.x;
                 }
 
                 break;
             case "top":
-                if(this.y+this.height-mouseY>=this.parent.bannerHeight){
+                if(this.y+this.height-mouseY>=effMinH){
                     this.height =this.y + this.height - mouseY;
                     this.y = mouseY;
                 }
 
                 break;
             case "bottom":
-                if(mouseY-this.y>=this.parent.bannerHeight){
+                if(mouseY-this.y>=effMinH){
                     this.height = mouseY - this.y;
                 }
 
                 break;
             case "top-left":
-                if(this.x+this.width-mouseX>=this.parent.bannerHeight){
+                if(this.x+this.width-mouseX>=effMinW){
                     this.width = this.x + this.width - mouseX;
                     this.x = mouseX;
                 }
     
-                if(this.y+this.height-mouseY>=this.parent.bannerHeight){
+                if(this.y+this.height-mouseY>=effMinH){
                     this.height =this.y + this.height - mouseY;
                     this.y = mouseY;
                 }
 
                 break;
             case "top-right":
-                if(mouseX-this.x>=this.parent.bannerHeight){
+                if(mouseX-this.x>=effMinW){
                     this.width = mouseX - this.x;
                 }
     
-                if(this.y+this.height-mouseY>=this.parent.bannerHeight){
+                if(this.y+this.height-mouseY>=effMinH){
                     this.height =this.y + this.height - mouseY;
                     this.y = mouseY;
                 }
 
                 break;
             case "bottom-left":
-                if(this.x+this.width-mouseX>=this.parent.bannerHeight){
+                if(this.x+this.width-mouseX>=effMinW){
                     this.width = this.x + this.width - mouseX;
                     this.x = mouseX;
                 }
     
-                if(mouseY-this.y>=this.parent.bannerHeight){
+                if(mouseY-this.y>=effMinH){
                     this.height = mouseY - this.y;
                 }
 
                 break;
             case "bottom-right":
-                if(mouseX-this.x>=this.parent.bannerHeight){
+                if(mouseX-this.x>=effMinW){
                     this.width = mouseX - this.x;
                 }
     
-                if(mouseY-this.y>=this.parent.bannerHeight){
+                if(mouseY-this.y>=effMinH){
                     this.height = mouseY - this.y;
                 }
 

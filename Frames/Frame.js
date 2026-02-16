@@ -48,8 +48,8 @@ export class Frame extends FrameComponent{
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, type, 
       enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-      {margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, showDebugOverlay=false} = {}){
-      super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay});
+      {margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, minWidth=0, minHeight=0, showDebugOverlay=false} = {}){
+      super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, minWidth: minWidth, minHeight: minHeight, showDebugOverlay: showDebugOverlay});
   
       this.backgroundColor = backgroundColor;
       this.borderColor = borderColor;
@@ -387,14 +387,17 @@ export class Frame extends FrameComponent{
    * Updates frame dimensions during resizing
    */
     updateDimensions(){
+      const effMinW = this.getEffectiveMinWidth();
+      const effMinH = this.getEffectiveMinHeight();
+
       if(this.nearestBorder=="left" || this.nearestBorder=="right"){
         if( this.nearestBorder=="left"){
-          if(this.x+this.width-mouseX>=this.bannerHeight){
+          if(this.x+this.width-mouseX>=effMinW){
             this.width = this.x + this.width - mouseX;
             this.x = mouseX;
           }
         } else {
-          if(mouseX-this.x>=this.bannerHeight){
+          if(mouseX-this.x>=effMinW){
             this.width = mouseX - this.x;
           }
         }
@@ -407,12 +410,12 @@ export class Frame extends FrameComponent{
 
       } else if(this.nearestBorder=="top"||this.nearestBorder=="bottom"){
         if(this.nearestBorder=="top"){
-          if(this.y+this.height-mouseY>=this.bannerHeight){
+          if(this.y+this.height-mouseY>=effMinH){
             this.height =this.y + this.height - mouseY;
             this.y = mouseY;
           }
         } else {
-          if(mouseY-this.y>=this.bannerHeight){
+          if(mouseY-this.y>=effMinH){
             this.height = mouseY - this.y;
           }
         }
@@ -429,39 +432,39 @@ export class Frame extends FrameComponent{
 
       } else {
         if(this.nearestBorder=="top-left"){
-          if(this.x+this.width-mouseX>=50){
+          if(this.x+this.width-mouseX>=effMinW){
             this.width = this.x + this.width - mouseX;
             this.x = mouseX;
           }
 
-          if(this.y+this.height-mouseY>=50){
+          if(this.y+this.height-mouseY>=effMinH){
             this.height =this.y + this.height - mouseY;
             this.y = mouseY;
           }
         } else if(this.nearestBorder=="top-right"){
-          if(mouseX-this.x>=50){
+          if(mouseX-this.x>=effMinW){
             this.width = mouseX - this.x;
           }
 
-          if(this.y+this.height-mouseY>=50){
+          if(this.y+this.height-mouseY>=effMinH){
             this.height =this.y + this.height - mouseY;
             this.y = mouseY;
           }
         } else if(this.nearestBorder=="bottom-left"){
-          if(this.x+this.width-mouseX>=50){
+          if(this.x+this.width-mouseX>=effMinW){
             this.width = this.x + this.width - mouseX;
             this.x = mouseX;
           }
 
-          if(mouseY-this.y>=50){
+          if(mouseY-this.y>=effMinH){
             this.height = mouseY - this.y;
           }
         } else if(this.nearestBorder=="bottom-right"){
-          if(mouseX-this.x>=50){
+          if(mouseX-this.x>=effMinW){
             this.width = mouseX - this.x;
           }
 
-          if(mouseY-this.y>=50){
+          if(mouseY-this.y>=effMinH){
             this.height = mouseY - this.y;
           }
         }

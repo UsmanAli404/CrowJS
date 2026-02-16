@@ -36,6 +36,12 @@ export class Label extends TextComponent{
    * @param {string} options.wrapMode - Wrap mode: "word" or "char"
    * @param {string} options.noWrapMode - No-wrap mode: "ellipsis" or "font-size"
   * @param {string} options.ellipsisMode - Ellipsis mode: "leading", "center", or "trailing"
+   * @param {p5.Image|null} options.icon - Icon image (null = text only)
+   * @param {number} options.iconSize - Icon display size in pixels
+   * @param {string} options.iconPosition - "left", "right", "top", or "bottom"
+   * @param {number} options.iconGap - Gap between icon and text
+   * @param {p5.Color|null} options.iconTintColor - Optional icon tint
+   * @param {number} options.iconOpacity - Icon opacity 0-255
    * @param {number} options.margin - General margin for all sides
    * @param {number} options.marginx - Horizontal margin (left and right)
    * @param {number} options.marginy - Vertical margin (top and bottom)
@@ -71,6 +77,12 @@ export class Label extends TextComponent{
         wrapMode = "word",
         noWrapMode = "font-size",
         ellipsisMode = "trailing",
+        icon = null,
+        iconSize = 20,
+        iconPosition = 'left',
+        iconGap = 6,
+        iconTintColor = null,
+        iconOpacity = 255,
         margin = 0,
         marginx = null,
         marginy = null,
@@ -78,6 +90,8 @@ export class Label extends TextComponent{
         marginr = null,
         margint = null,
         marginb = null,
+        minWidth = 0,
+        minHeight = 0,
         showDebugOverlay = false,
       } = {}) {
       super(x, y, width, height, label, {
@@ -107,6 +121,12 @@ export class Label extends TextComponent{
         wrapMode,
         noWrapMode,
         ellipsisMode,
+        icon,
+        iconSize,
+        iconPosition,
+        iconGap,
+        iconTintColor,
+        iconOpacity,
         margin,
         marginx,
         marginy,
@@ -114,6 +134,8 @@ export class Label extends TextComponent{
         marginr,
         margint,
         marginb,
+        minWidth,
+        minHeight,
         showDebugOverlay,
       });
     }

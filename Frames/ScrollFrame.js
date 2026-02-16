@@ -80,6 +80,8 @@ export class ScrollFrame extends Frame{
       marginr = null,
       margint = null,
       marginb = null,
+      minWidth = 0,
+      minHeight = 0,
       showDebugOverlay = false,
     } = {}) {
       if (pad !== null && pad !== undefined) {
@@ -99,7 +101,7 @@ export class ScrollFrame extends Frame{
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-        {margin, marginx, marginy, marginl, marginr, margint, marginb, showDebugOverlay});
+        {margin, marginx, marginy, marginl, marginr, margint, marginb, minWidth, minHeight, showDebugOverlay});
       
       this.preferences = [];
       //used for calculating weighted dimensions of child elements
@@ -704,6 +706,71 @@ export class ScrollFrame extends Frame{
         }
       }
     }
+
+    /**
+   * Computes the effective minimum width from children's constraints.
+   * @returns {number}
+   */
+    getEffectiveMinWidth() {
+      let minW = this.minWidth;
+      let len = this.children.length;
+      if (len === 0) return minW;
+
+      let maxNeeded = 0;
+      let invWeight = this.totalWeight > 0 ? 1 / this.totalWeight : 0;
+      for (let i = 0; i < len; i++) {
+        let curr = this.children[i];
+        let pref = this.preferences[i];
+        let childMin = curr.getEffectiveMinWidth();
+        if (childMin <= 0) continue;
+        let childNeeded = childMin + pref[1] + pref[2] + curr.marginl + curr.marginr;
+        if (this.alignment === "v") {
+          // All children share full width
+          maxNeeded = Math.max(maxNeeded, childNeeded + 2 * this.padx);
+        } else {
+          // Horizontal: proportional distribution
+          let weight = pref[0];
+          let needed = childNeeded / (weight * invWeight) + 2 * this.padx;
+          maxNeeded = Math.max(maxNeeded, needed);
+        }
+      }
+
+      return Math.max(minW, maxNeeded);
+    }
+
+    /**
+   * Computes the effective minimum height from children's constraints.
+   * @returns {number}
+   */
+    getEffectiveMinHeight() {
+      let minH = this.minHeight;
+      let len = this.children.length;
+      if (len === 0) return minH;
+
+      let bannerH = (this.alwaysShowBanner || this.enableReposition) ? (this.bannerHeight || 0) : 0;
+
+      let maxNeeded = 0;
+      let invWeight = this.totalWeight > 0 ? 1 / this.totalWeight : 0;
+      for (let i = 0; i < len; i++) {
+        let curr = this.children[i];
+        let pref = this.preferences[i];
+        let childMin = curr.getEffectiveMinHeight();
+        if (childMin <= 0) continue;
+        let childNeeded = childMin + pref[3] + pref[4] + curr.margint + curr.marginb;
+        if (this.alignment === "v") {
+          // Vertical: proportional distribution
+          let weight = pref[0];
+          let needed = childNeeded / (weight * invWeight) + 2 * this.pady + bannerH;
+          maxNeeded = Math.max(maxNeeded, needed);
+        } else {
+          // All children share full height
+          maxNeeded = Math.max(maxNeeded, childNeeded + 2 * this.pady + bannerH);
+        }
+      }
+
+      return Math.max(minH, maxNeeded);
+    }
+
     /**
    * Adjusts child component heights based on weights and alignment
    * @param {number} y - Starting y position
@@ -734,6 +801,9 @@ export class ScrollFrame extends Frame{
           } else {
             curr.height = h - pref[3] - pref[4] - curr.margint - curr.marginb;
           }
+
+          // Clamp to child's effective minimum height
+          curr.height = Math.max(curr.height, curr.getEffectiveMinHeight());
         }
   
         if(curr.type=="Frame"){
@@ -774,6 +844,9 @@ export class ScrollFrame extends Frame{
           } else {
             curr.width = (pref[0] * invWeight) * w - pref[1] - pref[2] - curr.marginl - curr.marginr;
           }
+
+          // Clamp to child's effective minimum width
+          curr.width = Math.max(curr.width, curr.getEffectiveMinWidth());
         }
   
         if(curr.type=="Frame"){

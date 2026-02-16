@@ -22,6 +22,7 @@ export class TextField extends Input{
     * @param {number} options.shadowOffsetX - Shadow offset on X axis
     * @param {number} options.shadowOffsetY - Shadow offset on Y axis
    * @param {string} options.placeholder - Placeholder text
+   * @param {string} options.placeholderColor - Placeholder text color (muted)
    * @param {string} options.text - Initial text
    * @param {string} options.textAlign - Text alignment
    * @param {number} options.pad - Internal padding
@@ -49,6 +50,7 @@ export class TextField extends Input{
         shadowOffsetX= 0,
         shadowOffsetY= 4,
         placeholder="",
+        placeholderColor='rgb(120, 120, 140)',
         text="",
         textAlign = "left",
         pad = 10,
@@ -59,11 +61,13 @@ export class TextField extends Input{
         marginr = null,
         margint = null,
         marginb = null,
+        minWidth = 0,
+        minHeight = 0,
         showDebugOverlay = false,
     }={}) {
         super(x, y, width, height, backgroundColor, borderFlag, borderColor,
             borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay});
+            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, minWidth: minWidth, minHeight: minHeight, showDebugOverlay: showDebugOverlay});
         
             this.cursorPos = 0;
             this.text = text;
@@ -78,6 +82,7 @@ export class TextField extends Input{
             this.padb = pad;
             this.textColor = textColor;
             this.placeholder = placeholder;
+            this.placeholderColor = placeholderColor;
 
             this.cursorVisible = true;
             this.lastCursorToggle = 0;
@@ -619,7 +624,15 @@ export class TextField extends Input{
             pop();
         }
 
-        text(this.text, x, y);
+        if (this.text.length === 0 && this.placeholder && !this.isFocused) {
+            push();
+            fill(this.placeholderColor);
+            noStroke();
+            text(this.placeholder, x, y);
+            pop();
+        } else {
+            text(this.text, x, y);
+        }
 
         if (millis() - this.lastCursorToggle > this.cursorBlinkInterval) {
             this.cursorVisible = !this.cursorVisible;

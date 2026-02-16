@@ -76,6 +76,8 @@ export class GridFrame extends Frame{
       marginr = null,
       margint = null,
       marginb = null,
+      minWidth = 0,
+      minHeight = 0,
       showDebugOverlay = false,
     }
     ){
@@ -96,7 +98,7 @@ export class GridFrame extends Frame{
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-        {margin, marginx, marginy, marginl, marginr, margint, marginb, showDebugOverlay});
+        {margin, marginx, marginy, marginl, marginr, margint, marginb, minWidth, minHeight, showDebugOverlay});
 
       //for storing child elements
       this.rows=rows;
@@ -259,6 +261,62 @@ export class GridFrame extends Frame{
       this.colWeights[colNum] = weight;
       this.totalColWeight+=weight;
     }
+
+    /**
+   * Computes the effective minimum width from children's constraints.
+   * @returns {number}
+   */
+    getEffectiveMinWidth() {
+      let minW = this.minWidth;
+      if (!this.grid) return minW;
+
+      let maxNeeded = 0;
+      for (let i = 0; i < this.cols; i++) {
+        for (let j = 0; j < this.rows; j++) {
+          if (this.grid[j][i] != null && this.grid[j][i] != "taken") {
+            let curr = this.grid[j][i];
+            let childMin = curr[0].getEffectiveMinWidth();
+            if (childMin <= 0) continue;
+            let childNeeded = childMin + curr[3] + curr[4] + curr[0].marginl + curr[0].marginr;
+            let spanWeight = 0;
+            for (let k = 0; k < curr[2]; k++) spanWeight += this.colWeights[i + k];
+            let needed = childNeeded * this.totalColWeight / spanWeight + 2 * this.padx;
+            maxNeeded = Math.max(maxNeeded, needed);
+          }
+        }
+      }
+
+      return Math.max(minW, maxNeeded);
+    }
+
+    /**
+   * Computes the effective minimum height from children's constraints.
+   * @returns {number}
+   */
+    getEffectiveMinHeight() {
+      let minH = this.minHeight;
+      if (!this.grid) return minH;
+
+      let bannerH = (this.alwaysShowBanner || this.enableReposition) ? (this.bannerHeight || 0) : 0;
+
+      let maxNeeded = 0;
+      for (let i = 0; i < this.rows; i++) {
+        for (let j = 0; j < this.cols; j++) {
+          if (this.grid[i][j] != null && this.grid[i][j] != "taken") {
+            let curr = this.grid[i][j];
+            let childMin = curr[0].getEffectiveMinHeight();
+            if (childMin <= 0) continue;
+            let childNeeded = childMin + curr[5] + curr[6] + curr[0].margint + curr[0].marginb;
+            let spanWeight = 0;
+            for (let k = 0; k < curr[1]; k++) spanWeight += this.rowWeights[i + k];
+            let needed = childNeeded * this.totalRowWeight / spanWeight + 2 * this.pady + bannerH;
+            maxNeeded = Math.max(maxNeeded, needed);
+          }
+        }
+      }
+
+      return Math.max(minH, maxNeeded);
+    }
   
     /**
    * Initializes the grid structure with specified rows and columns
@@ -309,6 +367,9 @@ export class GridFrame extends Frame{
             }
   
             curr[0].width -= curr[3] + curr[4] + curr[0].marginl + curr[0].marginr;
+
+            // Clamp to child's effective minimum width
+            curr[0].width = Math.max(curr[0].width, curr[0].getEffectiveMinWidth());
   
             if(curr[0].type=="Frame"){
               curr[0].adjustWidth(curr[0].x + curr[0].padx, curr[0].width - 2*curr[0].padx);
@@ -344,6 +405,9 @@ export class GridFrame extends Frame{
   
             curr[0].height -= curr[5] + curr[6] + curr[0].margint + curr[0].marginb;
   
+            // Clamp to child's effective minimum height
+            curr[0].height = Math.max(curr[0].height, curr[0].getEffectiveMinHeight());
+
             //console.log("curr[0].type:"+curr[0].type);
 
             if(curr[0].type=="Frame"){
@@ -482,6 +546,11 @@ export class GridFrame extends Frame{
   
       this.grid[row][col][0].width = w - this.grid[row][col][3] - this.grid[row][col][4] - this.grid[row][col][0].marginl - this.grid[row][col][0].marginr;
       this.grid[row][col][0].height = h - this.grid[row][col][5] - this.grid[row][col][6] - this.grid[row][col][0].margint - this.grid[row][col][0].marginb;
+
+      // Clamp to child's effective min dimensions
+      this.grid[row][col][0].width = Math.max(this.grid[row][col][0].width, this.grid[row][col][0].getEffectiveMinWidth());
+      this.grid[row][col][0].height = Math.max(this.grid[row][col][0].height, this.grid[row][col][0].getEffectiveMinHeight());
+
       this.grid[row][col][1] = yLimit+1;
       this.grid[row][col][2] = xLimit+1;
     }
