@@ -8,7 +8,8 @@ export class KeyboardEvent extends GUIEvent{
    * @param {string} type - The type of keyboard event
    * @param {Component} target - The target component
    */
-    constructor(x, y, type, target){
+    constructor(x, y, type, target, nativeEvent){
         super(x, y, type, target);
+        this.nativeEvent = nativeEvent || null;
     }
 }

@@ -24,7 +24,7 @@ export class TextField extends Input{
    * @param {string} options.placeholder - Placeholder text
    * @param {string} options.text - Initial text
    * @param {string} options.textAlign - Text alignment
-   * @param {number} options.padding - Internal padding
+   * @param {number} options.pad - Internal padding
    * @param {number} options.margin - General margin for all sides
    * @param {number} options.marginx - Horizontal margin (left and right)
    * @param {number} options.marginy - Vertical margin (top and bottom)
@@ -51,7 +51,7 @@ export class TextField extends Input{
         placeholder="",
         text="",
         textAlign = "left",
-        padding = 10,
+        pad = 10,
         margin = 0,
         marginx = null,
         marginy = null,
@@ -59,10 +59,11 @@ export class TextField extends Input{
         marginr = null,
         margint = null,
         marginb = null,
+        showDebugOverlay = false,
     }={}) {
         super(x, y, width, height, backgroundColor, borderFlag, borderColor,
             borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
+            shadowOffsetX, shadowOffsetY, {parent: parent, type: "Input", id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay});
         
             this.cursorPos = 0;
             this.text = text;
@@ -70,19 +71,31 @@ export class TextField extends Input{
             this.displayXOffset = 0;
 
             this.textAlign = textAlign;
-            this.padding = padding;
+            this.pad = pad;
+            this.padl = pad;
+            this.padr = pad;
+            this.padt = pad;
+            this.padb = pad;
             this.textColor = textColor;
             this.placeholder = placeholder;
 
             this.cursorVisible = true;
-            this.lastCursorToggle = millis();
+            this.lastCursorToggle = 0;
             this.cursorBlinkInterval = 500;
 
             this.selectionStart = null;
             this.selectionEnd = null;
             this.isSelecting = false;
 
+            // Key repeat state for long-press behavior
+            this._lastKeyCode = null;
+            this._keyDownStartTime = 0;
+            this._lastRepeatTime = 0;
+            this._keyRepeatDelay = 500;  // ms before repeat starts
+            this._keyRepeatInterval = 30; // ms between repeats
+
             this.addEventListener("keyPress", (event)=>this.onKeyPress(event));
+            this.addEventListener("keyDown", (event)=>this.onKeyDown(event));
             // this.addEventListener("click", (event)=>this.onMouseClick(event));
             this.addEventListener("press", (event)=>this.onMousePress(event)); // NEW
             this.addEventListener("drag", (event)=>this.onMouseDrag(event));
@@ -97,7 +110,8 @@ export class TextField extends Input{
    * @param {MouseEvent} event - The hover event
    */
     onMouseHover(event){
-        // event.stopPropagation();
+        cursor('text');
+        event.stopPropagation();
     }
 
     /**
@@ -121,6 +135,9 @@ export class TextField extends Input{
 
         // Cursor usually hides after blur in textfields
         this.cursorVisible = false;
+
+        // Reset key repeat state
+        this._lastKeyCode = null;
 
         console.log("blur called!");
 
@@ -175,38 +192,122 @@ export class TextField extends Input{
         }
     }
 
-    onKeyPress(event) {
-        // ADDED: if there's an active selection and user types or presses backspace/delete,
-        // we should remove the selection first (so typed char replaces selection)
+    /**
+     * Handles continuous key down for key repeat (long-press arrow keys, backspace, etc.)
+     * Called from draw loop while key is held.
+     */
+    onKeyDown(event) {
+        const now = millis();
+        const repeatableKeys = [LEFT_ARROW, RIGHT_ARROW, BACKSPACE];
+
+        if (!repeatableKeys.includes(keyCode)) {
+            return;
+        }
+
+        // Detect new key press
+        if (this._lastKeyCode !== keyCode) {
+            this._lastKeyCode = keyCode;
+            this._keyDownStartTime = now;
+            this._lastRepeatTime = 0;
+            return; // first press handled by onKeyPress
+        }
+
+        // Wait for initial delay before repeating
+        if (now - this._keyDownStartTime < this._keyRepeatDelay) {
+            return;
+        }
+
+        // Throttle repeats
+        if (now - this._lastRepeatTime < this._keyRepeatInterval) {
+            return;
+        }
+
+        this._lastRepeatTime = now;
+        this._handleRepeatable();
+    }
+
+    /**
+     * Executes the repeatable key action (shared by onKeyPress and onKeyDown repeat).
+     */
+    _handleRepeatable() {
         const hasSelection = this.selectionStart !== null && this.selectionStart !== this.selectionEnd;
 
         if (keyCode === LEFT_ARROW) {
+            if (keyIsDown(SHIFT) && (this.selectionStart === null || this.selectionStart === this.selectionEnd)) {
+                this.selectionStart = this.cursorPos;
+                this.selectionEnd = this.cursorPos;
+            }
+
             if (keyIsDown(CONTROL)) {
                 this.jumpLeftByOneWord();
             } else {
                 this.moveCursorLeft(1);
             }
-            // collapse selection when using arrows (typical behavior)
-            this.selectionStart = this.selectionEnd = this.cursorPos;
+
+            if (keyIsDown(SHIFT)) {
+                this.selectionEnd = this.cursorPos;
+            } else {
+                this.selectionStart = this.selectionEnd = this.cursorPos;
+            }
         } else if (keyCode === RIGHT_ARROW) {
+            if (keyIsDown(SHIFT) && (this.selectionStart === null || this.selectionStart === this.selectionEnd)) {
+                this.selectionStart = this.cursorPos;
+                this.selectionEnd = this.cursorPos;
+            }
+
             if (keyIsDown(CONTROL)) {
                 this.jumpRightByOneWord();
             } else {
                 this.moveCursorRight(1);
             }
-            this.selectionStart = this.selectionEnd = this.cursorPos;
+
+            if (keyIsDown(SHIFT)) {
+                this.selectionEnd = this.cursorPos;
+            } else {
+                this.selectionStart = this.selectionEnd = this.cursorPos;
+            }
         } else if (keyCode === BACKSPACE) {
             if (hasSelection) {
-                // ADDED: delete selection (Backspace with selection deletes selection)
                 this.deleteSelectedText();
             } else if (keyIsDown(CONTROL)) {
                 this.deleteOneWord();
             } else {
                 this.deleteOneChar();
             }
-            // collapse selection after deletion
             this.selectionStart = this.selectionEnd = this.cursorPos;
+        }
+
+        this.cursorVisible = true;
+        this.lastCursorToggle = millis();
+    }
+
+    onKeyPress(event) {
+        // Reset key repeat tracking on new press
+        this._lastKeyCode = keyCode;
+        this._keyDownStartTime = millis();
+        this._lastRepeatTime = 0;
+
+        // ADDED: if there's an active selection and user types or presses backspace/delete,
+        // we should remove the selection first (so typed char replaces selection)
+        const hasSelection = this.selectionStart !== null && this.selectionStart !== this.selectionEnd;
+
+        if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW || keyCode === BACKSPACE) {
+            this._handleRepeatable();
+            return; // cursor/selection already updated, skip to end
+        } else if (keyIsDown(CONTROL) && (key === 'a' || key === 'A')) {
+            // Select all text in the field
+            this.selectionStart = 0;
+            this.selectionEnd = this.text.length;
+            this.cursorPos = this.text.length;
+            // Prevent the browser from selecting all page content
+            if (event.nativeEvent) {
+                event.nativeEvent.preventDefault();
+            }
         } else if (key.length === 1) {
+            // Skip if Ctrl is held (avoid inserting control characters)
+            if (keyIsDown(CONTROL)) {
+                return;
+            }
             // ADDED: if a selection exists, remove it before insertion so typed char replaces selection
             if (hasSelection) {
                 this.deleteSelectedText();
@@ -236,10 +337,10 @@ export class TextField extends Input{
 
         if (this.textAlign === "left") {
             // left aligned starts at left padding, minus the scroll offset
-            return this.x + this.padding - this.displayXOffset;
+            return this.x + this.pad - this.displayXOffset;
         } else if (this.textAlign === "right") {
             // right aligned: text ends at width - padding, so start is that minus fullWidth
-            return this.x + this.width - this.padding - fullWidth - this.displayXOffset;
+            return this.x + this.width - this.pad - fullWidth - this.displayXOffset;
         } else { // center or anything else
             return this.x + this.width / 2 - fullWidth / 2 - this.displayXOffset;
         }
@@ -292,6 +393,10 @@ export class TextField extends Input{
 
             // ADDED: clear selection anchors and ensure they reflect cursor
             this.selectionStart = this.selectionEnd = null;
+
+            // Reset scroll offset and ensure cursor is visible
+            this.displayXOffset = 0;
+            this.scrollCursorIntoView();
         }
     }
 
@@ -420,8 +525,8 @@ export class TextField extends Input{
             cursorX = this.findTextWidth(0, this.cursorPos);
         }
     
-        if (cursorX - this.displayXOffset > this.width - this.padding) {
-            this.displayXOffset = cursorX - this.width + 2*this.padding;
+        if (cursorX - this.displayXOffset > this.width - this.pad) {
+            this.displayXOffset = cursorX - this.width + 2*this.pad;
         }
     
         if(!cursorX){
@@ -439,8 +544,8 @@ export class TextField extends Input{
             cursorX = this.findTextWidth(0, this.cursorPos);
         }
     
-        if(cursorX - this.displayXOffset < this.padding){
-            this.displayXOffset = cursorX - this.padding;
+        if(cursorX - this.displayXOffset < this.pad){
+            this.displayXOffset = cursorX - this.pad;
         }
     
         if(!cursorX){
@@ -494,7 +599,7 @@ export class TextField extends Input{
         
         let x, y;
         if(this.textAlign==="left"){
-            x = this.x - this.displayXOffset + this.padding;
+            x = this.x - this.displayXOffset + this.pad;
         } else if(this.textAlign==="right") {
             x = this.x - this.displayXOffset + this.width - this.textSize;
         }
@@ -506,12 +611,11 @@ export class TextField extends Input{
             
             let highlightX = x + this.findTextWidth(0, start);
             let highlightWidth = this.findTextWidth(start, end);
-            let highlightY = y - this.textSize * 0.7;
             
             push();
             fill('rgba(15, 111, 206, 0.7)');
             noStroke();
-            rect(highlightX, highlightY, highlightWidth, this.textSize);
+            rect(highlightX, this.y + this.pad, highlightWidth, this.height - 2 * this.pad);
             pop();
         }
 
@@ -527,7 +631,7 @@ export class TextField extends Input{
             if (this.cursorVisible) {
                 stroke(this.textColor);
                 strokeWeight(2);
-                line(cursorX, y - this.textSize * 0.5, cursorX, y + this.textSize * 0.45);
+                line(cursorX, this.y + this.pad, cursorX, this.y + this.height - this.pad);
             }
         }
 
@@ -545,7 +649,7 @@ export class TextField extends Input{
    * Updates text size based on current height
    */
     updateTextSize(){
-        this.textSize = this.height * 0.9;
+        this.textSize = (this.height - 2 * this.pad) * 0.9;
         this.scrollCursorIntoView();
     }
 

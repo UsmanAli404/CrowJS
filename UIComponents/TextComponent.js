@@ -80,10 +80,11 @@ export class TextComponent extends UIComponent {
     margint = null,
     marginb = null,
     type = 'UIComponent',
+    showDebugOverlay = false,
   } = {}) {
     super(x, y, width, height, backgroundColor, borderFlag, borderColor,
       borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-      shadowOffsetX, shadowOffsetY, { parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb });
+      shadowOffsetX, shadowOffsetY, { parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay });
 
     this.text = label;
     this.labelSize = 20;

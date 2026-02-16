@@ -80,6 +80,7 @@ export class ScrollFrame extends Frame{
       marginr = null,
       margint = null,
       marginb = null,
+      showDebugOverlay = false,
     } = {}) {
       if (pad !== null && pad !== undefined) {
         padx = pad;
@@ -98,7 +99,7 @@ export class ScrollFrame extends Frame{
       super(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
         cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, "Frame",
         enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-        {margin, marginx, marginy, marginl, marginr, margint, marginb});
+        {margin, marginx, marginy, marginl, marginr, margint, marginb, showDebugOverlay});
       
       this.preferences = [];
       //used for calculating weighted dimensions of child elements

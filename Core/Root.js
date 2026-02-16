@@ -20,6 +20,7 @@ export class Root{
       // this.preferences = {};
       this.focusedField = null;//for focusable input fields
       this.showDebugOverlay = showDebugOverlay;//for visualizing padding and margin
+      this._pressedInsideFocusedField = false;
     }
 
     /**
@@ -49,10 +50,9 @@ export class Root{
         this.layers[i].show();
       }
 
-      if(this.showDebugOverlay){
-        for(let i=0; i<this.layers.length; i++){
-          this.layers[i].drawDebugOverlayRecursive();
-        }
+      // Always run the recursive check; each component decides based on its own flag or root's flag
+      for(let i=0; i<this.layers.length; i++){
+        this.layers[i].drawDebugOverlayRecursive();
       }
     }
   
@@ -238,8 +238,8 @@ export class Root{
    * @param {Event|null} options.e - The original browser event
    */
     handleMouseEvent(type, x, y, {e=null}={}){
-      //currently engaged element
-      if(mouseIsPressed && !this.isNum(this.activeElement)){
+      //currently engaged element (only for continuous events like drag, not for new press/click)
+      if(type !== "press" && type !== "click" && mouseIsPressed && !this.isNum(this.activeElement)){
         this.sendToFront(this.activeElement);
 
         let target = this.activeElement;
@@ -266,7 +266,15 @@ export class Root{
       //clicked somewhere outside
       if(target==null){
         if(type=="click"||type=="press"){
+          // If the press started inside the focused field (drag-select that ended outside), don't blur
+          if(type=="click" && this._pressedInsideFocusedField){
+            this._pressedInsideFocusedField = false;
+            this.activeElement = -1;
+            return;
+          }
+
           if(!this.focusedField){
+            this.activeElement = -1;
             return;
           }
 
@@ -290,7 +298,19 @@ export class Root{
           if(!this.focusedField.isFocused){
             this.focusedField.focus();
           }
+
+          // Track that this press originated inside the focused field
+          if(type=="press"){
+            this._pressedInsideFocusedField = true;
+          }
           
+        } else {
+          // Pressed/clicked on a non-input component: blur focused field
+          if(type=="press" && this.focusedField){
+            this.focusedField.blur();
+            this.focusedField = null;
+          }
+          this._pressedInsideFocusedField = false;
         }
       }
     }
@@ -301,33 +321,13 @@ export class Root{
    * @param {number} x - The x-coordinate
    * @param {number} y - The y-coordinate
    */
-    handleKeyboardEvent(type, x, y){
-      if(this.focusedField){
-        // console.log(this.focusedField);
-        let target = this.focusedField;
-        let event = new KeyboardEvent(x, y, type, target);
-        // console.log(event);
-        target.dispatchEvent(event);
+    handleKeyboardEvent(type, x, y, nativeEvent){
+      if(!this.focusedField){
         return;
       }
 
-      let target = null;
-      for(let i=this.layers.length-1; i>=0; i--){
-        target = this.layers[i].findTarget();
-        if(target!=null){
-          // console.log(target.constructor.name);
-          this.lastActiveElement = this.activeElement;
-          this.activeElement = target;
-          break;
-        }
-      }
-
-      if(target==null){
-        this.activeElement = -1;
-        return;
-      }
-
-      let event = new KeyboardEvent(x, y, type, target);
+      let target = this.focusedField;
+      let event = new KeyboardEvent(x, y, type, target, nativeEvent);
       target.dispatchEvent(event);
     }
 
@@ -543,8 +543,8 @@ export class Root{
    * @param {number} x - The current mouse x-coordinate
    * @param {number} y - The current mouse y-coordinate
    */
-    keyPressedEventListeners(x, y){
-      this.handleKeyboardEvent("keyPress", x, y);
+    keyPressedEventListeners(x, y, nativeEvent){
+      this.handleKeyboardEvent("keyPress", x, y, nativeEvent);
     }
 
     //runs continously when a key is pressed

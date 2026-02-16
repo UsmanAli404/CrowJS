@@ -89,6 +89,7 @@ export class Button extends TextComponent {
       margint = null,
       marginb = null,
       enabled = true,
+      showDebugOverlay = false,
     } = {}) {
     super(x, y, width, height, label, {
       id,
@@ -124,6 +125,7 @@ export class Button extends TextComponent {
       marginr,
       margint,
       marginb,
+      showDebugOverlay,
     });
 
     this.hoverBackgroundColor = hoverBackgroundColor;
@@ -138,7 +140,12 @@ export class Button extends TextComponent {
     this.addEventListener('mouseEnter', () => {
       if (!this.enabled) return;
       this.isHovered = true;
+    });
+
+    this.addEventListener('hover', (event) => {
+      if (!this.enabled) return;
       cursor('pointer');
+      event.stopPropagation();
     });
 
     this.addEventListener('mouseLeave', () => {

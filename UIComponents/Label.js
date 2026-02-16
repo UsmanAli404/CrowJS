@@ -78,6 +78,7 @@ export class Label extends TextComponent{
         marginr = null,
         margint = null,
         marginb = null,
+        showDebugOverlay = false,
       } = {}) {
       super(x, y, width, height, label, {
         id,
@@ -113,6 +114,7 @@ export class Label extends TextComponent{
         marginr,
         margint,
         marginb,
+        showDebugOverlay,
       });
     }
 

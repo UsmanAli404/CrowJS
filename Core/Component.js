@@ -18,7 +18,7 @@ export class Component{
    * @param {number} options.margint - Top margin
    * @param {number} options.marginb - Bottom margin
    */
-  constructor(x, y, width, height, {type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}){
+  constructor(x, y, width, height, {type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, showDebugOverlay=false} = {}){
     this.x = x;
     this.y = y;
     this.id = id;
@@ -29,6 +29,7 @@ export class Component{
     this.root = null;
     this.eventListeners = {};
     this.children = [];
+    this.showDebugOverlay = showDebugOverlay;
 
     // Margin resolution
     const resolvedMarginx = (marginx ?? margin ?? 0);
@@ -591,10 +592,14 @@ export class Component{
   }
 
   /**
-   * Recursively draws debug overlays for this component and all children
+   * Recursively draws debug overlays for this component and all children.
+   * Draws if the component's own showDebugOverlay is true, or if the root's showDebugOverlay is true.
    */
   drawDebugOverlayRecursive(){
-    this.drawDebugOverlay();
+    const rootDebug = this.root && this.root.showDebugOverlay;
+    if(this.showDebugOverlay || rootDebug){
+      this.drawDebugOverlay();
+    }
     for(let i = 0; i < this.children.length; i++){
       this.children[i].drawDebugOverlayRecursive();
     }

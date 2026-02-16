@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue'
 import { Root } from '../../../../Core/Root.js'
 import { Button } from '../../../../UIComponents/Button.js'
 import { ScrollFrame } from "../../../../Frames/ScrollFrame.js";
+import { TextField } from '../../../../UIComponents/TextField.js'
 
 const container = ref(null)
 let p5Instance = null
@@ -66,6 +67,12 @@ const bindGlobals = (p) => {
     'max',
     'color',
     'pow',
+    'millis',
+    'line',
+    'arc',
+    'resizeCanvas',
+    'constrain',
+    'keyIsDown',
   ]
 
   functions.forEach((name) => {
@@ -74,7 +81,7 @@ const bindGlobals = (p) => {
     }
   })
 
-  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM', 'BASELINE']
+  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM', 'BASELINE', 'PI', 'HALF_PI', 'TWO_PI', 'LEFT_ARROW', 'RIGHT_ARROW', 'UP_ARROW', 'DOWN_ARROW', 'BACKSPACE', 'CONTROL', 'ENTER', 'DELETE', 'TAB', 'ESCAPE', 'SHIFT', 'ALT']
   constants.forEach((name) => {
     window[name] = p[name]
   })
@@ -95,6 +102,8 @@ const bindGlobals = (p) => {
   defineLiveProp('mouseX', () => p.mouseX)
   defineLiveProp('mouseY', () => p.mouseY)
   defineLiveProp('keyIsPressed', () => p.keyIsPressed)
+  defineLiveProp('keyCode', () => p.keyCode)
+  defineLiveProp('key', () => p.key)
   defineLiveProp('drawingContext', () => p.drawingContext)
 }
 
@@ -155,7 +164,7 @@ const startSketch = () => {
       canvas.parent(container.value)
 
       bindGlobals(p)
-      root = new Root({showDebugOverlay: false})
+      root = new Root()
 
       const useScrollFrame = !isTouchDevice()
       const scrollFrameWidth = 300
@@ -200,6 +209,7 @@ const startSketch = () => {
           // ellipsisMode: 'trailing',
           pad: 10,
           margin: 10,
+          // showDebugOverlay: true,
         }
       )
 
@@ -208,11 +218,29 @@ const startSketch = () => {
         event.target.setText(`You clicked ${clickTimes} times!`)
       })
 
+      const textField = new TextField(
+        20,
+        height - 60,
+        width - 40,
+        40,
+        {
+          // cornerRadius: 13,
+          // backgroundColor: 'rgba(0, 0, 0, 1)',
+          // textColor: 'rgba(255, 255, 255, 1)',
+          // borderFlag: false,
+          pad: 10,
+          margin: 10,
+          showDebugOverlay: true,
+        }
+      )
+
       if (scrollFrame) {
         scrollFrame.add(button)
+        scrollFrame.add(textField)
         root.add(scrollFrame)
       } else {
         root.add(button)
+        root.add(textField)
       }
     }
 
@@ -271,7 +299,7 @@ const startSketch = () => {
       }
 
       if (root) {
-        root.keyPressedEventListeners(p.mouseX, p.mouseY)
+        root.keyPressedEventListeners(p.mouseX, p.mouseY, event)
       }
     }
 

@@ -33,11 +33,11 @@ export class Input extends UIComponent{
    */
     constructor(x, y, width, height, backgroundColor, borderFlag, borderColor, borderWidth,
         cornerRadius, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-        {parent=null, type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}
+        {parent=null, type="", id=null, margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, showDebugOverlay=false} = {}
     ){
         super(x, y, width, height, backgroundColor, borderFlag, borderColor,
             borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-            shadowOffsetX, shadowOffsetY, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
+            shadowOffsetX, shadowOffsetY, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay});
         this.isFocused = false;
         // this.addEventListener("focus", (event)=>this.onFocus());
         // this.addEventListener("blur", (event)=>this.onBlur());

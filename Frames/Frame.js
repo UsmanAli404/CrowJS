@@ -48,8 +48,8 @@ export class Frame extends FrameComponent{
     constructor(x, y, width, height, id, backgroundColor, borderColor, highlightedBorderColor, borderWidth,
       cornerRadius, padx, pady, alwaysShowBanner, bannerHeight, bannerColor, bannerDotColor, nearestBorderThreshold, parent, type, 
       enableReposition, enableOptimisedReposition, enableResizing, enableOptimisedResizing, enableShadow, shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY,
-      {margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null} = {}){
-      super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb});
+      {margin=0, marginx=null, marginy=null, marginl=null, marginr=null, margint=null, marginb=null, showDebugOverlay=false} = {}){
+      super(x, y, width, height, {parent: parent, type: type, id: id, margin: margin, marginx: marginx, marginy: marginy, marginl: marginl, marginr: marginr, margint: margint, marginb: marginb, showDebugOverlay: showDebugOverlay});
   
       this.backgroundColor = backgroundColor;
       this.borderColor = borderColor;
