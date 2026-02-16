@@ -65,7 +65,7 @@ const bindGlobals = (p) => {
     'min',
     'max',
     'color',
-    'pow'
+    'pow',
   ]
 
   functions.forEach((name) => {
@@ -74,7 +74,7 @@ const bindGlobals = (p) => {
     }
   })
 
-  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM']
+  const constants = ['LEFT', 'RIGHT', 'CENTER', 'TOP', 'BOTTOM', 'BASELINE']
   constants.forEach((name) => {
     window[name] = p[name]
   })
@@ -170,7 +170,8 @@ const startSketch = () => {
           alwaysShowBanner: true,
           enableHScroll: false,
           enableReposition: true,
-          enableShadow: true,
+          enableResizing: true,
+          // enableShadow: true,
           shadowColor: 'rgba(0, 0, 0, 1)',
           shadowBlur: 50,
           shadowOffsetX: 0,
@@ -191,12 +192,17 @@ const startSketch = () => {
           cornerRadius: 13,
           backgroundColor: 'rgba(0, 0, 0, 1)',
           textColor: 'rgba(255, 255, 255, 1)',
+          wrap: false,
+          wrapMode: 'char',
+          noWrapMode: 'font-size',
+          ellipsisMode: 'trailing',
+          pad: 5,
         }
       )
 
       button.addEventListener('click', (event) => {
         clickTimes += 1
-        event.target.setText(`You clicked ${clickTimes}\ntimes!`)
+        event.target.setText(`You clicked ${clickTimes} times because it is so annoying to `)
       })
 
       if (scrollFrame) {

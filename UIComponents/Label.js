@@ -1,7 +1,7 @@
-import {UIComponent} from './UIComponent.js';
+import { TextComponent } from './TextComponent.js';
 import { Component } from '../Core/Component.js';
 
-export class Label extends UIComponent{
+export class Label extends TextComponent{
   /**
    * Creates a text label component
    * @param {number} x - The x-coordinate
@@ -19,10 +19,10 @@ export class Label extends UIComponent{
    * @param {number} options.borderWidth - Border width
    * @param {number} options.cornerRadius - Corner radius
    * @param {boolean} options.enableShadow - Enable shadow rendering
-  * @param {string} options.shadowColor - Shadow color (CSS color string)
-  * @param {number} options.shadowBlur - Shadow blur radius
-  * @param {number} options.shadowOffsetX - Shadow offset on X axis
-  * @param {number} options.shadowOffsetY - Shadow offset on Y axis
+   * @param {string} options.shadowColor - Shadow color (CSS color string)
+   * @param {number} options.shadowBlur - Shadow blur radius
+   * @param {number} options.shadowOffsetX - Shadow offset on X axis
+   * @param {number} options.shadowOffsetY - Shadow offset on Y axis
    * @param {string} options.HTextAlign - Horizontal text alignment
    * @param {string} options.VTextAlign - Vertical text alignment
    * @param {number} options.pad - General padding
@@ -32,6 +32,10 @@ export class Label extends UIComponent{
    * @param {number} options.padr - Right padding
    * @param {number} options.padt - Top padding
    * @param {number} options.padb - Bottom padding
+   * @param {boolean} options.wrap - Whether to wrap text
+   * @param {string} options.wrapMode - Wrap mode: "word" or "char"
+   * @param {string} options.noWrapMode - No-wrap mode: "ellipsis" or "font-size"
+  * @param {string} options.ellipsisMode - Ellipsis mode: "leading", "center", or "trailing"
    */
     constructor(x, y, width, height, label,
        {id=null,
@@ -56,27 +60,39 @@ export class Label extends UIComponent{
         padr = null,
         padt = null,
         padb = null,
+        wrap = false,
+        wrapMode = "word",
+        noWrapMode = "font-size",
+        ellipsisMode = "trailing",
       } = {}) {
-      super(x, y, width, height, backgroundColor, borderFlag, borderColor,
-        borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-        shadowOffsetX, shadowOffsetY, {parent: parent, type: "UIComponent", id: id});
-
-      this.text = label;
-      this.labelSize = 20;
-      this.textColor = textColor;
-
-      this.HTextAlign = HTextAlign;
-      this.VTextAlign = VTextAlign;
-
-      const resolvedPadx = (padx ?? pad ?? 0)
-      const resolvedPady = (pady ?? pad ?? 0)
-      this.pad = pad;
-      this.padx = resolvedPadx;
-      this.pady = resolvedPady;
-      this.padl = padl ?? resolvedPadx;
-      this.padr = padr ?? resolvedPadx;
-      this.padt = padt ?? resolvedPady;
-      this.padb = padb ?? resolvedPady;
+      super(x, y, width, height, label, {
+        id,
+        parent,
+        backgroundColor,
+        textColor,
+        borderFlag,
+        borderColor,
+        borderWidth,
+        cornerRadius,
+        enableShadow,
+        shadowColor,
+        shadowBlur,
+        shadowOffsetX,
+        shadowOffsetY,
+        HTextAlign,
+        VTextAlign,
+        pad,
+        padx,
+        pady,
+        padl,
+        padr,
+        padt,
+        padb,
+        wrap,
+        wrapMode,
+        noWrapMode,
+        ellipsisMode,
+      });
     }
 
     /**
@@ -99,36 +115,7 @@ export class Label extends UIComponent{
       
       // Text
       fill(this.textColor);
-      // textAlign(CENTER, CENTER);
-      textSize(this.labelSize);
-
-      let x;
-      if(this.HTextAlign === "left"){
-        textAlign(LEFT, CENTER);
-        x = this.padl;
-      } else if(this.HTextAlign === "right"){
-        textAlign(RIGHT, CENTER);
-        x = this.width - this.padr;
-      } else{
-        //center
-        textAlign(CENTER, CENTER);
-        x = this.width / 2;
-      } 
-
-      let y;
-      if(this.VTextAlign === "top"){
-        textAlign(this.getHTextAlign(), BOTTOM);
-        y = this.labelSize + this.padt;
-      } else if(this.VTextAlign === "bottom"){
-        textAlign(this.getHTextAlign(), TOP);
-        y = this.height - this.labelSize - this.padb;
-      } else {
-        //center
-        textAlign(this.getHTextAlign(), CENTER);
-        y = this.height / 2;
-      }
-
-      text(this.text, x, y);
+      this.renderText();
       // rect(x, y, this.labelSize, this.labelSize);
       
       // Border
@@ -142,89 +129,5 @@ export class Label extends UIComponent{
       pop();
     }
 
-    /**
-   * Converts horizontal alignment string to P5 constant
-   * @returns {number} P5 alignment constant
-   */
-    getHTextAlign(){
-      switch(this.HTextAlign){
-        case "left":
-          return LEFT;
-        case "right":
-          return RIGHT;
-        default:
-          return CENTER;
-      }
-    }
-
-    /**
-   * Converts vertical alignment string to P5 constant
-   * @returns {number} P5 alignment constant
-   */
-    getVTextAlign(){
-      switch(this.VTextAlign){
-        case "top":
-          return TOP;
-        case "bottom":
-          return BOTTOM;
-        default:
-          return CENTER;
-      }
-    }
-    
-    /**
-   * Updates the label text and recalculates text size
-   * @param {string} text - The new text to display
-   */
-    setText(text){
-      this.text = text;
-      this.updateLabelSize();
-    }
-    
-    //needs heavy optimizations
-    /**
-   * Dynamically calculates the optimal text size to fit the container
-   * Uses binary search for efficient size calculation
-   */
-    updateLabelSize() {
-      let maxSize = min(this.width * 0.9, this.height * 0.8);
-      let minSize = 1;
-      let low = minSize;
-      let high = maxSize;
-      let bestSize = minSize;
-   
-      const maxLabelWidth = this.width * 0.9;
-      const maxLabelHeight = this.height * 0.8;
-   
-      while (low <= high) {
-         let mid = Math.floor((low + high) / 2);
-         textSize(mid);
-         let labelWidth = textWidth(this.text);
-         let labelHeight = textAscent() + textDescent();
-   
-         if (labelWidth <= maxLabelWidth && labelHeight <= maxLabelHeight) {
-            bestSize = mid;
-            low = mid + 1;
-         } else {
-            high = mid - 1;
-         }
-      }
-   
-      this.labelSize = bestSize;
-    }
-
-    /**
-   * Handles width changes and updates text size accordingly
-   */
-    updateWidth(){
-      this.updateLabelSize();
-    }
-
-    /**
-   * Handles height changes and updates text size accordingly
-   */
-    updateHeight(){
-      this.updateLabelSize();
-    }
   }
   

@@ -1,7 +1,7 @@
-import { UIComponent } from './UIComponent.js';
+import { TextComponent } from './TextComponent.js';
 import { Component } from '../Core/Component.js';
 
-export class Button extends UIComponent {
+export class Button extends TextComponent {
   /**
    * Creates a button component with hover/press visuals and click behavior
    * @param {number} x - The x-coordinate
@@ -36,6 +36,10 @@ export class Button extends UIComponent {
    * @param {number} options.padr - Right padding
    * @param {number} options.padt - Top padding
    * @param {number} options.padb - Bottom padding
+   * @param {boolean} options.wrap - Whether to wrap text
+   * @param {string} options.wrapMode - Wrap mode: "word" or "char"
+   * @param {string} options.noWrapMode - No-wrap mode: "ellipsis" or "font-size"
+   * @param {string} options.ellipsisMode - Ellipsis mode: "leading", "center", or "trailing"
    * @param {boolean} options.enabled - Whether the button is enabled
    */
   constructor(x, y, width, height, label,
@@ -66,33 +70,45 @@ export class Button extends UIComponent {
       padr = null,
       padt = null,
       padb = null,
+      wrap = false,
+      wrapMode = 'word',
+      noWrapMode = 'font-size',
+      ellipsisMode = 'trailing',
       enabled = true,
     } = {}) {
-    super(x, y, width, height, backgroundColor, borderFlag, borderColor,
-      borderWidth, cornerRadius, enableShadow, shadowColor, shadowBlur,
-      shadowOffsetX, shadowOffsetY, { parent: parent, type: 'UIComponent', id: id });
-
-    this.text = label;
-    this.labelSize = 20;
-    this.textColor = textColor;
+    super(x, y, width, height, label, {
+      id,
+      parent,
+      backgroundColor,
+      textColor,
+      borderFlag,
+      borderColor,
+      borderWidth,
+      cornerRadius,
+      enableShadow,
+      shadowColor,
+      shadowBlur,
+      shadowOffsetX,
+      shadowOffsetY,
+      HTextAlign,
+      VTextAlign,
+      pad,
+      padx,
+      pady,
+      padl,
+      padr,
+      padt,
+      padb,
+      wrap,
+      wrapMode,
+      noWrapMode,
+      ellipsisMode,
+    });
 
     this.hoverBackgroundColor = hoverBackgroundColor;
     this.hoverTextColor = hoverTextColor;
     this.pressedBackgroundColor = pressedBackgroundColor;
     this.pressedTextColor = pressedTextColor;
-
-    this.HTextAlign = HTextAlign;
-    this.VTextAlign = VTextAlign;
-
-    const resolvedPadx = (padx ?? pad ?? 0)
-    const resolvedPady = (pady ?? pad ?? 0)
-    this.pad = pad
-    this.padx = resolvedPadx
-    this.pady = resolvedPady
-    this.padl = padl ?? resolvedPadx
-    this.padr = padr ?? resolvedPadx
-    this.padt = padt ?? resolvedPady
-    this.padb = padb ?? resolvedPady
 
     this.enabled = enabled;
     this.isHovered = false;
@@ -138,33 +154,7 @@ export class Button extends UIComponent {
 
     // Text
     fill(this.getTextColor());
-    textSize(this.labelSize);
-
-    let x;
-    if (this.HTextAlign === 'left') {
-      textAlign(LEFT, CENTER);
-      x = this.padl;
-    } else if (this.HTextAlign === 'right') {
-      textAlign(RIGHT, CENTER);
-      x = this.width - this.padr;
-    } else {
-      textAlign(CENTER, CENTER);
-      x = this.width / 2;
-    }
-
-    let y;
-    if (this.VTextAlign === 'top') {
-      textAlign(this.getHTextAlign(), BOTTOM);
-      y = this.labelSize + this.padt;
-    } else if (this.VTextAlign === 'bottom') {
-      textAlign(this.getHTextAlign(), TOP);
-      y = this.height - this.labelSize - this.padb;
-    } else {
-      textAlign(this.getHTextAlign(), CENTER);
-      y = this.height / 2;
-    }
-
-    text(this.text, x, y);
+    this.renderText();
 
     if (this.borderFlag) {
       noFill();
@@ -177,15 +167,6 @@ export class Button extends UIComponent {
   }
 
   /**
-   * Updates the button label text and recalculates text size
-   * @param {string} text - The new text to display
-   */
-  setText(text) {
-    this.text = text;
-    this.updateLabelSize();
-  }
-
-  /**
    * Enables or disables the button
    * @param {boolean} enabled - True to enable, false to disable
    */
@@ -194,72 +175,6 @@ export class Button extends UIComponent {
     if (!enabled) {
       this.isHovered = false;
       this.isPressed = false;
-    }
-  }
-
-  /**
-   * Updates the text size to fit the component
-   */
-  updateLabelSize() {
-    let maxSize = min(this.width * 0.9, this.height * 0.8);
-    let minSize = 1;
-    let low = minSize;
-    let high = maxSize;
-    let bestSize = minSize;
-
-    const maxLabelWidth = this.width * 0.9;
-    const maxLabelHeight = this.height * 0.8;
-
-    while (low <= high) {
-      let mid = Math.floor((low + high) / 2);
-      textSize(mid);
-      let labelWidth = textWidth(this.text);
-      let labelHeight = textAscent() + textDescent();
-
-      if (labelWidth <= maxLabelWidth && labelHeight <= maxLabelHeight) {
-        bestSize = mid;
-        low = mid + 1;
-      } else {
-        high = mid - 1;
-      }
-    }
-
-    this.labelSize = bestSize;
-  }
-
-  /**
-   * Handles width changes and updates text size accordingly
-   */
-  updateWidth() {
-    this.updateLabelSize();
-  }
-
-  /**
-   * Handles height changes and updates text size accordingly
-   */
-  updateHeight() {
-    this.updateLabelSize();
-  }
-
-  getHTextAlign() {
-    switch (this.HTextAlign) {
-      case 'left':
-        return LEFT;
-      case 'right':
-        return RIGHT;
-      default:
-        return CENTER;
-    }
-  }
-
-  getVTextAlign() {
-    switch (this.VTextAlign) {
-      case 'top':
-        return TOP;
-      case 'bottom':
-        return BOTTOM;
-      default:
-        return CENTER;
     }
   }
 

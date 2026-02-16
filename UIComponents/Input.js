@@ -15,10 +15,10 @@ export class Input extends UIComponent{
    * @param {number} borderWidth - Border width
    * @param {number} cornerRadius - Corner radius
    * @param {boolean} enableShadow - Enable shadow
-    * @param {string} shadowColor - Shadow color (CSS color string)
-    * @param {number} shadowBlur - Shadow blur radius
-    * @param {number} shadowOffsetX - Shadow offset on X axis
-    * @param {number} shadowOffsetY - Shadow offset on Y axis
+   * @param {string} shadowColor - Shadow color (CSS color string)
+   * @param {number} shadowBlur - Shadow blur radius
+   * @param {number} shadowOffsetX - Shadow offset on X axis
+   * @param {number} shadowOffsetY - Shadow offset on Y axis
    * @param {Object} options - Additional options
    * @param {Component|null} options.parent - Parent component
    * @param {string} options.type - Component type
