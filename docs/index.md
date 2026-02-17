@@ -12,10 +12,10 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /get-started
+      link: /guide/getting-started
     - theme: alt
-      text: Examples
-      link: /examples
+      text: API Reference
+      link: /api/root
 
 features:
   - title: Structured Frame System

@@ -1,7 +1,7 @@
 import {
   defineComponent,
   h
-} from "./chunk-JLJ73CPZ.js";
+} from "./chunk-SNNOYR6U.js";
 
 // node_modules/@iconify/vue/dist/iconify.mjs
 var matchIconName = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -1487,30 +1487,25 @@ var render = (icon, props) => {
       continue;
     }
     switch (key) {
-      // Properties to ignore
       case "icon":
       case "style":
       case "onLoad":
       case "mode":
       case "ssr":
         break;
-      // Boolean attributes
       case "inline":
       case "hFlip":
       case "vFlip":
         customisations[key] = value === true || value === "true" || value === 1;
         break;
-      // Flip as string: 'horizontal,vertical'
       case "flip":
         if (typeof value === "string") {
           flipFromString(customisations, value);
         }
         break;
-      // Color: override style
       case "color":
         style.color = value;
         break;
-      // Rotation as string
       case "rotate":
         if (typeof value === "string") {
           customisations[key] = rotateFromString(value);
@@ -1518,7 +1513,6 @@ var render = (icon, props) => {
           customisations[key] = value;
         }
         break;
-      // Remove aria-hidden
       case "ariaHidden":
       case "aria-hidden":
         if (value !== true && value !== "true") {
