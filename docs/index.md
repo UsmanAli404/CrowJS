@@ -43,7 +43,7 @@ let clickTimes = 0;
 function setup(){
   root = new Root();
 
-  const button = new Button(0, 0, 200, 100, "Click Me! ðŸ¦â€â¬›", {
+  const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
     cornerRadius: 10,
   });
 
