@@ -1,7 +1,7 @@
 <div align="center">
   <img src="/crowjs-01-01.png" alt="CrowJS Logo" width="250" />
   
-  # 🐦‍⬛ CrowJS
+  # CrowJS 🐦‍⬛
   
   **A lightweight, canvas-native GUI library built for p5.js.**
   
@@ -41,10 +41,9 @@ npm install @usman404/crowjs
 **Via Manual Download**
 Download this repository and place the `CrowJS` folder inside your project's source code. Open the `index.html` file in your browser (it already contains the required setup for p5.js and module loading). 
 
-> ⚠️ **Important Notes**
+> [!WARNING]
 > - **Do not rename** the `sketch.js` file. CrowJS depends on this filename for consistent module loading.  
 > - **Do not alter** the structure or script tags inside `index.html`. Modifying them may prevent CrowJS from running correctly.  
-> - *A CDN-based installation method will be added in the future.*
 
 ### 2. Basic Example
 All GUI development should be done inside **`sketch.js`**, which serves as the main entry point for both your p5.js sketch and your CrowJS components.
