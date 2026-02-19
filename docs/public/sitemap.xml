@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://crow-js.vercel.app/</loc>
+    <lastmod>2026-02-20</lastmod>
+    <priority>1.00</priority>
+  </url>
+  <url>
+    <loc>https://crow-js.vercel.app/guide/getting-started</loc>
+    <lastmod>2026-02-20</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://crow-js.vercel.app/guide/core-concepts</loc>
+    <lastmod>2026-02-20</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://crow-js.vercel.app/api/root</loc>
+    <lastmod>2026-02-20</lastmod>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://crow-js.vercel.app/examples</loc>
+    <lastmod>2026-02-20</lastmod>
+    <priority>0.64</priority>
+  </url>
+</urlset>

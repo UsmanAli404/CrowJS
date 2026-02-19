@@ -4,9 +4,58 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "CrowJS",
   description: "A lightweight GUI framework for p5.js",
+  lang: 'en-US',
+
+  // canonical site URL (used for Open Graph / JSON-LD / sitemap)
+  // update if you host at a different domain
+
+  cleanUrls: true,
+
+  sitemap: {
+    hostname: 'https://crow-js.vercel.app',
+  },
+
   head: [
     ['link', { rel: 'icon', href: '/crowjs_favicon.png' }],
-    ['script', { src: 'https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js', defer: '' }]
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js', defer: '' }],
+
+    // Basic SEO
+    ['link', { rel: 'canonical', href: 'https://crow-js.vercel.app/' }],
+    ['meta', { name: 'keywords', content: 'CrowJS, p5.js, GUI, UI, JavaScript, canvas, components' }],
+    ['meta', { name: 'author', content: 'Usman Ali' }],
+    ['meta', { name: 'robots', content: 'index,follow' }],
+
+    // Open Graph
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'CrowJS — lightweight GUI for p5.js' }],
+    ['meta', { property: 'og:description', content: 'A lightweight GUI framework for p5.js' }],
+    ['meta', { property: 'og:url', content: 'https://crow-js.vercel.app/' }],
+    ['meta', { property: 'og:image', content: '/crow.png' }],
+    ['meta', { property: 'og:locale', content: 'en_US' }],
+
+    // Twitter card
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'CrowJS — lightweight GUI for p5.js' }],
+    ['meta', { name: 'twitter:description', content: 'A lightweight GUI framework for p5.js' }],
+    ['meta', { name: 'twitter:image', content: '/crow.png' }],
+
+    // Geo tags (optional; edit to target a specific region/city)
+    ['meta', { name: 'geo.region', content: 'PK' }],
+    ['meta', { name: 'geo.placename', content: 'Karachi, Pakistan' }],
+    ['meta', { name: 'geo.position', content: '24.8607;67.0011' }],
+
+    // JSON-LD structured data for the project
+    ['script', { type: 'application/ld+json' }, JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "CrowJS",
+      "url": "https://crow-js.vercel.app/",
+      "description": "A lightweight GUI framework for p5.js",
+      "author": { "@type": "Person", "name": "Usman Ali" },
+      "license": "https://opensource.org/licenses/MIT",
+      "applicationCategory": "GraphicsApplication",
+      "operatingSystem": "All"
+    })]
   ],
 
   markdown: {
@@ -120,7 +169,7 @@ export default defineConfig({
 
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present Usman Ali'
+      copyright: 'Copyright © 2025-present Usman Ali'
     }
   }
 })

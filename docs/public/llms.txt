@@ -1,0 +1,44 @@
+LLMs Data Manifest — CrowJS Documentation
+
+Purpose:
+- This file provides machine-readable metadata and pointers to allow LLMs or automated agents to discover and summarize the CrowJS docs site accurately.
+
+Usage guidance for automated agents:
+- Prefer the `sitemap` to discover site pages and canonical URLs.
+- Respect `robots.txt` and rate limits when crawling.
+- Use the `pages` entries below as a quick prioritized index; always verify code samples against the repository.
+
+Human-readable pointers:
+- Repo: https://github.com/UsmanAli404/CrowJS
+- Docs site: https://crow-js.vercel.app/
+- Sitemap: https://crow-js.vercel.app/sitemap.xml
+- Robots: https://crow-js.vercel.app/robots.txt
+
+---
+
+JSON manifest (machine-readable):
+
+{
+	"site": {
+		"name": "CrowJS",
+		"description": "A lightweight GUI framework for p5.js",
+		"url": "https://crow-js.vercel.app",
+		"language": "en-US",
+		"license": "MIT",
+		"author": "Usman Ali"
+	},
+	"sitemap": "https://crow-js.vercel.app/sitemap.xml",
+	"robots": "https://crow-js.vercel.app/robots.txt",
+	"pages": [
+		{ "path": "/", "title": "Home", "summary": "Overview and quick links" },
+		{ "path": "/guide/getting-started", "title": "Getting Started", "summary": "How to use CrowJS and basic examples" },
+		{ "path": "/guide/core-concepts", "title": "Core Concepts", "summary": "Design and architecture of CrowJS" },
+		{ "path": "/api/root", "title": "API Reference - Root", "summary": "Core API and usage" },
+		{ "path": "/examples", "title": "Examples", "summary": "Runtime demos and usage samples" }
+	],
+	"keywords": ["CrowJS","p5.js","GUI","UI","JavaScript","canvas","components"],
+	"lastUpdated": "2026-02-20",
+	"notes": "This manifest is a convenience file for LLMs and agents. Always refer to the canonical URLs and the source repository for authoritative code and behavior. Do not assume the docs contain exhaustive runtime guarantees."
+}
+
+
