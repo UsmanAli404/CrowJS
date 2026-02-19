@@ -3,7 +3,11 @@
   "version": "1.1.2",
   "description": "lightweight and extensible GUI library built on top of p5.js",
   "keywords": [
-    "CROWJS"
+    "p5js",
+    "gui",
+    "canvas",
+    "creative-coding",
+    "crowjs"
   ],
   "homepage": "https://crow-js.vercel.app/",
   "bugs": {
@@ -11,11 +15,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/UsmanAli404/CrowJS"
+    "url": "git+https://github.com/UsmanAli404/CrowJS.git"
   },
   "license": "MIT",
   "author": "Usman Ali",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
