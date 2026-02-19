@@ -1,130 +1,133 @@
-# CrowJS 🐦‍⬛
-**CrowJS** is a lightweight and extensible GUI library built on top of [p5.js](https://p5js.org/), designed for creative coders and simulation builders who need intuitive, canvas-native UI components like buttons, sliders, input fields, and more — all rendered directly inside the p5.js canvas.
+<div align="center">
+  <img src="/crowjs-01-01.png" alt="CrowJS Logo" width="250" />
+  
+  # 🐦‍⬛ CrowJS
+  
+  **A lightweight, canvas-native GUI library built for p5.js.**
+  
+  [![NPM Version](https://img.shields.io/npm/v/@usman404/crowjs?style=for-the-badge&logo=npm&color=CB3837)](https://www.npmjs.com/package/@usman404/crowjs)
+  [![Read the Docs](https://img.shields.io/badge/📖_Read_The_Docs-181717?style=for-the-badge&logo=vercel&logoColor=white)](https://crow-js.vercel.app/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-![Logo](/crowjs-01-01.png)
+  <br/>
 
-## Features
-- Minimal and canvas-native UI for p5.js sketches  
-- Frames, nested layouts, scrollable & grid containers  
-- Customizable UI components: buttons, sliders, toggles, input fields, etc.  
-- Event system inspired by the web (click, hover, focus, blur)  
-- Modular design with support for custom components  
-- Fully drawn inside p5.js (no HTML overlays or DOM interference)  
-- Ideal for creative coding, simulations, visual experiments, and tools  
-
-## Getting Started
-
-### 1. Install
-
-To use **CrowJS**, begin by downloading this repository and placing the `CrowJS` folder inside your project's source code.  
-Once included, open the `index.html` file in your browser; it already contains the required setup for p5.js and for loading CrowJS modules.
-
-All GUI development should be done inside **`sketch.js`**, which serves as the main entry point for both your p5.js sketch and all CrowJS components.
+  *Designed for creative coders and simulation builders who need intuitive UI components like buttons, sliders, and input fields rendered directly inside the p5.js canvas.*
+</div>
 
 ---
 
-### ⚠ Important Notes
-- **Do not rename** the `sketch.js` file. CrowJS depends on this filename for consistent module loading.  
-- **Do not alter** the structure or script tags inside `index.html`. Modifying them may prevent CrowJS from running correctly.  
-- A **CDN-based installation** method will be added in the future to make setup even easier.
+## 🌟 Why CrowJS?
+While p5.js is amazing for generative art and simulations, there's a noticeable gap when it comes to in-sketch UI. CrowJS fills that gap by giving you a **canvas-first GUI framework** that blends seamlessly with your visuals without relying on clunky HTML overlays or DOM interference.
+
+## ✨ Features
+- **Minimal & Canvas-Native:** UI drawn directly inside your p5.js sketches.
+- **Layout Systems:** Frames, nested layouts, scrollable areas, and grid containers.
+- **Customizable Components:** Buttons, sliders, toggles, input fields, and more.
+- **Web-Style Event System:** Supports `click`, `hover`, `focus`, and `blur`.
+- **Modular Design:** Easily create and integrate your own custom components.
+- **Perfect For:** Creative coding, visual experiments, simulations, and internal tools.
 
 ---
+
+## 🚀 Getting Started
+
+### 1. Installation
+
+**Via NPM (Recommended)**
+```bash
+npm install @usman404/crowjs
+```
+
+**Via Manual Download**
+Download this repository and place the `CrowJS` folder inside your project's source code. Open the `index.html` file in your browser (it already contains the required setup for p5.js and module loading). 
+
+> ⚠️ **Important Notes**
+> - **Do not rename** the `sketch.js` file. CrowJS depends on this filename for consistent module loading.  
+> - **Do not alter** the structure or script tags inside `index.html`. Modifying them may prevent CrowJS from running correctly.  
+> - *A CDN-based installation method will be added in the future.*
 
 ### 2. Basic Example
+All GUI development should be done inside **`sketch.js`**, which serves as the main entry point for both your p5.js sketch and your CrowJS components.
+
 ```javascript
 import { Root } from "./Core/Root.js";
-import { Label } from "./UIComponents/Label.js";
-
+import { Button } from "./UIComponents/Button.js";
 
 /** @type {Root} */
 let root;
-let clickTimes=1;
+let clickTimes = 0;
 
-window.setup = function(){
-    createCanvas(windowWidth, windowHeight);
-    root = new Root();
+function setup() {
+  root = new Root();
 
-    let btnWidth = 200;
-    let btnHeight = 100;
+  const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
+    cornerRadius: 10,
+  });
 
-    let btn = new Label((windowWidth/2)-(btnWidth/2), (windowHeight/2)-(btnHeight/2), 200, 100, "Hello! 👋", 
-      {cornerRadius: 20,
-       backgroundColor: "rgba(0, 0, 0, 1)",
-       textColor: "rgba(255, 255, 255, 1)",
-      });
+  button.addEventListener('click', (event) => {
+    clickTimes += 1;
+    event.target.setText(`You clicked ${clickTimes} times!`);
+  });
 
-    btn.addEventListener("click", (event)=>{
-      clickTimes+=1;
-      event.target.setText(`You clicked ${clickTimes} \ntimes!`);
-    });
-
-    root.add(btn);
+  root.add(button);
 }
 
-window.draw = function () {
-  background('rgba(255,255,255,255)');
+function draw() {
   root.show();
+  
+  // Event Listeners
   root.mouseEnterEventListeners(mouseX, mouseY);
   root.hoverEventListeners(mouseX, mouseY);
   root.mouseLeaveEventListeners(mouseX, mouseY);
-  root.keyDownEventListeners(mouseX, mouseY);
 }
 
-window.mouseDragged = function (){
-  root.mouseDraggedEventListeners(mouseX, mouseY);
-}
-
-window.mouseClicked = function(){ 
+window.mouseClicked = function() { 
   root.mouseClickedEventListeners(mouseX, mouseY);
 }
 
-window.mousePressed = function(){
+window.mousePressed = function() {
   root.mousePressedEventListeners(mouseX, mouseY);
 }
 
-window.mouseReleased = function(){
+window.mouseReleased = function() {
   root.mouseReleasedEventListeners(mouseX, mouseY);
-}
-
-window.mouseWheel = function(event){
-  root.mouseWheelEventListeners(mouseX, mouseY, event);
-}
-
-window.keyPressed = function(event){
-  if (keyCode === UP_ARROW || keyCode === DOWN_ARROW || keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
-    event.preventDefault();
-  }
-
-  root.keyPressedEventListeners(mouseX, mouseY);
 }
 ```
 
-## Components Overview
-- `Label(x, y, width, height, text, {options})`  
-- `ScrollFrame`, `GridFrame`, `Label`, etc.  
+---
 
-More components and documentation coming soon.
+## 🧩 Components Overview
+  
+- Label(x, y, width, height, text, {options})
+- Button
+- ScrollFrame
+- GridFrame
+  
+*More components and detailed API documentation coming soon!*
 
-## Documentation & Tutorials
-A full **video series** and documentation site are in the works!  
-Stay tuned for:  
+---
+
+## 📚 Documentation & Tutorials
+A full **video series** and our documentation site are actively being updated! 
+
+Check out the official docs at **[crow-js.vercel.app](https://crow-js.vercel.app/)** for:  
 - Getting started tutorials  
-- Custom component creation  
+- Custom component creation guides  
 - Internals of CrowJS for contributors  
 
-## Why CrowJS?
-While p5.js is amazing for generative art and simulations, there's a noticeable gap when it comes to in-sketch UI. CrowJS fills that gap by giving you a canvas-first GUI framework that blends seamlessly with your visuals.
+---
 
-## Contributing
-CrowJS is open-source! Contributions, bug reports, and ideas are welcome.  
-See the `CONTRIBUTING.md` file for details.
+## 🤝 Contributing
+CrowJS is open-source! Contributions, bug reports, and ideas are highly welcome.  
+Please see the `CONTRIBUTING.md` file for details on how to get started.
 
-## License
-This project is licensed under the MIT License.  
-See the `LICENSE` file for details.
+## 🔗 Links
+- **Creator's Sketches:** [Usman's p5.js Editor](https://editor.p5js.org/Usman_Ali/sketches/)
+- **Powered By:** [p5.js Official Site](https://p5js.org)
 
-## Links
-- My sketches: [https://editor.p5js.org/Usman_Ali/sketches/](p5js.org/Usman_Ali/sketches/)
-- p5.js: [https://p5js.org](https://p5js.org)
+---
 
-Created with ❤️ by **Usman**
+<div align="center">
+  Created with ❤️ by <b>Usman</b> <br/>
+  <i>Licensed under the MIT License.</i>
+</div>
