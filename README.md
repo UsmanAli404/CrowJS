@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="/crowjs-01-01.png" alt="CrowJS Logo" width="250" />
+  <img src="/docs/public/crowjs_favicon.png" alt="CrowJS Logo" width="270" />
   
-  # CrowJS 🐦‍⬛
+  # CrowJS
   
   **A lightweight, canvas-native GUI library built for p5.js.**
   
