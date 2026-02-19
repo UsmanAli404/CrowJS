@@ -5,13 +5,13 @@
   "keywords": [
     "CROWJS"
   ],
-  "homepage": "https://github.com/UsmanAli404/P5GUI#readme",
+  "homepage": "https://github.com/UsmanAli404/CrowJS#readme",
   "bugs": {
-    "url": "https://github.com/UsmanAli404/P5GUI/issues"
+    "url": "https://github.com/UsmanAli404/CrowJS/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UsmanAli404/P5GUI.git"
+    "url": "https://github.com/UsmanAli404/CrowJS"
   },
   "license": "MIT",
   "author": "Usman Ali",
