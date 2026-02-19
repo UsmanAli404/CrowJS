@@ -169,32 +169,36 @@ const startSketch = () => {
       bindGlobals(p)
       root = new Root({showDebugOverlay: false})
 
-      const useScrollFrame = !isTouchDevice()
-      const scrollFrameWidth = 320
-      const scrollFrameHeight = 360
-      const scrollFrame = useScrollFrame
-        ? new ScrollFrame(
-          (width - scrollFrameWidth) / 2,
-          (height - scrollFrameHeight) / 2,
-          scrollFrameWidth,
-          scrollFrameHeight, {
-          cornerRadius: 13,
-          alwaysShowBanner: true,
-          enableHScroll: false,
-          enableReposition: true,
-          enableResizing: true,
-          pad: 10,
-          margin: 10,
-        })
-        : null
+      // const useScrollFrame = !isTouchDevice()
+      // const scrollFrameWidth = 320
+      // const scrollFrameHeight = 360
+      // const scrollFrame = useScrollFrame
+      //   ? new ScrollFrame(
+      //     (width - scrollFrameWidth) / 2,
+      //     (height - scrollFrameHeight) / 2,
+      //     scrollFrameWidth,
+      //     scrollFrameHeight, {
+      //     cornerRadius: 13,
+      //     alwaysShowBanner: true,
+      //     enableHScroll: false,
+      //     enableReposition: true,
+      //     enableResizing: true,
+      //     pad: 10,
+      //     margin: 10,
+      //   })
+      //   : null
 
       // ---- 1. Text-only button (existing behaviour) ----
+      const buttonWidth = 200
+      const buttonHeight = 100
       const textOnlyBtn = new Button(
-        0, 0, 200, 45,
-        'Text Only 🐦‍⬛',
+        (width - buttonWidth) / 2,
+        (height - buttonHeight) / 2,
+        buttonWidth,
+        buttonHeight,
+        'Click Me! 🐦‍⬛',
         {
-          pad: 10,
-          margin: 5,
+          cornerRadius: 10,
         }
       )
       textOnlyBtn.addEventListener('click', (event) => {
@@ -203,98 +207,100 @@ const startSketch = () => {
       })
 
       // ---- 2. Text + icon button (icon left) ----
-      const textIconBtn = new Button(
-        0, 0, 200, 45,
-        'Text + Icon',
-        {
-          icon: crowImg,
-          iconSize: 22,
-          iconPosition: 'left',
-          iconGap: 8,
-          pad: 10,
-          margin: 5,
-        }
-      )
+      // const textIconBtn = new Button(
+      //   0, 0, 200, 45,
+      //   'Text + Icon',
+      //   {
+      //     icon: crowImg,
+      //     iconSize: 22,
+      //     iconPosition: 'left',
+      //     iconGap: 8,
+      //     pad: 10,
+      //     margin: 5,
+      //   }
+      // )
 
-      // ---- 3. Icon-only button ----
-      const iconOnlyBtn = new Button(
-        0, 0, 50, 45,
-        '',
-        {
-          icon: crowImg,
-          iconSize: 26,
-          pad: 8,
-          margin: 5,
-        }
-      )
+      // // ---- 3. Icon-only button ----
+      // const iconOnlyBtn = new Button(
+      //   0, 0, 50, 45,
+      //   '',
+      //   {
+      //     icon: crowImg,
+      //     iconSize: 26,
+      //     pad: 8,
+      //     margin: 5,
+      //   }
+      // )
 
-      // ---- 4. Text-only label ----
-      const textOnlyLabel = new Label(
-        0, 0, 200, 40,
-        'Text-only Label',
-        {
-          pad: 8,
-          margin: 5,
-        }
-      )
+      // // ---- 4. Text-only label ----
+      // const textOnlyLabel = new Label(
+      //   0, 0, 200, 40,
+      //   'Text-only Label',
+      //   {
+      //     pad: 8,
+      //     margin: 5,
+      //   }
+      // )
 
-      // ---- 5. Text + icon label (icon right) ----
-      const textIconLabel = new Label(
-        0, 0, 200, 40,
-        'Label + Icon',
-        {
-          icon: crowImg,
-          iconSize: 20,
-          iconPosition: 'right',
-          iconGap: 6,
-          pad: 8,
-          margin: 5,
-        }
-      )
+      // // ---- 5. Text + icon label (icon right) ----
+      // const textIconLabel = new Label(
+      //   0, 0, 200, 40,
+      //   'Label + Icon',
+      //   {
+      //     icon: crowImg,
+      //     iconSize: 20,
+      //     iconPosition: 'right',
+      //     iconGap: 6,
+      //     pad: 8,
+      //     margin: 5,
+      //   }
+      // )
 
-      // ---- 6. Icon-only label ----
-      const iconOnlyLabel = new Label(
-        0, 0, 45, 40,
-        '',
-        {
-          icon: crowImg,
-          iconSize: 24,
-          pad: 6,
-          margin: 5,
-        }
-      )
+      // // ---- 6. Icon-only label ----
+      // const iconOnlyLabel = new Label(
+      //   0, 0, 45, 40,
+      //   '',
+      //   {
+      //     icon: crowImg,
+      //     iconSize: 24,
+      //     pad: 6,
+      //     margin: 5,
+      //   }
+      // )
 
-      // ---- TextField ----
-      const textField = new TextField(
-        20,
-        height - 60,
-        width - 40,
-        40,
-        {
-          pad: 10,
-          margin: 5,
-          placeholder: 'Type something...'
-        }
-      )
+      // // ---- TextField ----
+      // const textField = new TextField(
+      //   20,
+      //   height - 60,
+      //   width - 40,
+      //   40,
+      //   {
+      //     pad: 10,
+      //     margin: 5,
+      //     placeholder: 'Type something...'
+      //   }
+      // )
 
-      if (scrollFrame) {
-        scrollFrame.add(textOnlyBtn)
-        scrollFrame.add(textIconBtn)
-        scrollFrame.add(iconOnlyBtn)
-        scrollFrame.add(textOnlyLabel)
-        scrollFrame.add(textIconLabel)
-        scrollFrame.add(iconOnlyLabel)
-        scrollFrame.add(textField)
-        root.add(scrollFrame)
-      } else {
-        root.add(textOnlyBtn)
-        root.add(textIconBtn)
-        root.add(iconOnlyBtn)
-        root.add(textOnlyLabel)
-        root.add(textIconLabel)
-        root.add(iconOnlyLabel)
-        root.add(textField)
-      }
+      // if (scrollFrame) {
+      //   scrollFrame.add(textOnlyBtn)
+      //   // scrollFrame.add(textIconBtn)
+      //   // scrollFrame.add(iconOnlyBtn)
+      //   // scrollFrame.add(textOnlyLabel)
+      //   // scrollFrame.add(textIconLabel)
+      //   // scrollFrame.add(iconOnlyLabel)
+      //   // scrollFrame.add(textField)
+      //   root.add(scrollFrame)
+      // } else {
+      //   root.add(textOnlyBtn)
+      //   // root.add(textIconBtn)
+      //   // root.add(iconOnlyBtn)
+      //   // root.add(textOnlyLabel)
+      //   // root.add(textIconLabel)
+      //   // root.add(iconOnlyLabel)
+      //   // root.add(textField)
+      // }
+
+      root.add(textOnlyBtn);
     }
 
     p.draw = () => {

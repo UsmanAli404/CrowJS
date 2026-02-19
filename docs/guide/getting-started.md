@@ -8,6 +8,14 @@ CrowJS is a lightweight and extensible GUI library built on top of [p5.js](https
 
 ## Installation
 
+### Install via npm
+
+Install CrowJS from npm into your project:
+
+```bash
+npm install @usman404/crowjs
+```
+
 ### Download
 
 Download or clone the [CrowJS repository](https://github.com/UsmanAli404/CrowJS) and place the project folder in your workspace. The `index.html` file already includes the required `<script>` tags for p5.js and CrowJS modules.

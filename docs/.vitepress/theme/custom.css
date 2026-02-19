@@ -9,6 +9,7 @@
   --vp-button-brand-bg: #f8c200;
   --vp-button-brand-hover-bg: #ffd027;
   --vp-button-brand-text: #000000;
+  --vp-button-brand-hover-text: #000000;
   --vp-button-brand-active-bg: #e0b000;
   --vp-button-brand-active-text: #000000;
 
@@ -154,4 +155,13 @@
     width: 100%;
     height: 100%;
   }
+}
+
+/* Restore feature box hover border: VitePress theme uses different
+   class names across versions ("link" vs "VPLink"). Match both. */
+.VPFeature.link:hover,
+.VPFeature.VPLink:hover,
+.VPLink.VPFeature:hover,
+.VPFeature.VPLink:focus {
+  border-color: var(--vp-c-brand-1);
 }
