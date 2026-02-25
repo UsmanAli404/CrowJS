@@ -69,6 +69,19 @@
   min-width: 0;
 }
 
+/* Target only the code blocks inside your specific .home-build-text wrapper */
+.home-build-text div[class*="language-"] {
+  height: 755px; /* Adjust this to your exact preferred height */
+  overflow-y: auto;
+}
+
+/* Optional: Ensure the background matches nicely without breaking the bottom border radius */
+.home-build-text .vp-code-group {
+  background-color: var(--vp-code-block-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .home-build-demo {
   display: flex;
   justify-content: center;
@@ -164,4 +177,7 @@
 .VPLink.VPFeature:hover,
 .VPFeature.VPLink:focus {
   border-color: var(--vp-c-brand-1);
+}
+.VPFeature.VPLink {
+  border: 0.05px solid #313131;
 }
