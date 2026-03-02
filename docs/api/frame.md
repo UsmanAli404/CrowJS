@@ -12,7 +12,7 @@ Resizable, draggable container with banner, shadow, and border highlight. Base c
 import { Frame } from "./Frames/Frame.js";
 ```
 
-**Extends:** [FrameComponent](./component) → [Component](./component)
+**Extends:** [FrameComponent](./frame-component) → [Component](./component)
 
 ## Constructor
 

@@ -81,6 +81,7 @@ export default defineConfig({
       '/guide/': [
         {
           text: 'Introduction',
+          collapsed: false,
           items: [
             { text: 'Getting Started', link: '/guide/getting-started' },
             { text: 'Core Concepts', link: '/guide/core-concepts' },
@@ -88,6 +89,7 @@ export default defineConfig({
         },
         {
           text: 'Components',
+          collapsed: false,
           items: [
             { text: 'Label', link: '/guide/components/label' },
             { text: 'Button', link: '/guide/components/button' },
@@ -97,6 +99,7 @@ export default defineConfig({
         },
         {
           text: 'Frames (Layout)',
+          collapsed: false,
           items: [
             { text: 'Frame', link: '/guide/frames/frame' },
             { text: 'ScrollFrame', link: '/guide/frames/scroll-frame' },
@@ -105,14 +108,23 @@ export default defineConfig({
         },
         {
           text: 'Events',
+          collapsed: false,
           items: [
             { text: 'Event System', link: '/guide/events' },
+          ]
+        },
+        {
+          text: 'Contributing',
+          collapsed: false,
+          items: [
+            { text: 'Contribution Guide', link: '/guide/contributing' },
           ]
         },
       ],
       '/api/': [
         {
           text: 'Core',
+          collapsed: false,
           items: [
             { text: 'Root', link: '/api/root' },
             { text: 'Component', link: '/api/component' },
@@ -120,6 +132,7 @@ export default defineConfig({
         },
         {
           text: 'Events',
+          collapsed: false,
           items: [
             { text: 'GUIEvent', link: '/api/gui-event' },
             { text: 'MouseEvent', link: '/api/mouse-event' },
@@ -128,14 +141,18 @@ export default defineConfig({
         },
         {
           text: 'Frames',
+          collapsed: false,
           items: [
+            { text: 'FrameComponent', link: '/api/frame-component' },
             { text: 'Frame', link: '/api/frame' },
+            { text: 'DummyFrame', link: '/api/dummy-frame' },
             { text: 'ScrollFrame', link: '/api/scroll-frame' },
             { text: 'GridFrame', link: '/api/grid-frame' },
           ]
         },
         {
           text: 'UI Components',
+          collapsed: false,
           items: [
             { text: 'UIComponent', link: '/api/ui-component' },
             { text: 'TextComponent', link: '/api/text-component' },

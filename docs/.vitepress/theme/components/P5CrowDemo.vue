@@ -10,6 +10,7 @@ import { TextField } from '../../../../UIComponents/TextField.js'
 const container = ref(null)
 let p5Instance = null
 let resizeHandler = null
+let scrollHandler = null
 let isMounted = false
 
 const loadP5 = () => {
@@ -125,6 +126,11 @@ const isTouchDevice = () => {
 }
 
 const teardownSketch = () => {
+  if (scrollHandler) {
+    window.removeEventListener('scroll', scrollHandler)
+    scrollHandler = null
+  }
+
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler)
     resizeHandler = null
@@ -145,6 +151,9 @@ const startSketch = () => {
     let root = null
     let crowImg = null
     let clickTimes = 0
+    let textOnlyBtn = null
+    let buttonDefaultY = 0
+    let canvasHeight = 0
 
     const getSize = () => {
       const bounds = container.value?.getBoundingClientRect()
@@ -191,9 +200,11 @@ const startSketch = () => {
       // ---- 1. Text-only button (existing behaviour) ----
       const buttonWidth = 200
       const buttonHeight = 100
-      const textOnlyBtn = new Button(
+      canvasHeight = height
+      buttonDefaultY = (height - buttonHeight) / 2
+      textOnlyBtn = new Button(
         (width - buttonWidth) / 2,
-        (height - buttonHeight) / 2,
+        buttonDefaultY,
         buttonWidth,
         buttonHeight,
         'Click Me! 🐦‍⬛',
@@ -201,6 +212,22 @@ const startSketch = () => {
           cornerRadius: 10,
         }
       )
+
+      // Keep the button in view when the user scrolls past the canvas
+      const edgePadding = 100 // fixed distance from the top/bottom edge
+      scrollHandler = () => {
+        if (!container.value || !textOnlyBtn) return
+        const rect = container.value.getBoundingClientRect()
+        const visibleTop = Math.max(0, -rect.top)
+        const visibleBottom = Math.min(canvasHeight, window.innerHeight - rect.top)
+        if (visibleBottom - visibleTop <= 0) return // canvas fully off-screen
+        const visibleCenterY = (visibleTop + visibleBottom) / 2
+        const minY = visibleTop + edgePadding
+        const maxY = visibleBottom - buttonHeight - edgePadding
+        const clampedY = Math.max(minY, Math.min(maxY, visibleCenterY - buttonHeight / 2))
+        textOnlyBtn.y = clampedY
+      }
+      window.addEventListener('scroll', scrollHandler, { passive: true })
       textOnlyBtn.addEventListener('click', (event) => {
         clickTimes += 1
         event.target.setText(`Clicked ${clickTimes} times!`)
