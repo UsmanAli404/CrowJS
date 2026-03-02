@@ -236,3 +236,20 @@
 .VPFeature.VPLink {
   border: 0.05px solid #313131;
 }
+
+/* Style feature icons with yellow and black colors */
+.VPFeature .VPIcon {
+  color: var(--vp-c-brand-1);
+  background-color: transparent;
+  border-radius: 6px;
+  width: auto;
+  height: auto;
+  padding: 0;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}

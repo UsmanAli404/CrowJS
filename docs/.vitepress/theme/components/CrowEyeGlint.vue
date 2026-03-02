@@ -6,7 +6,7 @@
  * so it stays aligned at every viewport width — no media-query
  * gymnastics needed.
  */
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute } from 'vitepress'
 
 // ── Eye position as a fraction of the crow image's dimensions ──
@@ -67,6 +67,14 @@ const cleanup = () => {
 
 onMounted(() => {
   inject()
+})
+
+// Re-inject when navigating back to the home page via client-side routing
+watch(() => route.path, () => {
+  nextTick(() => {
+    cleanup()
+    inject()
+  })
 })
 
 onBeforeUnmount(() => {

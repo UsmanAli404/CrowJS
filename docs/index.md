@@ -20,12 +20,20 @@ hero:
 features:
   - title: Structured Frame System
     details: Organize UI using ScrollFrame and GridFrame layouts instead of manual coordinate management.
+    icon: 📦
+    link: /guide/frames/frame
   - title: Built-in Event Handling
     details: Automatic mouse, focus, and interaction management without boilerplate.
+    icon: 🖱️
+    link: /guide/events
   - title: Designed for p5.js
     details: Works naturally with the p5.js draw loop and rendering lifecycle.
+    icon: 🎨
+    link: https://p5js.org
   - title: Lightweight & Extensible
     details: Minimal overhead with the ability to build custom components easily.
+    icon: ⚡
+    link: /guide/contributing
 ---
 ## Build P5.js Native UI in Minutes
 
