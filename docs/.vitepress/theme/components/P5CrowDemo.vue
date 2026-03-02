@@ -213,19 +213,39 @@ const startSketch = () => {
         }
       )
 
-      // Keep the button in view when the user scrolls past the canvas
-      const edgePadding = 100 // fixed distance from the top/bottom edge
+      // Keep the button in view when the user scrolls past the canvas.
+      // Behaves like CSS "position: sticky" within the canvas:
+      // • Entering view → button near the visible edge (with padding)
+      // • Enough room  → settles at canvas center and stays
+      // • Leaving view  → opposite boundary pushes button along
+      const edgePadding = 20
+      const canvasMinY = edgePadding
+      const canvasMaxY = canvasHeight - buttonHeight - edgePadding
       scrollHandler = () => {
         if (!container.value || !textOnlyBtn) return
         const rect = container.value.getBoundingClientRect()
-        const visibleTop = Math.max(0, -rect.top)
+
+        // Account for the fixed VitePress header
+        const header = document.querySelector('.VPNav') || document.querySelector('header')
+        const headerHeight = header ? header.getBoundingClientRect().height : 0
+
+        const visibleTop = Math.max(0, headerHeight - rect.top)
         const visibleBottom = Math.min(canvasHeight, window.innerHeight - rect.top)
         if (visibleBottom - visibleTop <= 0) return // canvas fully off-screen
-        const visibleCenterY = (visibleTop + visibleBottom) / 2
-        const minY = visibleTop + edgePadding
-        const maxY = visibleBottom - buttonHeight - edgePadding
-        const clampedY = Math.max(minY, Math.min(maxY, visibleCenterY - buttonHeight / 2))
-        textOnlyBtn.y = clampedY
+
+        // Visible-area bounds intersected with canvas padding bounds
+        const topBound = Math.max(canvasMinY, visibleTop + edgePadding)
+        const bottomBound = Math.min(canvasMaxY, visibleBottom - buttonHeight - edgePadding)
+
+        if (bottomBound < topBound) {
+          // Visible strip too narrow — center in it, but respect canvas limits
+          const centered = (visibleTop + visibleBottom) / 2 - buttonHeight / 2
+          textOnlyBtn.y = Math.max(canvasMinY, Math.min(canvasMaxY, centered))
+          return
+        }
+
+        // Aim for the canvas center; clamp to the visible bounds
+        textOnlyBtn.y = Math.max(topBound, Math.min(bottomBound, buttonDefaultY))
       }
       window.addEventListener('scroll', scrollHandler, { passive: true })
       textOnlyBtn.addEventListener('click', (event) => {
