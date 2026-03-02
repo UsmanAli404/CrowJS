@@ -218,7 +218,7 @@ const startSketch = () => {
       // • Entering view → button near the visible edge (with padding)
       // • Enough room  → settles at canvas center and stays
       // • Leaving view  → opposite boundary pushes button along
-      const edgePadding = 20
+      const edgePadding = 50
       const canvasMinY = edgePadding
       const canvasMaxY = canvasHeight - buttonHeight - edgePadding
       scrollHandler = () => {
