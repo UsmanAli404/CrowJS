@@ -12,6 +12,7 @@ Every visual element in CrowJS extends the base `Component` class. The inheritan
 
 ```
 Component
+├── DummyFrame
 ├── FrameComponent
 │   └── Frame
 │       ├── GridFrame
@@ -21,8 +22,10 @@ Component
     │   ├── Label
     │   └── Button
     ├── Icon
-    └── Input
-        └── TextField
+    ├── Input
+    |    └── TextField
+    ...
+    
 ```
 
 - **Component** — provides positioning, margins, event handling, parent/child relationships, and hit testing.

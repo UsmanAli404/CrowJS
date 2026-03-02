@@ -27,22 +27,34 @@ git clone https://github.com/UsmanAli404/CrowJS.git
 ### Project Structure
 
 ```
+
 CrowJS/
-├── index.html          # Entry point (do not modify)
-├── sketch.js           # Your main sketch file
+├── index.html # app entry [keep as-is]
+├── sketch.js # p5.js sketch [required; place app code here]
 ├── Core/
-│   ├── Root.js         # Root manager
-│   ├── Component.js    # Base component class
-│   └── GUIEvent/       # Event classes
+│   ├── Root.js # scene manager [public; use]
+│   ├── Component.js # base component class [abstract/internal; don't] instantiate
+│   └── GUIEvent/
+│       └── GUIEvent.js # event base types [internal]
+│           ├── KeyboardEvent.js # keyboard event wrapper [internal]
+│           └── MouseEvent.js # mouse event wrapper [internal]
 ├── Frames/
-│   ├── Frame.js        # Draggable/resizable container
-│   ├── ScrollFrame.js  # Scrollable container
-│   └── GridFrame.js    # Grid layout container
+│   ├── DummyFrame.js # example/testing frame [optional to use]
+│   └── FrameComponent.js # frame wrapper [internal; not for direct use]
+│       └── Frame.js # layout frame base [abstract; use subclasses] instead
+│           ├── ScrollFrame.js # scrollable layout [public; use]
+│           └── GridFrame.js # grid layout [public; use]
 └── UIComponents/
-    ├── Label.js         # Static text display
-    ├── Button.js        # Interactive button
-    ├── TextField.js     # Text input field
-    └── Icon.js          # Image/icon display
+    └── UIComponent.js # base UI component [abstract/internal; don't instantiate]
+        ├── Input.js # input family wrapper [internal; use children]
+        │   └── TextField.js # text input [public; use]
+        ├── TextComponent.js # text family base [internal]
+        │   ├── Label.js # read-only text [public; use]
+        │   └── Button.js # clickable control [public; use]
+        ├── Icon.js # icon renderer [public; use]
+        |
+        ...
+
 ```
 
 ::: warning Important
@@ -52,70 +64,42 @@ CrowJS/
 
 ## Quick Start
 
-All GUI code goes in `sketch.js`. Here's a minimal example that creates a clickable label:
+All GUI code goes in `sketch.js`. Here's a minimal example that creates a clickable button:
 
 ```js
 import { Root } from "./Core/Root.js";
-import { Label } from "./UIComponents/Label.js";
+import { Button } from "./UIComponents/Button.js";
 
 /** @type {Root} */
 let root;
+let clickTimes = 0;
 
-window.setup = function () {
-  createCanvas(windowWidth, windowHeight);
+function setup(){
   root = new Root();
 
-  const label = new Label(100, 100, 200, 60, "Hello CrowJS!", {
-    cornerRadius: 12,
-    backgroundColor: "rgba(0, 0, 0, 1)",
-    textColor: "rgba(255, 255, 255, 1)",
+  const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
+    cornerRadius: 10,
   });
 
-  label.addEventListener("click", (event) => {
-    event.target.setText("Clicked!");
+  button.addEventListener('click', (event) => {
+    clickTimes += 1;
+    event.target.setText(`You clicked ${clickTimes} times!`);
   });
 
-  root.add(label);
+  root.add(button);
 };
 
-window.draw = function () {
-  background(255);
+function draw(){
   root.show();
   root.mouseEnterEventListeners(mouseX, mouseY);
-  root.hoverEventListeners(mouseX, mouseY);
-  root.mouseLeaveEventListeners(mouseX, mouseY);
-  root.keyDownEventListeners(mouseX, mouseY);
 };
 
-window.mouseClicked = function () {
+window.mouseClicked = function(){ 
   root.mouseClickedEventListeners(mouseX, mouseY);
-};
-
-window.mousePressed = function () {
-  root.mousePressedEventListeners(mouseX, mouseY);
-};
-
-window.mouseReleased = function () {
-  root.mouseReleasedEventListeners(mouseX, mouseY);
-};
-
-window.mouseDragged = function () {
-  root.mouseDraggedEventListeners(mouseX, mouseY);
-};
-
-window.mouseWheel = function (event) {
-  root.mouseWheelEventListeners(mouseX, mouseY, event);
-};
-
-window.keyPressed = function (event) {
-  if ([UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW].includes(keyCode)) {
-    event.preventDefault();
-  }
-  root.keyPressedEventListeners(mouseX, mouseY);
 };
 ```
 
-Open `index.html` in a browser — you'll see a black rounded label that changes text when clicked.
+Open `index.html` in a browser — you'll see a styled button that updates its label as you click it.
 
 ## The Root Object
 
