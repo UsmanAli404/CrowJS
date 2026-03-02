@@ -206,6 +206,25 @@
   }
 }
 
+/* On phones (<640px) VitePress applies negative horizontal margins
+   (margin: 16px -24px) to code blocks so they bleed edge-to-edge.
+   Inside .home-build-text the parent .vp-code-group has overflow:hidden,
+   which clips the line-numbers gutter (left: 0, width: 32px) and the
+   copy button (right: 12px, width: 40px). Reset those margins here. */
+@media (max-width: 639px) {
+  .home-build-text div[class*="language-"] {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 8px;
+  }
+
+  .home-build-text .vp-code-group .tabs {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 8px 8px 0 0;
+  }
+}
+
 /* Restore feature box hover border: VitePress theme uses different
    class names across versions ("link" vs "VPLink"). Match both. */
 .VPFeature.link:hover,
