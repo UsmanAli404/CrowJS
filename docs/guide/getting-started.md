@@ -29,29 +29,29 @@ git clone https://github.com/UsmanAli404/CrowJS.git
 ```
 
 CrowJS/
-├── index.html # app entry [keep as-is]
-├── sketch.js # p5.js sketch [required; place app code here]
+├── index.html                   # app entry [keep as-is]
+├── sketch.js                    # p5.js sketch [required; place app code here]
 ├── Core/
-│   ├── Root.js # scene manager [public; use]
-│   ├── Component.js # base component class [abstract/internal; don't] instantiate
+│   ├── Root.js                  # scene manager [public; use]
+│   ├── Component.js             # base component class [abstract/internal; don't] instantiate
 │   └── GUIEvent/
-│       └── GUIEvent.js # event base types [internal]
+│       └── GUIEvent.js          # event base types [internal]
 │           ├── KeyboardEvent.js # keyboard event wrapper [internal]
-│           └── MouseEvent.js # mouse event wrapper [internal]
+│           └── MouseEvent.js    # mouse event wrapper [internal]
 ├── Frames/
-│   ├── DummyFrame.js # example/testing frame [optional to use]
-│   └── FrameComponent.js # frame wrapper [internal; not for direct use]
-│       └── Frame.js # layout frame base [abstract; use subclasses] instead
-│           ├── ScrollFrame.js # scrollable layout [public; use]
-│           └── GridFrame.js # grid layout [public; use]
+│   ├── DummyFrame.js            # example/testing frame [optional to use]
+│   └── FrameComponent.js        # frame wrapper [internal; not for direct use]
+│       └── Frame.js             # layout frame base [abstract; use subclasses] instead
+│           ├── ScrollFrame.js   # scrollable layout [public; use]
+│           └── GridFrame.js     # grid layout [public; use]
 └── UIComponents/
-    └── UIComponent.js # base UI component [abstract/internal; don't instantiate]
-        ├── Input.js # input family wrapper [internal; use children]
-        │   └── TextField.js # text input [public; use]
-        ├── TextComponent.js # text family base [internal]
-        │   ├── Label.js # read-only text [public; use]
-        │   └── Button.js # clickable control [public; use]
-        ├── Icon.js # icon renderer [public; use]
+    └── UIComponent.js           # base UI component [abstract/internal; don't instantiate]
+        ├── Input.js             # input family wrapper [internal; use children]
+        │   └── TextField.js     # text input [public; use]
+        ├── TextComponent.js     # text family base [internal]
+        │   ├── Label.js         # read-only text [public; use]
+        │   └── Button.js        # clickable control [public; use]
+        ├── Icon.js              # icon renderer [public; use]
         |
         ...
 

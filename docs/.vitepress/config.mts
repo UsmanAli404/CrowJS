@@ -109,12 +109,6 @@ export default defineConfig({
             { text: 'Event System', link: '/guide/events' },
           ]
         },
-        {
-          text: 'Deployment',
-          items: [
-            { text: 'Vercel Web Analytics', link: '/guide/vercel-web-analytics' },
-          ]
-        },
       ],
       '/api/': [
         {
