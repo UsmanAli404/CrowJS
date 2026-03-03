@@ -154,6 +154,7 @@ const startSketch = () => {
     let textOnlyBtn = null
     let buttonDefaultY = 0
     let canvasHeight = 0
+    let enableScrollTracking = false  // Toggle between scroll-following (true) and fixed-center (false)
 
     const getSize = () => {
       const bounds = container.value?.getBoundingClientRect()
@@ -223,6 +224,13 @@ const startSketch = () => {
       const canvasMaxY = canvasHeight - buttonHeight - edgePadding
       scrollHandler = () => {
         if (!container.value || !textOnlyBtn) return
+        
+        // If scroll tracking is disabled, keep button at center
+        if (!enableScrollTracking) {
+          textOnlyBtn.y = buttonDefaultY
+          return
+        }
+
         const rect = container.value.getBoundingClientRect()
 
         // Account for the fixed VitePress header
