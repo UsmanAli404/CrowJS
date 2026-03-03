@@ -93,6 +93,8 @@ export default defineConfig({
           items: [
             { text: 'Label', link: '/guide/components/label' },
             { text: 'Button', link: '/guide/components/button' },
+            { text: 'Checkbox', link: '/guide/components/checkbox' },
+            { text: 'RadioButton', link: '/guide/components/radio-button' },
             { text: 'TextField', link: '/guide/components/text-field' },
             { text: 'Icon', link: '/guide/components/icon' },
           ]
@@ -158,6 +160,8 @@ export default defineConfig({
             { text: 'TextComponent', link: '/api/text-component' },
             { text: 'Label', link: '/api/label' },
             { text: 'Button', link: '/api/button' },
+            { text: 'Checkbox', link: '/api/checkbox' },
+            { text: 'RadioButton', link: '/api/radio-button' },
             { text: 'Icon', link: '/api/icon' },
             { text: 'Input', link: '/api/input' },
             { text: 'TextField', link: '/api/text-field' },

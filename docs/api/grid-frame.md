@@ -28,11 +28,11 @@ See the [GridFrame guide](../guide/frames/grid-frame) for the full options table
 |---|---|---|---|
 | `rows` | `number` | `1` | Number of rows |
 | `cols` | `number` | `1` | Number of columns |
-| `grid` | `Array[][]` | — | 2D array of grid cells |
-| `rowWeights` | `number[]` | `[1, ...]` | Weight per row |
-| `colWeights` | `number[]` | `[1, ...]` | Weight per column |
-| `totalRowWeight` | `number` | — | Sum of row weights |
-| `totalColWeight` | `number` | — | Sum of column weights |
+| `grid` | `Array[][]` | `null` | 2D array of grid cells (initialized by `gridConfig()`) |
+| `rowWeights` | `number[]` | `[]` | Weight per row (populated by `gridConfig()` or `rowConfig()`) |
+| `colWeights` | `number[]` | `[]` | Weight per column (populated by `gridConfig()` or `colConfig()`) |
+| `totalRowWeight` | `number` | `0` | Sum of row weights |
+| `totalColWeight` | `number` | `0` | Sum of column weights |
 
 ## Methods
 
@@ -52,7 +52,11 @@ Remove a component from the grid.
 
 ### `gridConfig(rows, cols)`
 
-Reinitialize the grid dimensions. Clears existing children.
+Reinitialize the grid dimensions. Clears existing children. Sets all row and column weights to `1`.
+
+::: tip
+If `add()` is called before `gridConfig()`, the grid is **auto-configured** using the constructor's `rows` and `cols` values.
+:::
 
 ### `rowConfig(rowNum, weight)`
 
@@ -85,3 +89,23 @@ Compute minimum size from children's effective minimum sizes.
 ### `printGrid()`
 
 Log a visual representation of the grid to the console for debugging.
+
+### `getElementPos(element)`
+
+Finds the grid position of a child component.
+
+```js
+const pos = grid.getElementPos(label); // [row, col] or null
+```
+
+**Returns:** `number[]|null` — `[row, col]` of the element, or `null` if not found.
+
+### `show()`
+
+Renders the grid frame and all child components. Handles background, clipping, children, banner, and border drawing.
+
+### `updatePosUtil(xDiff, yDiff)`
+
+Updates child component positions during frame movement (e.g. drag). Recursively propagates to nested frames.
+
+**Parameters:** `xDiff` (number) — X offset, `yDiff` (number) — Y offset.

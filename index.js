@@ -16,6 +16,8 @@ const ScrollFrame = require('./Frames/ScrollFrame');
 const Input = require('./UIComponents/Input');
 const Label = require('./UIComponents/Label');
 const Button = require('./UIComponents/Button');
+const Checkbox = require('./UIComponents/Checkbox');
+const RadioButton = require('./UIComponents/RadioButton');
 const TextField = require('./UIComponents/TextField');
 const UIComponent = require('./UIComponents/UIComponent');
 const Icon = require('./UIComponents/Icon');
@@ -39,6 +41,8 @@ module.exports = {
   Input,
   Label,
   Button,
+  Checkbox,
+  RadioButton,
   TextField,
   UIComponent,
   Icon

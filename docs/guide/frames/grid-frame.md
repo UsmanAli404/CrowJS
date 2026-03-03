@@ -52,26 +52,37 @@ new GridFrame(x, y, width, height, options?)
 | `id` | `string` | `null` | Unique identifier |
 | `rows` | `number` | `1` | Number of rows |
 | `cols` | `number` | `1` | Number of columns |
-| `backgroundColor` | `string` | `"rgba(200,200,200,1)"` | Background color |
-| `borderColor` | `string` | `"rgba(0,0,0,1)"` | Border color |
-| `highlightedBorderColor` | `string` | `"rgba(0,100,255,1)"` | Border highlight on resize hover |
-| `borderWidth` | `number` | `2` | Border thickness |
-| `cornerRadius` | `number` | `0` | Corner rounding |
+| `backgroundColor` | `p5.Color` | `color('#1e1e2e')` | Background color |
+| `borderColor` | `p5.Color` | `color('#3a3a4d')` | Border color |
+| `highlightedBorderColor` | `p5.Color` | `color('#5a5a7a')` | Border highlight on resize hover |
+| `borderWidth` | `number` | `1` | Border thickness |
+| `cornerRadius` | `number` | `8` | Corner rounding |
 | `pad` | `number` | — | Uniform padding (sets `padx` and `pady`) |
 | `padx` / `pady` | `number` | `0` | Horizontal / vertical padding |
 | `alwaysShowBanner` | `boolean` | `false` | Always show banner |
-| `bannerHeight` | `number` | `20` | Banner height |
-| `bannerColor` | `string` | `"rgba(100,100,100,1)"` | Banner color |
-| `bannerDotColor` | `string` | `"rgba(255,255,255,1)"` | Banner dot color |
-| `nearestBorderThreshold` | `number` | `5` | Resize activation distance |
+| `bannerHeight` | `number` | `35` | Banner height |
+| `bannerColor` | `string` | `'#2a2a3d'` | Banner color |
+| `bannerDotColor` | `string` | `'#6a6a8a'` | Banner dot color |
+| `nearestBorderThreshold` | `number` | `8` | Resize activation distance |
+| `parent` | `Component\|null` | `null` | Parent component |
 | `enableReposition` | `boolean` | `false` | Enable drag |
 | `enableOptimisedReposition` | `boolean` | `false` | Optimised drag |
 | `enableResizing` | `boolean` | `false` | Enable resize |
 | `enableOptimisedResizing` | `boolean` | `false` | Optimised resize |
 | `enableShadow` | `boolean` | `false` | Enable shadow |
-| `shadowColor` / `shadowBlur` / `shadowOffsetX` / `shadowOffsetY` | — | — | Shadow settings |
-| `margin` | `number` | `0` | Outer margin |
-| `minWidth` / `minHeight` | `number` | `0` | Minimum dimensions |
+| `shadowColor` | `string` | `'rgba(0,0,0,0.5)'` | Shadow color (CSS color string) |
+| `shadowBlur` | `number` | `12` | Shadow blur radius |
+| `shadowOffsetX` | `number` | `0` | Shadow offset on X axis |
+| `shadowOffsetY` | `number` | `4` | Shadow offset on Y axis |
+| `margin` | `number` | `0` | Outer margin (all sides) |
+| `marginx` | `number` | `null` | Horizontal margin (left and right) |
+| `marginy` | `number` | `null` | Vertical margin (top and bottom) |
+| `marginl` | `number` | `null` | Left margin |
+| `marginr` | `number` | `null` | Right margin |
+| `margint` | `number` | `null` | Top margin |
+| `marginb` | `number` | `null` | Bottom margin |
+| `minWidth` | `number` | `0` | Minimum width |
+| `minHeight` | `number` | `0` | Minimum height |
 | `showDebugOverlay` | `boolean` | `false` | Debug overlay |
 
 ## Adding Children
@@ -122,8 +133,12 @@ Reinitialize the grid structure after creation:
 grid.gridConfig(3, 4); // 3 rows, 4 columns
 ```
 
+::: tip
+If you call `add()` before calling `gridConfig()`, the grid is **auto-configured** using the `rows` and `cols` values passed (or defaulted) in the constructor.
+:::
+
 ::: warning
-This clears the existing grid. Re-add children after calling `gridConfig`.
+Calling `gridConfig()` manually clears the existing grid. Re-add children after calling it.
 :::
 
 ## Cell Spanning
@@ -162,6 +177,9 @@ const dashboard = new GridFrame(20, 20, 600, 400, {
   alwaysShowBanner: true,
   bannerColor: "#1e293b",
 });
+
+// Initialize the grid before configuring weights
+dashboard.gridConfig(3, 3);
 
 // Header spans full width
 dashboard.rowConfig(0, 1);
@@ -213,4 +231,15 @@ Use `printGrid()` to log the grid structure to the console:
 grid.printGrid();
 ```
 
-This outputs a visual map of which cells are occupied and by which components.
+This outputs a visual map of which cells are occupied (`*`) and which are empty (`_`).
+
+### Finding a Child's Grid Position
+
+Use `getElementPos(element)` to retrieve the `[row, col]` index of a child:
+
+```js
+const pos = grid.getElementPos(myLabel);
+console.log(pos); // e.g. [1, 2]
+```
+
+Returns `null` if the element is not found in the grid.
