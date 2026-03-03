@@ -22,7 +22,7 @@ window.setup = function(){
     const rb2 = new RadioButton(0, 0, 0, 0, "Medium", { group: "quality", value: "medium" });
     const rb3 = new RadioButton(0, 0, 0, 0, "High", { group: "quality", value: "high" });
 
-    frame.colConfig(1, 5);
+    frame.colConfig(1, 2);
 
     frame.add(rb1, 0, 0);
     frame.add(rb2, 0, 1);

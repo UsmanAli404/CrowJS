@@ -134,7 +134,24 @@ export class GridFrame extends Frame{
     {
       //check if grid is configured or not
       if(this.grid===null){
+        //preserve any user-set weights before auto-configuring
+        let savedRowWeights = [...this.rowWeights];
+        let savedColWeights = [...this.colWeights];
+
         this.gridConfig(this.rows, this.cols);
+
+        //restore user-set weights
+        for(let i=0; i<savedRowWeights.length && i<this.rows; i++){
+          if(savedRowWeights[i] != null){
+            this.rowConfig(i, savedRowWeights[i]);
+          }
+        }
+        for(let i=0; i<savedColWeights.length && i<this.cols; i++){
+          if(savedColWeights[i] != null){
+            this.colConfig(i, savedColWeights[i]);
+          }
+        }
+
         console.log(`grid configured automatically [${this.rows}x${this.cols}]`);
       }
 
@@ -322,6 +339,18 @@ export class GridFrame extends Frame{
     gridConfig(rows, cols){
       this.rows = rows;
       this.cols = cols;
+
+      //clear stale children
+      for(let i=0; i<this.children.length; i++){
+        this.children[i].parent = null;
+      }
+      this.children = [];
+
+      //reset weights before reconfiguring
+      this.rowWeights = [];
+      this.colWeights = [];
+      this.totalRowWeight = 0;
+      this.totalColWeight = 0;
   
       for(let i=0; i<this.rows; i++){
         this.rowConfig(i, 1);

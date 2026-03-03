@@ -50,27 +50,38 @@ new ScrollFrame(x, y, width, height, options?)
 | `alignment` | `string` | `"v"` | `"v"` for vertical stack, `"h"` for horizontal |
 | `enableVScroll` | `boolean` | `false` | Enable vertical scrolling |
 | `enableHScroll` | `boolean` | `false` | Enable horizontal scrolling |
-| `scrollSensitivity` | `number` | `2` | Scroll speed multiplier |
-| `backgroundColor` | `string` | `"rgba(200,200,200,1)"` | Background color |
-| `borderColor` | `string` | `"rgba(0,0,0,1)"` | Border color |
-| `highlightedBorderColor` | `string` | `"rgba(0,100,255,1)"` | Border highlight on resize hover |
-| `borderWidth` | `number` | `2` | Border thickness |
-| `cornerRadius` | `number` | `0` | Corner rounding |
+| `scrollSensitivity` | `number` | `20` | Scroll speed (pixels per step) |
+| `backgroundColor` | `p5.Color` | `color('#1e1e2e')` | Background color |
+| `borderColor` | `p5.Color` | `color('#3a3a4d')` | Border color |
+| `highlightedBorderColor` | `p5.Color` | `color('#5a5a7a')` | Border highlight on resize hover |
+| `borderWidth` | `number` | `1` | Border thickness |
+| `cornerRadius` | `number` | `8` | Corner rounding |
 | `pad` | `number` | — | Uniform padding (sets `padx` and `pady`) |
 | `padx` / `pady` | `number` | `0` | Horizontal / vertical padding |
 | `alwaysShowBanner` | `boolean` | `false` | Always show banner bar |
-| `bannerHeight` | `number` | `20` | Banner height |
-| `bannerColor` | `string` | `"rgba(100,100,100,1)"` | Banner color |
-| `bannerDotColor` | `string` | `"rgba(255,255,255,1)"` | Banner dot color |
-| `nearestBorderThreshold` | `number` | `5` | Resize activation distance |
+| `bannerHeight` | `number` | `35` | Banner height |
+| `bannerColor` | `string` | `'#2a2a3d'` | Banner color |
+| `bannerDotColor` | `string` | `'#6a6a8a'` | Banner dot color |
+| `nearestBorderThreshold` | `number` | `8` | Resize activation distance |
+| `parent` | `Component\|null` | `null` | Parent component |
 | `enableReposition` | `boolean` | `false` | Enable drag to reposition |
 | `enableOptimisedReposition` | `boolean` | `false` | Optimised drag mode |
 | `enableResizing` | `boolean` | `false` | Enable resize |
 | `enableOptimisedResizing` | `boolean` | `false` | Optimised resize mode |
 | `enableShadow` | `boolean` | `false` | Enable drop shadow |
-| `shadowColor` / `shadowBlur` / `shadowOffsetX` / `shadowOffsetY` | — | — | Shadow settings |
-| `margin` | `number` | `0` | Outer margin |
-| `minWidth` / `minHeight` | `number` | `0` | Minimum dimensions |
+| `shadowColor` | `string` | `'rgba(0,0,0,0.5)'` | Shadow color (CSS color string) |
+| `shadowBlur` | `number` | `12` | Shadow blur radius |
+| `shadowOffsetX` | `number` | `0` | Shadow offset on X axis |
+| `shadowOffsetY` | `number` | `4` | Shadow offset on Y axis |
+| `margin` | `number` | `0` | Outer margin (all sides) |
+| `marginx` | `number` | `null` | Horizontal margin (left and right) |
+| `marginy` | `number` | `null` | Vertical margin (top and bottom) |
+| `marginl` | `number` | `null` | Left margin |
+| `marginr` | `number` | `null` | Right margin |
+| `margint` | `number` | `null` | Top margin |
+| `marginb` | `number` | `null` | Bottom margin |
+| `minWidth` | `number` | `0` | Minimum width |
+| `minHeight` | `number` | `0` | Minimum height |
 | `showDebugOverlay` | `boolean` | `false` | Debug overlay |
 
 ## Adding Children

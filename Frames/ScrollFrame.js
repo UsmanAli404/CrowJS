@@ -299,6 +299,17 @@ export class ScrollFrame extends Frame{
       this.totalWeight -= this.preferences[index][0];
       this.preferences = this.preferences.filter((_, i) => i!==index);
       this.removeChild(element);
+
+      //recalculate scroll tracking indices
+      if(this.enableVScroll){
+        this.recalcTopper();
+        this.recalcDeepest();
+      }
+      if(this.enableHScroll){
+        this.recalcLeftist();
+        this.recalcRightist();
+      }
+
       this.redraw();
 
       console.log(`element (id: ${element.id}) successfully removed from ${this.constructor.name} (id: ${this.id})!`);
@@ -315,14 +326,15 @@ export class ScrollFrame extends Frame{
         return;
       }
 
-      if(weight<1){
-        console.log("weight to set must be >= 1");
+      if(weight<=0){
+        console.log("weight can't be non-positive");
         return;
       }
 
       this.totalWeight -= this.preferences[index][0];
       this.totalWeight += weight;
       this.preferences[index][0] = weight;
+      this.redraw();
     }
 
     /**
@@ -356,6 +368,7 @@ export class ScrollFrame extends Frame{
       }
 
       this.preferences[index][1] = padL;
+      this.redraw();
     }
 
     /**
@@ -389,6 +402,7 @@ export class ScrollFrame extends Frame{
       }
 
       this.preferences[index][2] = padR;
+      this.redraw();
     }
 
     /**
@@ -422,6 +436,7 @@ export class ScrollFrame extends Frame{
       }
 
       this.preferences[index][3] = padT;
+      this.redraw();
     }
 
     /**
@@ -455,6 +470,7 @@ export class ScrollFrame extends Frame{
       }
 
       this.preferences[index][4] = padB;
+      this.redraw();
     }
 
     /**
@@ -556,6 +572,63 @@ export class ScrollFrame extends Frame{
         this.rightist = i;
       }
     }
+
+    /**
+   * Recalculates the topmost child index by scanning all children
+   */
+    recalcTopper(){
+      if(this.children.length===0){ this.topper=-1; return; }
+      this.topper=0;
+      for(let i=1; i<this.children.length; i++){
+        if(this.children[i].y + this.preferences[i][3] <
+           this.children[this.topper].y + this.preferences[this.topper][3]){
+          this.topper=i;
+        }
+      }
+    }
+
+    /**
+   * Recalculates the bottommost child index by scanning all children
+   */
+    recalcDeepest(){
+      if(this.children.length===0){ this.deepest=-1; return; }
+      this.deepest=0;
+      for(let i=1; i<this.children.length; i++){
+        if(this.children[i].y + this.children[i].height - this.preferences[i][4] >
+           this.children[this.deepest].y + this.children[this.deepest].height - this.preferences[this.deepest][4]){
+          this.deepest=i;
+        }
+      }
+    }
+
+    /**
+   * Recalculates the leftmost child index by scanning all children
+   */
+    recalcLeftist(){
+      if(this.children.length===0){ this.leftist=-1; return; }
+      this.leftist=0;
+      for(let i=1; i<this.children.length; i++){
+        if(this.children[i].x + this.preferences[i][1] <
+           this.children[this.leftist].x + this.preferences[this.leftist][1]){
+          this.leftist=i;
+        }
+      }
+    }
+
+    /**
+   * Recalculates the rightmost child index by scanning all children
+   */
+    recalcRightist(){
+      if(this.children.length===0){ this.rightist=-1; return; }
+      this.rightist=0;
+      for(let i=1; i<this.children.length; i++){
+        if(this.children[i].x + this.children[i].width - this.preferences[i][2] >
+           this.children[this.rightist].x + this.children[this.rightist].width - this.preferences[this.rightist][2]){
+          this.rightist=i;
+        }
+      }
+    }
+
     /**
    * Scrolls content downward
    */

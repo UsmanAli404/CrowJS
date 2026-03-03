@@ -29,7 +29,7 @@ See the [ScrollFrame guide](../guide/frames/scroll-frame) for the full options t
 | `alignment` | `string` | `"v"` | `"v"` (vertical) or `"h"` (horizontal) |
 | `enableVScroll` | `boolean` | `false` | Enable vertical scrolling |
 | `enableHScroll` | `boolean` | `false` | Enable horizontal scrolling |
-| `scrollSensitivity` | `number` | `2` | Scroll speed multiplier |
+| `scrollSensitivity` | `number` | `20` | Scroll speed (pixels per step) |
 | `preferences` | `Array` | `[]` | Per-child `[weight, padL, padR, padT, padB]` arrays |
 | `totalWeight` | `number` | `0` | Sum of all child weights |
 
@@ -76,3 +76,13 @@ Toggle the banner bar.
 ### `getEffectiveMinWidth()` / `getEffectiveMinHeight()`
 
 Compute minimum size from children's effective minimum sizes.
+
+### `show()`
+
+Renders the scroll frame and all child components. Handles background, clipping, children, banner, and border drawing.
+
+### `updatePosUtil(xDiff, yDiff)`
+
+Updates child component positions during frame movement (e.g. drag). Recursively propagates to nested frames.
+
+**Parameters:** `xDiff` (number) — X offset, `yDiff` (number) — Y offset.

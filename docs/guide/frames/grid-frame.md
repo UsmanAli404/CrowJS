@@ -134,11 +134,11 @@ grid.gridConfig(3, 4); // 3 rows, 4 columns
 ```
 
 ::: tip
-If you call `add()` before calling `gridConfig()`, the grid is **auto-configured** using the `rows` and `cols` values passed (or defaulted) in the constructor.
+If you call `add()` before calling `gridConfig()`, the grid is **auto-configured** using the `rows` and `cols` values from the constructor. Any weights set via `rowConfig()` / `colConfig()` before the first `add()` are preserved.
 :::
 
 ::: warning
-Calling `gridConfig()` manually clears the existing grid. Re-add children after calling it.
+Calling `gridConfig()` manually clears the existing grid **and** removes all children. All row and column weights are reset to `1`. Re-add children after calling it.
 :::
 
 ## Cell Spanning
@@ -177,9 +177,6 @@ const dashboard = new GridFrame(20, 20, 600, 400, {
   alwaysShowBanner: true,
   bannerColor: "#1e293b",
 });
-
-// Initialize the grid before configuring weights
-dashboard.gridConfig(3, 3);
 
 // Header spans full width
 dashboard.rowConfig(0, 1);

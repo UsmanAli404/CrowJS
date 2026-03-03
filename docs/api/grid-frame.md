@@ -52,10 +52,10 @@ Remove a component from the grid.
 
 ### `gridConfig(rows, cols)`
 
-Reinitialize the grid dimensions. Clears existing children. Sets all row and column weights to `1`.
+Reinitialize the grid dimensions. Clears existing children (unsets their `parent`) and resets all row/column weights to `1`.
 
 ::: tip
-If `add()` is called before `gridConfig()`, the grid is **auto-configured** using the constructor's `rows` and `cols` values.
+If `add()` is called before `gridConfig()`, the grid is **auto-configured** using the constructor's `rows` and `cols` values. Any weights set via `rowConfig()` / `colConfig()` before the first `add()` are preserved.
 :::
 
 ### `rowConfig(rowNum, weight)`
