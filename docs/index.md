@@ -51,12 +51,12 @@ features:
   let clickTimes = 0;
 
   function setup(){
-    createCanvas(windowWidth, windowHeight);
     root = new Root();
 
     const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
       cornerRadius: 10,
     });
+
     button.addEventListener('click', (event) => {
       clickTimes += 1;
       event.target.setText(`You clicked ${clickTimes} times!`);
