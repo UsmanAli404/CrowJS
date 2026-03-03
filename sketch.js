@@ -12,23 +12,15 @@ window.setup = function(){
     createCanvas(windowWidth, windowHeight);
     root = new Root();
 
-    const frame = new GridFrame(20, 20, 500, 50, {
-      rows: 1,
-      cols: 3,
-      backgroundColor: "#1e1e2e",
+    const button = new Button(0, 0, 200, 100, "Click Me! 🐦‍⬛", {
+      cornerRadius: 10,
+    });
+    button.addEventListener('click', (event) => {
+      clickTimes += 1;
+      event.target.setText(`You clicked ${clickTimes} times!`);
     });
 
-    const rb1 = new RadioButton(0, 0, 0, 0, "Low", { group: "quality", value: "low", selected: true });
-    const rb2 = new RadioButton(0, 0, 0, 0, "Medium", { group: "quality", value: "medium" });
-    const rb3 = new RadioButton(0, 0, 0, 0, "High", { group: "quality", value: "high" });
-
-    frame.colConfig(1, 2);
-
-    frame.add(rb1, 0, 0);
-    frame.add(rb2, 0, 1);
-    frame.add(rb3, 0, 2);
-
-    root.add(frame);
+    root.add(button);
 }
 
 window.draw = function () {
