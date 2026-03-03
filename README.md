@@ -102,7 +102,7 @@ window.mouseReleased = function() {
 - ScrollFrame
 - GridFrame
   
-*More components and detailed API documentation coming soon!*
+*More components coming soon!*
 
 ---
 
