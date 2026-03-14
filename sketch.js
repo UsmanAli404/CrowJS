@@ -1,8 +1,7 @@
 import { Root } from "./Core/Root.js";
-import { Label } from "./UIComponents/Label.js";
-import { Checkbox } from "./UIComponents/Checkbox.js";
-import { RadioButton } from "./UIComponents/RadioButton.js";
-import { GridFrame } from "./Frames/GridFrame.js";
+import { Button } from "./UIComponents/Button.js";
+import { Slider } from "./UIComponents/Slider.js";
+import { ScrollFrame } from "./Frames/ScrollFrame.js";
 
 /** @type {Root} */
 let root;
@@ -20,7 +19,19 @@ window.setup = function(){
       event.target.setText(`You clicked ${clickTimes} times!`);
     });
 
-    root.add(button);
+    const slider = new Slider(windowWidth/2, windowHeight/2, 300, 50, {});
+
+    const sf = new ScrollFrame(windowWidth/2, windowHeight/2, 300, 300, {
+      enableReposition: true,
+      alwaysShowBanner: true,
+      enableResizing: true,
+      pad: 5,
+    });
+    sf.add(button);
+    sf.add(slider);
+    
+    // root.add(button);
+    root.add(sf);
 }
 
 window.draw = function () {

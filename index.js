@@ -21,6 +21,7 @@ const RadioButton = require('./UIComponents/RadioButton');
 const TextField = require('./UIComponents/TextField');
 const UIComponent = require('./UIComponents/UIComponent');
 const Icon = require('./UIComponents/Icon');
+const Slider = require('./UIComponents/Slider');
 
 module.exports = {
   // Core
@@ -45,5 +46,6 @@ module.exports = {
   RadioButton,
   TextField,
   UIComponent,
-  Icon
+  Icon,
+  Slider
 };
